@@ -27,13 +27,76 @@
     });
   }
 
-  // --- mobile nav --------------------------------------------------------
-  var toggle = document.getElementById('menu-toggle');
-  if (toggle) {
-    toggle.addEventListener('click', function () {
+  // --- sidebar ------------------------------------------------------------
+  // Narrow screens slide the sidebar in over the page; wide screens fold it
+  // away and centre the reading column, which is what you want in a cramped
+  // panel or on a full screen.
+  var NAV_KEY = 'edexcel-maths-nav-collapsed';
+  var wide = window.matchMedia('(min-width: 1001px)');
+
+  function applyStoredNav() {
+    var collapsed = false;
+    try { collapsed = localStorage.getItem(NAV_KEY) === '1'; } catch (e) {}
+    document.body.classList.toggle('nav-collapsed', wide.matches && collapsed);
+  }
+  applyStoredNav();
+  if (wide.addEventListener) wide.addEventListener('change', applyStoredNav);
+
+  function toggleNav() {
+    if (wide.matches) {
+      var collapsed = document.body.classList.toggle('nav-collapsed');
+      try { localStorage.setItem(NAV_KEY, collapsed ? '1' : '0'); } catch (e) {}
+    } else {
       document.body.classList.toggle('nav-open');
+    }
+  }
+
+  var toggle = document.getElementById('menu-toggle');
+  if (toggle) toggle.addEventListener('click', toggleNav);
+
+  // --- full screen --------------------------------------------------------
+  // Only offered where the browser will actually grant it: inside an embedded
+  // frame that doesn't allow fullscreen, the button would silently do nothing,
+  // so it stays hidden and the page is opened in its own tab instead.
+  var fsBtn = document.getElementById('fullscreen-toggle');
+  var root = document.documentElement;
+  var canFullscreen = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+
+  function fullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement;
+  }
+
+  function toggleFullscreen() {
+    if (!canFullscreen) return;
+    if (fullscreenElement()) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      var req = root.requestFullscreen || root.webkitRequestFullscreen;
+      if (req) {
+        var r = req.call(root);
+        if (r && r.catch) r.catch(function () {});
+      }
+    }
+  }
+
+  if (fsBtn && canFullscreen) {
+    fsBtn.hidden = false;
+    fsBtn.addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', function () {
+      var on = !!fullscreenElement();
+      fsBtn.textContent = on ? '\u2715' : '\u26F6';
+      fsBtn.title = on ? 'Leave full screen (f)' : 'Full screen (f)';
     });
   }
+
+  // --- keyboard shortcuts -------------------------------------------------
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var el = document.activeElement;
+    if (el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return;
+    if (e.key === 'f') { toggleFullscreen(); }
+    else if (e.key === 'n') { toggleNav(); }
+  });
 
   // --- nav filter --------------------------------------------------------
   var filter = document.getElementById('nav-filter');

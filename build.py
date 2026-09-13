@@ -157,9 +157,10 @@ window.MathJax = {{
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
-  <button id="menu-toggle" aria-label="Toggle navigation">☰</button>
+  <button id="menu-toggle" aria-label="Show or hide the topic list" title="Show/hide the topic list (n)">☰</button>
   <a class="topbar-title" href="index.html">Edexcel A-Level Maths</a>
   <div class="topbar-actions">
+    <button id="fullscreen-toggle" aria-label="Toggle full screen" title="Full screen (f)" hidden>⛶</button>
     <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">◐</button>
   </div>
 </header>
@@ -193,9 +194,10 @@ window.MathJax = {{
 <script defer src="vendor/tex-svg.js"></script>
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
-  <button id="menu-toggle" aria-label="Toggle navigation">&#9776;</button>
+  <button id="menu-toggle" aria-label="Show or hide the topic list" title="Show/hide the topic list (n)">&#9776;</button>
   <a class="topbar-title" href="index.html">Edexcel A-Level Maths</a>
   <div class="topbar-actions">
+    <button id="fullscreen-toggle" aria-label="Toggle full screen" title="Full screen (f)" hidden>&#9974;</button>
     <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">&#9689;</button>
   </div>
 </header>

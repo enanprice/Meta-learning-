@@ -31,7 +31,9 @@ the first view needs an internet connection).
 
 The site includes:
 
-- a filterable sidebar covering every topic
+- a filterable sidebar covering every topic, which folds away with the ☰ button (or `n`) to centre
+  the reading column — useful in a narrow panel or on a big screen
+- a full-screen button in the top bar (or press `f`), shown only where the browser will grant it
 - per-topic "mark as revised" checkboxes with a progress bar on the home page (stored in your
   browser's local storage)
 - collapsible solutions, so you can attempt questions before looking

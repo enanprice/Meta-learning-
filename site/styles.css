@@ -120,7 +120,8 @@ a { color: var(--accent); }
   background: transparent; border: 1px solid var(--line); color: var(--text);
   border-radius: 8px; padding: 4px 10px; font-size: 16px; cursor: pointer;
 }
-#menu-toggle { display: none; }
+#menu-toggle { display: block; }
+#fullscreen-toggle[hidden] { display: none !important; }
 
 /* --------------------------------------------------------------- sidebar */
 .sidebar {
@@ -165,11 +166,22 @@ a { color: var(--accent); }
 
 /* --------------------------------------------------------------- content */
 .content { margin-left: 310px; padding: 34px 28px 90px; max-width: 920px; }
+.sidebar { transition: transform .18s ease; }
+
+/* Reading mode: the sidebar folds away and the column centres itself, for a
+   narrow panel or a genuinely full screen. Toggled by the ☰ button. */
+body.nav-collapsed .sidebar { transform: translateX(-100%); }
+body.nav-collapsed .content {
+  margin-left: 0;
+  margin-inline: auto;
+  max-width: 860px;
+  padding-inline: clamp(16px, 4vw, 56px);
+}
+
 @media (max-width: 1000px) {
-  #menu-toggle { display: block; }
-  .sidebar { transform: translateX(-100%); transition: transform .18s ease; z-index: 40; width: 290px; box-shadow: 0 0 40px rgba(0,0,0,.25); }
+  .sidebar { transform: translateX(-100%); z-index: 40; width: 290px; box-shadow: 0 0 40px rgba(0,0,0,.25); }
   body.nav-open .sidebar { transform: none; }
-  .content { margin-left: 0; padding: 22px 16px 80px; }
+  .content, body.nav-collapsed .content { margin-left: 0; padding: 22px 16px 80px; }
 }
 
 .eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 12px; font-weight: 650; color: var(--muted); margin: 0 0 6px; }
