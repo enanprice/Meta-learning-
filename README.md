@@ -3,7 +3,7 @@
 A complete set of topic guides for **Pearson Edexcel A Level Mathematics (9MA0)**, covering the whole
 two-year course: Pure (Year 12 and 13), Statistics and Mechanics.
 
-**50 topic guides · 293 practice questions with full solutions · 170 worked examples · ~100,000 words.**
+**50 topic guides · 50 diagrams · 293 practice questions with full solutions · 170 worked examples · ~100,000 words.**
 
 Every topic guide follows the same structure:
 
@@ -11,9 +11,11 @@ Every topic guide follows the same structure:
 2. **The ideas, built up in order** — each new piece of machinery explained from the ground up, with
    the reasoning shown rather than just the rule stated
 3. **Worked examples** — full solutions with the thinking written out
-4. **Common mistakes** — the specific, predictable ways marks get dropped
-5. **In the exam** — what questions look like and what examiners want written down
-6. **Practice questions** — graded from routine to exam-standard, each with a full worked solution
+4. **Diagrams** where a picture does work words cannot — the shape of a curve, which region a
+   solution lies in, which way a force points
+5. **Common mistakes** — the specific, predictable ways marks get dropped
+6. **In the exam** — what questions look like and what examiners want written down
+7. **Practice questions** — graded from routine to exam-standard, each with a full worked solution
    behind a toggle
 
 ## Viewing it
@@ -71,6 +73,12 @@ content/            Markdown source, one file per topic
 assets/             styles.css and app.js, copied into the build
 md.py               dependency-free Markdown renderer (the subset used here,
                     plus the ::: directive blocks)
+figlib.py           SVG drawing toolkit -- figures are specified in data
+                    coordinates, and take their colours from CSS tokens so
+                    they follow the light and dark themes
+figures.py          the catalogue of 50 diagrams
+preview_figures.py  renders every figure onto one contact sheet, for checking
+                    them in bulk (writes site/_figures.html)
 build.py            static site generator
 site/               generated output (regenerate with build.py)
 ```
@@ -102,10 +110,22 @@ Then write the body using standard Markdown plus these block directives:
 :::exam Title         exam technique note
 :::question Q1 (4 marks)
 :::answer             collapsible solution
+:::figure <id>        a diagram from figures.py; the body becomes its caption
 ```
 
 Each is closed by a line containing only `:::`. Maths goes in `$...$` (inline) or `$$...$$` (display).
 Run `python3 build.py` to regenerate.
+
+### Adding a diagram
+
+Add a function to `figures.py` decorated with `@figure("some-id")`, returning
+`Canvas(...).svg()`. Draw in data coordinates — `c.func(lambda x: x*x)`,
+`c.point(1, -9, "(1, −9)")`, `c.arrow(...)` — and never hard-code a colour; the
+`fig-*` classes in `assets/styles.css` handle both themes. Then reference it from
+a content file with `:::figure some-id`.
+
+Run `python3 preview_figures.py` to render every figure onto one page, or
+`python3 preview_figures.py circle trig` to filter by substring.
 
 ## A note on accuracy
 
