@@ -21,8 +21,11 @@
   --insight: #8a6d1f;
   --insight-soft: #f8f1dd;
   --radius: 10px;
-  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
-  --serif: ui-serif, Georgia, "Times New Roman", serif;
+  /* Archivo carries the interface -- headings, nav, labels, chips.
+     Spectral sets the prose: a screen-built serif that sits comfortably beside
+     MathJax's Times-like maths rather than fighting it. */
+  --sans: Archivo, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --serif: Spectral, ui-serif, Georgia, "Times New Roman", serif;
 }
 
 :root[data-theme="dark"],
@@ -84,9 +87,19 @@ body {
   color: var(--text);
   font-family: var(--sans);
   font-size: 16px;
-  line-height: 1.65;
+  line-height: 1.6;
   -webkit-text-size-adjust: 100%;
 }
+
+/* Long-form reading: serif, a little larger, measured line length. */
+.prose, .lede, .answer-body, .box p, .box li, blockquote {
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  line-height: 1.68;
+}
+.prose p, .prose li { max-width: 68ch; }
+.box p, .box li, .answer-body p, .answer-body li { max-width: 66ch; }
+table { font-variant-numeric: tabular-nums; }
 
 a { color: var(--accent); }
 .skip { position: absolute; left: -9999px; }
@@ -160,12 +173,14 @@ a { color: var(--accent); }
 }
 
 .eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 12px; font-weight: 650; color: var(--muted); margin: 0 0 6px; }
-h1 { font-size: clamp(1.7rem, 1.2rem + 2vw, 2.4rem); line-height: 1.15; letter-spacing: -0.02em; margin: 0 0 10px; }
+h1 { font-family: var(--sans); font-weight: 700; font-size: clamp(1.7rem, 1.2rem + 2vw, 2.35rem); line-height: 1.12; letter-spacing: -0.022em; margin: 0 0 10px; text-wrap: balance; }
 .prose h2 {
-  font-size: 1.4rem; letter-spacing: -0.01em; margin: 2.4em 0 .6em;
+  font-family: var(--sans); font-weight: 650;
+  font-size: 1.35rem; letter-spacing: -0.015em; margin: 2.3em 0 .6em;
   padding-bottom: .3em; border-bottom: 2px solid var(--line);
+  text-wrap: balance;
 }
-.prose h3 { font-size: 1.12rem; margin: 1.8em 0 .4em; }
+.prose h3 { font-family: var(--sans); font-weight: 650; font-size: 1.09rem; letter-spacing: -0.008em; margin: 1.8em 0 .4em; }
 .prose h4 { font-size: 1rem; margin: 1.4em 0 .3em; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-size: .82rem; }
 .prose p, .prose li { overflow-wrap: break-word; }
 .prose li { margin: .3em 0; }
@@ -173,7 +188,7 @@ h1 { font-size: clamp(1.7rem, 1.2rem + 2vw, 2.4rem); line-height: 1.15; letter-s
 .anchor { opacity: 0; margin-left: .4em; text-decoration: none; color: var(--muted); font-weight: 400; }
 h2:hover .anchor, h3:hover .anchor { opacity: .6; }
 
-.lede { font-size: 1.06rem; color: var(--muted); margin: 0 0 14px; }
+.lede { font-size: 1.08rem; color: var(--muted); margin: 0 0 14px; max-width: 62ch; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
 .chip {
   font-size: 12px; background: var(--surface-2); border: 1px solid var(--line);
@@ -195,7 +210,17 @@ h2:hover .anchor, h3:hover .anchor { opacity: .6; }
   background: var(--surface); border-radius: var(--radius);
   padding: 14px 16px; margin: 18px 0;
 }
-.box-title { font-weight: 650; margin: 0 0 .5em; font-size: .93rem; letter-spacing: .01em; }
+/* Specificity note: `.box p` above also matches the title, so the title needs
+   an equally specific selector to keep the interface face. */
+.box p.box-title {
+  font-family: var(--sans);
+  font-weight: 650;
+  margin: 0 0 .5em;
+  font-size: .89rem;
+  line-height: 1.4;
+  letter-spacing: .005em;
+  max-width: none;
+}
 .box > :last-child { margin-bottom: 0; }
 .box.example { border-left-color: var(--example); background: var(--example-soft); }
 .box.example .box-title { color: var(--example); }
@@ -269,8 +294,8 @@ hr { border: none; border-top: 1px solid var(--line); margin: 30px 0; }
   border-radius: var(--radius); padding: 10px 12px; height: 100%;
 }
 .topic-list a:hover { border-color: var(--accent); }
-.topic-list .t { font-weight: 600; font-size: .95rem; }
-.topic-list .s { grid-column: 2; color: var(--muted); font-size: .82rem; line-height: 1.45; }
+.topic-list .t { font-family: var(--sans); font-weight: 600; font-size: .95rem; letter-spacing: -0.005em; }
+.topic-list .s { grid-column: 2; color: var(--muted); font-family: var(--serif); font-size: .87rem; line-height: 1.45; }
 .topic-list li.done a { border-left: 4px solid var(--accent); }
 .topic-list li.done .t::after { content: " ✓"; color: var(--accent); }
 

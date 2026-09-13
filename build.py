@@ -135,6 +135,9 @@ PAGE_TEMPLATE = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 <meta name="description" content="{description}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap">
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>∫</text></svg>">
 <script>
@@ -167,6 +170,40 @@ window.MathJax = {{
 <script src="app.js"></script>
 </body>
 </html>
+"""
+
+
+ARTIFACT_TEMPLATE = """<title>Edexcel A-Level Maths Revision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script>
+window.MathJax = {{
+  tex: {{
+    inlineMath: [['$', '$']],
+    displayMath: [['$$', '$$']],
+    processEscapes: true,
+    tags: 'none'
+  }},
+  options: {{ skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }},
+  svg: {{ fontCache: 'global' }}
+}};
+</script>
+<script defer src="vendor/tex-svg.js"></script>
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar">
+  <button id="menu-toggle" aria-label="Toggle navigation">&#9776;</button>
+  <a class="topbar-title" href="index.html">Edexcel A-Level Maths</a>
+  <div class="topbar-actions">
+    <button id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">&#9689;</button>
+  </div>
+</header>
+{nav}
+<main id="main" class="content">
+{content}
+</main>
+<script src="app.js"></script>
 """
 
 
@@ -315,6 +352,17 @@ def main() -> int:
         PAGE_TEMPLATE.format(
             title="Edexcel A-Level Maths — Year 12 &amp; 13 revision",
             description="Complete Edexcel A-Level Maths revision resource: notes, worked examples and practice questions.",
+            nav=nav_html(sections, None),
+            content=build_index(sections),
+        ),
+    )
+
+    # The Artifact host supplies <!doctype>, <head> and <body>, so the hosted
+    # home page is emitted as a fragment: head elements inline at the top
+    # (browsers accept <link> and <script> in the body), then the same markup.
+    write(
+        OUT / "home.html",
+        ARTIFACT_TEMPLATE.format(
             nav=nav_html(sections, None),
             content=build_index(sections),
         ),
