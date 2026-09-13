@@ -56,6 +56,11 @@ Everything follows from this picture:
 
 $y = \cos\theta$ is exactly $y = \sin\theta$ shifted **left** by $90°$: $\cos\theta \equiv \sin(\theta + 90°)$.
 
+:::figure trig-graphs
+The horizontal line is the method for counting solutions: however many times it crosses inside the
+interval is how many answers the question wants. Widening the interval adds solutions.
+:::
+
 Transformations apply exactly as in P1.4. For $y = a\sin(b\theta) + c$:
 
 - $a$ is the **amplitude** (vertical stretch),
@@ -96,6 +101,11 @@ In quadrant 3, both $x$ and $y$ are negative, so $\sin<0$, $\cos<0$, but their r
 Only tangent. ✓
 
 If you can reconstruct the unit circle you never need to remember CAST as a mnemonic.
+:::
+
+:::figure unit-circle-cast
+The coordinates of the point **are** $\cos\theta$ and $\sin\theta$. Read the signs of $x$ and $y$ in
+each quadrant and CAST follows.
 :::
 
 ---

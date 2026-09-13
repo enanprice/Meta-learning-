@@ -80,6 +80,11 @@ That's the "resolve in two perpendicular directions" of M8, written in vector no
 tidier notation.
 :::
 
+:::figure vector-resultant
+Adding vectors componentwise is the same triangle law from P1.11. The resultant's direction is the
+direction of the acceleration it produces.
+:::
+
 ---
 
 ## 3. The vector SUVAT equations

@@ -158,6 +158,12 @@ $$\Delta = b^2 - 4ac$$
 | $b^2 - 4ac < 0$ | No real roots | Never meets the $x$-axis |
 :::
 
+:::figure discriminant-cases
+The discriminant is the part under the root, so it decides whether you are
+square-rooting a positive number, zero, or a negative one — and that is exactly
+what decides how many times the curve meets the axis.
+:::
+
 :::exam The phrase that tells you to use the discriminant
 Any of: *"has two distinct roots"*, *"has equal roots"*, *"has no real roots"*, *"the line is a tangent
 to the curve"*, *"the line does not intersect the curve"*, *"find the range of values of $k$ for which…"*.
@@ -211,6 +217,11 @@ and nothing else.
 
 *Sanity check:* the turning point should sit halfway between the roots. Midpoint of $-2$ and $4$ is
 $1$. ✓
+:::
+
+:::figure quadratic-anatomy
+Everything a sketch needs, on one curve: the two roots, the $y$-intercept, the turning point from
+completed square form, and the line of symmetry halfway between the roots.
 :::
 
 :::insight A check worth having

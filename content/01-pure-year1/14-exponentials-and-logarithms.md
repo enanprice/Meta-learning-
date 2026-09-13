@@ -94,6 +94,11 @@ $$\ln(e^x) = x \qquad e^{\ln x} = x \quad (x>0)$$
 $\ln$ and $e^x$ are inverse functions, so their graphs are reflections in the line $y = x$.
 :::
 
+:::figure exp-log-reflection
+Each graph is the other read backwards. $e^x$ passes through $(0,1)$; $\ln x$ therefore passes
+through $(1,0)$, and is undefined for $x \leq 0$.
+:::
+
 Consequences of the definition, worth knowing on sight:
 $$\log_a a = 1, \qquad \log_a 1 = 0, \qquad \ln e = 1, \qquad \ln 1 = 0$$
 

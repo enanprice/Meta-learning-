@@ -79,6 +79,11 @@ Between $0$ and $2$ there must therefore be a maximum. (You could find it with c
 + 4x$, $\frac{dy}{dx} = 3x^2 - 8x + 4 = (3x-2)(x-2)$, so a turning point at $x = \frac23$.)
 :::
 
+:::figure cubic-roots
+A single root and a repeated root on the same curve. The multiplicity of a factor is what decides
+whether the curve crosses the axis or bounces off it.
+:::
+
 ### Quartics
 
 $y = ax^4 + \dots$. If $a > 0$ both ends go **up**; if $a < 0$ both ends go **down**. Same root rules
@@ -95,6 +100,11 @@ For $y = \dfrac{k}{x}$:
 - As $x \to 0$, $|y| \to \infty$: **vertical asymptote** $x = 0$.
 - As $x \to \pm\infty$, $y \to 0$: **horizontal asymptote** $y = 0$.
 - If $k > 0$, branches sit in quadrants 1 and 3. If $k < 0$, quadrants 2 and 4.
+
+:::figure reciprocal-graph
+The two branches never touch the axes. Marks are specifically allocated for drawing the asymptotes
+as dashed lines **and** writing their equations.
+:::
 
 :::warning Asymptotes must be shown
 If a question says "sketch, stating the equations of any asymptotes", draw them as **dashed lines**
@@ -157,12 +167,22 @@ $\frac{1}{2}$, not $2$.
 **Rule of thumb:** *outside does what it says, inside does the opposite.*
 :::
 
+:::figure transformations-translate
+Both translations on one set of axes. The $+2$ does exactly what it says; the $+3$ **inside** the
+bracket moves the curve the other way.
+:::
+
 ### Reflections
 
 Reflections are just stretches with a negative scale factor:
 
 - $y = -f(x)$: reflection in the **$x$-axis** (all $y$-values negated).
 - $y = f(-x)$: reflection in the **$y$-axis** (all $x$-values negated).
+
+:::figure transformations-stretch
+The vertical stretch doubles every height. The horizontal one halves every $x$-value, so the peak
+moves from $x = 1$ to $x = \frac12$ — a stretch of scale factor $\frac12$, not 2.
+:::
 
 ### What happens to specific points
 

@@ -39,6 +39,11 @@ Not directly examined, but invaluable as a **sanity check**: if you compute a pr
 something within one standard deviation, you know immediately it's wrong.
 :::
 
+:::figure normal-68-95
+Worth committing to memory purely as a check on your calculator work: about two-thirds of the
+distribution lies within one standard deviation of the mean.
+:::
+
 :::warning The notation $N(\mu, \sigma^2)$
 The second parameter is the **variance**, not the standard deviation. $N(50, 16)$ means $\mu = 50$ and
 $\sigma = 4$.
@@ -58,6 +63,11 @@ Writing $N(50, 4)$ means something different and will cost you the answer.
    - For "less than $a$", use a lower bound of $-10^{99}$ (or a very negative number).
    - For "greater than $b$", use an upper bound of $10^{99}$.
 4. Check the answer against your sketch: is it more or less than 0.5? Does it look right?
+:::
+
+:::figure normal-shaded
+Sketch and shade before touching the calculator. Almost every error in this topic is shading the
+wrong tail, and the sketch catches it instantly.
 :::
 
 :::example Worked example 1 — $X \sim N(50, 16)$. Find (a) $P(X<55)$, (b) $P(X>58)$, (c) $P(45<X<55)$.

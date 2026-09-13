@@ -62,6 +62,11 @@ number whose size is at least 1. Small numbers have big reciprocals; that's the 
 Similarly, where $\cos\theta \to 0$, its reciprocal blows up — hence the asymptotes.
 :::
 
+:::figure sec-graph
+Secant is built entirely from cosine: asymptotes wherever cosine crosses zero, and turning points
+wherever cosine reaches $\pm1$.
+:::
+
 ---
 
 ## 2. The two new Pythagorean identities
@@ -157,6 +162,11 @@ cosine decreases steadily from 1 to $-1$, hitting each value exactly once.
 
 This is why your calculator returns $\cos^{-1}(-0.5) = \frac{2\pi}{3}$ (a second-quadrant angle) but
 $\sin^{-1}(-0.5) = -\frac\pi6$ (a negative angle). Different ranges, by design.
+:::
+
+:::figure inverse-trig-graphs
+Each inverse exists only because the domain of the original was restricted. The chosen range is
+printed under each curve — those are the values your calculator will return.
 :::
 
 :::warning $\sin^{-1}x$ is not $\dfrac{1}{\sin x}$

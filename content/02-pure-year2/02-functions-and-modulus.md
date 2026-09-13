@@ -158,6 +158,11 @@ $f$ meets its own inverse lies on the line $y=x$ (which is often the quick way t
 $f(x) = f^{-1}(x)$ — just solve $f(x) = x$).
 :::
 
+:::figure inverse-reflection
+Every point $(a,b)$ on $f$ becomes $(b,a)$ on $f^{-1}$. That is exactly what reflecting in $y = x$
+does, and it is why the domain and range swap over.
+:::
+
 ---
 
 ## 4. The modulus function
@@ -175,10 +180,20 @@ $|{-5}| = 5$, $|3| = 3$, $|0| = 0$.
 **Reflect every part of the curve that is below the $x$-axis up above it.** The negative outputs become
 positive; everything above the axis is unchanged.
 
+:::figure modulus-outside
+The dashed curve is the original $f$. Taking the modulus of the **output** flips the negative section
+upward.
+:::
+
 ### Sketching $y = f(|x|)$
 
 **Keep the part of the curve for $x \geq 0$, then reflect it in the $y$-axis** (discarding the original
 left-hand part). The result is always symmetric about the $y$-axis.
+
+:::figure modulus-inside
+Taking the modulus of the **input** keeps the right-hand half and mirrors it, so the result is always
+symmetric about the $y$-axis.
+:::
 
 :::insight Why they're different
 $|f(x)|$ takes the modulus of the **output** — that's a vertical operation, so it affects $y$-values,

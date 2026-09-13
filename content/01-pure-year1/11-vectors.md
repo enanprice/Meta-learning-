@@ -64,6 +64,11 @@ $$\overrightarrow{AC} = \overrightarrow{AB} + \overrightarrow{BC} = -\overrighta
 This is the single most useful move in vector geometry proofs.
 :::
 
+:::figure vector-triangle
+The triangle law is just "go A to B, then B to C". Written as vectors the middle letter cancels, which
+is what makes routes through any convenient point legitimate.
+:::
+
 ### Scalar multiplication
 
 $k\mathbf{a}$ has magnitude $|k|$ times that of $\mathbf{a}$, in the **same** direction if $k>0$ and the

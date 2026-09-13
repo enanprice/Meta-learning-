@@ -132,6 +132,11 @@ find the tension you must write $F = ma$ for **one** of the objects on its own.
 Pick whichever object has fewer forces on it — usually the trailer, or the hanging mass.
 :::
 
+:::figure pulley-system
+Two objects, two equations. The tension is the same throughout because the string is light and the
+pulley smooth, and the accelerations have equal magnitude because the string is inextensible.
+:::
+
 :::example Worked example 3 — A car of mass 1200 kg tows a trailer of mass 400 kg. The engine provides a driving force of 3000 N. Resistances are 600 N on the car and 200 N on the trailer. Find the acceleration and the tension in the tow bar.
 **Solution.**
 

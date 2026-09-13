@@ -53,6 +53,11 @@ That cancellation is the whole trick of first principles. If the $h$ doesn't can
 algebra mistake.
 :::
 
+:::figure first-principles
+As $h$ shrinks, the chord $PQ$ swings round until it becomes the tangent at $P$. The limit is what
+turns an average gradient into an instantaneous one.
+:::
+
 :::exam First principles in the exam
 You'll be asked for it explicitly ("differentiate from first principles"), usually for a simple
 quadratic or cubic, worth 4–5 marks. The marks are for:
@@ -213,6 +218,11 @@ At a maximum, the gradient goes positive → zero → negative — **decreasing*
 down, like a cap.
 
 Memory hook: positive second derivative = "happy" curve = minimum at the bottom.
+:::
+
+:::figure stationary-points
+A positive cubic reaches its maximum first and its minimum second. The second derivative tells you
+which is which without needing the sketch.
 :::
 
 ### Method B: the sign of the gradient either side

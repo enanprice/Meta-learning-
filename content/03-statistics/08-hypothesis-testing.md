@@ -63,6 +63,11 @@ tail. A 5% two-tailed test means 2.5% in each tail.
 The give-away words are "changed", "different from", "not equal to".
 :::
 
+:::figure critical-region
+A two-tailed test splits the significance level between the tails, so each tail gets 2.5%. Using the
+full 5% in one tail is the most common structural error in the topic.
+:::
+
 ---
 
 ## 2. The binomial hypothesis test

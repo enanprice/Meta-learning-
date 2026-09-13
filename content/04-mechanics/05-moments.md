@@ -99,6 +99,11 @@ $$3R_A = 58.8 - 19.6 = 39.2 \;\Rightarrow\; R_A = 13.07 \;\checkmark$$
 5. Check by taking moments about a different point.
 :::
 
+:::figure beam-moments
+Taking moments about a support kills that support's reaction, because its perpendicular distance from
+the pivot is zero. Choose the pivot that removes the unknown you don't want.
+:::
+
 ---
 
 ## 3. Non-uniform rods

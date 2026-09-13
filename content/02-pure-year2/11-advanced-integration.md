@@ -241,6 +241,11 @@ And note the structure: the **first and last** $y$-values get multiplied by 1; *
 gets multiplied by 2.
 :::
 
+:::figure trapezium-rule
+Four strips means five ordinates. Here the curve is convex, so every trapezium lies above it and the
+rule **overestimates** the area.
+:::
+
 :::key Over- or under-estimate?
 - If the curve is **convex** (bending upwards) over the interval, the trapezia sit **above** the curve,
   so the rule **overestimates**.

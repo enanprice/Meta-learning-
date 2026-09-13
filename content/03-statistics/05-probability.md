@@ -63,6 +63,11 @@ If $P(A) = 0.5$, $P(B) = 0.4$ and $P(A\cap B) = 0.15$:
 **Check the four regions sum to 1.** Every time.
 :::
 
+:::figure venn-two-sets
+$P(A)$ is the **whole** of circle $A$: here $0.35 + 0.15 = 0.5$. Confusing "$A$" with "$A$ only" is
+the classic Venn diagram error.
+:::
+
 :::warning $P(A)$ is the whole circle
 When you write 0.35 in the "$A$ only" region, $P(A)$ is still 0.5 — it's the total of everything inside
 circle $A$, including the overlap. Confusing "$A$" with "$A$ only" is the most common Venn diagram
@@ -162,6 +167,11 @@ Best for sequences of events — especially **without replacement**, where the p
 - Probabilities on each set of branches must sum to 1.
 - For "without replacement", the **second set of branches has a smaller denominator** and different
   numerators.
+:::
+
+:::figure tree-diagram
+Multiply along a branch, add between branches. The denominators drop from 8 to 7 on the second stage
+because the first counter was not replaced.
 :::
 
 :::example Worked example 2 — A bag has 5 red and 3 blue counters. Two are drawn without replacement.

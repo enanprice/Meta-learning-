@@ -49,6 +49,11 @@ $\tan 60 = \frac{\sqrt3}{1} = \sqrt3$, and so on.
 Two triangles, all six values. Draw them in the margin at the start of any exam.
 :::
 
+:::figure exact-triangles
+Every exact value in the table comes from one of these two triangles. If you blank in an exam, draw
+them and read the ratios off.
+:::
+
 ---
 
 ## 2. The sine rule
@@ -99,6 +104,11 @@ But $\sin(180° - 49.9°) = \sin 130.1°$ is the same value, so $B = 130.1°$ is
 - $35 + 130.1 = 165.1°$ ✓ (leaves $C = 14.9°$)
 
 Both work, so $B = 49.9°$ **or** $130.1°$.
+:::
+
+:::figure ambiguous-case
+Two different triangles are consistent with the same side, side and non-included angle. The sine rule
+finds the acute one; you have to supply the obtuse one yourself and then test whether it fits.
 :::
 
 :::method Handling the ambiguous case

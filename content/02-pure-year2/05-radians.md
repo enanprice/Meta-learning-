@@ -78,6 +78,11 @@ cancelling. In degrees you'd be writing $\frac{\theta}{360}\times 2\pi r$, which
 A **segment** is the region between a chord and the arc. Its area is
 $$\text{sector} - \text{triangle} = \tfrac12 r^2\theta - \tfrac12 r^2\sin\theta = \tfrac12 r^2(\theta - \sin\theta)$$
 
+:::figure sector-segment
+The segment is what is left when the triangle is cut away from the sector. Both $\theta$s in the
+formula need radian mode — the first as a pure number, the second inside a sine.
+:::
+
 :::warning $\theta$ appears twice in different roles
 In $\frac12 r^2(\theta - \sin\theta)$, the first $\theta$ is used as a pure number (from the sector
 formula) and the second is inside a sine. **Both need radian mode.** This formula is the classic place

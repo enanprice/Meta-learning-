@@ -116,6 +116,11 @@ cross. Starting at $x_0$:
   positive near the root.
 - **Cobweb:** the path spirals in around the root, alternating sides. Happens when $g'(x)$ is negative.
 
+:::figure iteration-cobweb
+A cobweb pattern, which happens when $g'$ is negative: each step overshoots, so the values alternate
+above and below the root while converging.
+:::
+
 **Convergence** requires $|g'(x)| < 1$ near the root. If $|g'| > 1$ the iteration **diverges**, spiralling
 or staircasing away.
 :::
@@ -131,6 +136,11 @@ works and another that fails.* For $x^3 - 4x + 1 = 0$:
 - Other rearrangements diverge entirely.
 
 The rearrangement decides which root (if any) you find.
+:::
+
+:::figure iteration-staircase
+A staircase pattern, which happens when $g'$ is positive near the root: each step moves in the same
+direction, closing in steadily.
 :::
 
 ---
@@ -158,6 +168,11 @@ $$x = x_n - \frac{f(x_n)}{f'(x_n)}$$
 That's the formula. It works because near a root, a smooth curve looks almost exactly like its
 tangent — which is why the convergence is so fast (roughly **doubling** the number of correct digits
 each step).
+:::
+
+:::figure newton-raphson
+Each tangent is followed down to the $x$-axis, and where it lands becomes the next guess. If the
+tangent is horizontal it never lands, which is exactly the case where the method fails.
 :::
 
 :::example Worked example 3 — Use Newton–Raphson with $x_0 = 2$ to find a root of $f(x) = x^3 - 4x + 1$ to 5 decimal places.

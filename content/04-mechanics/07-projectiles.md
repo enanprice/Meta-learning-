@@ -45,6 +45,11 @@ This is why the whole topic reduces to "do SUVAT twice". The only link between t
 **$t$**, because both motions happen over the same period of time.
 :::
 
+:::figure projectile-path
+The horizontal velocity never changes; only the vertical one is affected by gravity. Time is the one
+quantity the two calculations share.
+:::
+
 :::method The projectile procedure
 1. **Resolve the initial velocity** into $u\cos\theta$ horizontally and $u\sin\theta$ vertically.
 2. Write two SUVAT lists, one per direction. Mark which quantity you want.

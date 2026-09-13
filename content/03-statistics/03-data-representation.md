@@ -35,6 +35,11 @@ Using area keeps every value contributing the same amount of ink, whatever class
 what makes the picture honest, and it's why a histogram is different from a bar chart.
 :::
 
+:::figure histogram-density
+The last class has the second largest frequency but by far the shortest bar, because those values are
+spread over a class four times as wide. That is the histogram doing its job.
+:::
+
 :::key Histogram vs bar chart
 | Histogram | Bar chart |
 |---|---|
@@ -161,6 +166,11 @@ mean $>$ median means positive skew.
 
 Classic real example: incomes. A handful of very high earners drags the mean well above the median,
 which is why "average income" quoted as a mean is so misleading.
+:::
+
+:::figure box-plot-skew
+The skew is in the *whiskers and the box*, not the median line: compare $Q_3 - Q_2$ with
+$Q_2 - Q_1$ and the direction follows.
 :::
 
 ---

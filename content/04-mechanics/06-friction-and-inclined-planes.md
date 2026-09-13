@@ -135,6 +135,11 @@ $\theta = 90°$ (vertical cliff), it's the other way round ✓.
 That two-second check settles it every time.
 :::
 
+:::figure forces-on-slope
+Resolve **along and perpendicular to the slope**, never horizontally and vertically — that way the
+acceleration lies entirely along one axis.
+:::
+
 :::key On a slope
 $$R = mg\cos\theta \quad\text{(when nothing else acts perpendicular to the slope)}$$
 $$\text{Friction} \leq \mu R = \mu mg\cos\theta$$

@@ -184,6 +184,11 @@ condition ties them together. Four unknowns, three equations plus the friction l
 out, and always in that order.
 :::
 
+:::figure ladder
+Four forces, and two of them act at the foot. Taking moments about the foot removes both at once,
+leaving one equation in one unknown.
+:::
+
 ---
 
 ## In the exam

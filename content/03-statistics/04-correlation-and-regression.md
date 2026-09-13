@@ -103,6 +103,11 @@ This is where the marks are. Always:
 Every prediction question expects you to say which one you've done and comment on reliability.
 :::
 
+:::figure scatter-regression
+Inside the shaded range the line is supported by evidence. Beyond it you are assuming the
+relationship continues — which is exactly the assumption the data cannot justify.
+:::
+
 :::example Worked example 1 — Data on 12 plants relates water $w$ (ml/day, ranging from 10 to 60) to height $h$ (cm). The regression line is $h = 4.2 + 0.35w$, and $r = 0.91$.
 **(a)** Interpret the gradient. **(b)** Predict the height for $w = 40$ and for $w = 150$, commenting
 on reliability. **(c)** Comment on the correlation.

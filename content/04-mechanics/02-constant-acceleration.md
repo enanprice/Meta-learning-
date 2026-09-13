@@ -69,6 +69,11 @@ Substituting $v = u+at$ into that gives $s = ut + \frac12at^2$; eliminating $t$ 
 $v^2 = u^2+2as$. Every equation is one of those two with a substitution.
 :::
 
+:::figure velocity-time-graph
+Gradient gives acceleration, area gives distance. Splitting the shape into a triangle, a rectangle and
+a triangle is usually quicker than three separate SUVAT calculations.
+:::
+
 :::example Worked example 1 — A car accelerates uniformly from $4\text{ m s}^{-1}$ at $2.5\text{ m s}^{-2}$ for 6 seconds. Find its final speed and the distance travelled.
 **Solution.**
 

@@ -94,6 +94,11 @@ In practice: **flip the fraction and change the sign.** Gradient $\frac{3}{4}$ �
 gradient $-\frac43$. Gradient $-2$ → perpendicular gradient $\frac12$.
 :::
 
+:::figure perpendicular-gradients
+Rotating the step $\binom{4}{3}$ through 90° turns it into $\binom{-3}{4}$, which is why the
+gradients multiply to $-1$.
+:::
+
 :::warning Two special cases
 A **horizontal** line ($y = k$) has gradient $0$. Its perpendicular is **vertical** ($x = k$), whose
 gradient is *undefined*, not $0$ — the rule $m_1m_2 = -1$ breaks down here. Just state the equation

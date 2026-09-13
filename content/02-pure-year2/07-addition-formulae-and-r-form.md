@@ -142,6 +142,12 @@ That's the whole derivation — "square and add, then divide" — and it's a leg
 "prove that" version of this question.
 :::
 
+:::figure r-form
+Adding two waves of the same frequency gives a third wave of the same frequency — just taller and
+shifted. The maximum of the sum is $R$, which is what makes this the tool for every
+"find the maximum value" question.
+:::
+
 :::method Using the R form
 1. Match your expression to the right template (is the *first* term sine or cosine?).
 2. Compute $R = \sqrt{a^2+b^2}$ — leave it in surd form unless told otherwise.

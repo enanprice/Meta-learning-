@@ -64,6 +64,11 @@ Multiply: $\binom nr p^r(1-p)^{n-r}$. The $\binom nr$ in the binomial distributi
 in the binomial expansion are the **same object**, counting the same thing.
 :::
 
+:::figure binomial-bars
+The distribution is discrete, so "at least 8" means the bars from 8 upwards — which is why it equals
+$1 - P(X \leq 7)$ and not $1 - P(X\leq8)$.
+:::
+
 :::warning Checking the conditions is examined
 "Give a reason why a binomial model may not be appropriate here" is a standard 1–2 mark question. The
 answer is always one of the four conditions failing, **stated in context**:

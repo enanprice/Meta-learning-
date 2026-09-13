@@ -80,6 +80,11 @@ $$Q = L + \frac{\text{(position needed)} - \text{(c.f. before the class)}}{\text
 where $L$ is the lower boundary of the class containing $Q$.
 :::
 
+:::figure cumulative-interpolation
+Interpolation assumes the values are spread evenly across each class, which is the same assumption as
+joining the cumulative frequency points with straight lines.
+:::
+
 :::example Worked example 2 — Same table: estimate $Q_1$ and the interquartile range
 **Solution.**
 

@@ -161,6 +161,11 @@ $$\frac{16}{3} + \frac73 = \frac{23}{3} \approx 7.67$$
 neither the area nor even positive. Always sketch first.)*
 :::
 
+:::figure signed-area
+The integral counts area below the axis as negative. Split at every crossing point, then take the
+modulus of each piece before adding.
+:::
+
 ---
 
 ## 4. Area between two curves
@@ -190,6 +195,11 @@ is above.
 
 $$\text{Area} = \int_0^3 \big[(4x - x^2) - x\big]dx = \int_0^3 (3x - x^2)\,dx$$
 $$= \left[\frac{3x^2}{2} - \frac{x^3}{3}\right]_0^3 = \left(\frac{27}{2} - 9\right) - 0 = \frac{9}{2} = 4.5$$
+:::
+
+:::figure area-between
+Integrating (upper $-$ lower) handles the signs automatically, which is why this is usually easier
+than finding two areas separately.
 :::
 
 ### The alternative: trapezium minus integral

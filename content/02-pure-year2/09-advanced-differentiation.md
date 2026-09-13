@@ -287,6 +287,11 @@ of values either side is the standard way, and it earns the mark.
 Note that an inflection point does **not** have to be stationary. $y = x^3 - 3x$ has an inflection at
 $x = 0$ where the gradient is $-3$, not 0.
 
+:::figure concavity
+The curve changes from concave to convex at the origin, where $f''$ changes sign. Note the gradient
+there is $-3$, not zero: an inflection need not be a stationary point.
+:::
+
 ---
 
 ## In the exam

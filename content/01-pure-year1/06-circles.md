@@ -111,6 +111,11 @@ $$4y - 20 = -3x + 15$$
 $$3x + 4y - 35 = 0$$
 :::
 
+:::figure circle-tangent
+The radius to the point of contact and the tangent there meet at a right angle. That single fact is
+the engine of almost every tangent question.
+:::
+
 :::warning When the radius is horizontal or vertical
 If the radius from the centre to the point of contact is **horizontal**, the tangent is **vertical**,
 with equation $x = k$ -- the negative-reciprocal rule can't be used because a vertical line has no
@@ -130,6 +135,11 @@ You will use this in half a dozen exam questions. It never changes.
 ### Fact 2 in action: finding a centre from three points
 
 Given three points on a circle, the centre is where the perpendicular bisectors of two chords meet.
+
+:::figure circle-chord
+The perpendicular from the centre to a chord bisects it — so the perpendicular bisector of any chord
+runs through the centre.
+:::
 
 :::method Centre from three points
 1. Pick two pairs of points (two chords).

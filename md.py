@@ -187,6 +187,14 @@ def collect_directive(lines: list[str], start: int) -> tuple[list[str], int]:
 
 
 def render_directive(kind: str, title: str, body: list[str], headings: list, depth: int) -> str:
+    if kind == "figure":
+        # ":::figure <id>" pulls a generated diagram from the figure catalogue;
+        # the block body, if any, is the caption.
+        from figures import render_figure
+
+        caption = parse(body, headings, depth + 1) if body else ""
+        return render_figure(title.strip(), caption)
+
     inner = parse(body, headings, depth + 1)
     if kind == "answer":
         label = inline(title) if title else "Show full solution"

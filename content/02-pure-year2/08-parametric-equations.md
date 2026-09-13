@@ -83,6 +83,11 @@ A circle of radius 3 centred at the origin.
 circle as $\theta$ goes from 0 to $2\pi$.)*
 :::
 
+:::figure parametric-ellipse
+As $t$ runs from $0$ to $2\pi$ the point traces the whole ellipse once. No single equation
+$y = f(x)$ could do this, because most vertical lines meet the curve twice.
+:::
+
 :::example Worked example 3 — A curve has parametric equations $x = 2 + \sin t$, $y = 3 - 2\cos t$. Find its Cartesian equation and describe the curve.
 **Solution.**
 

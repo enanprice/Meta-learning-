@@ -201,6 +201,11 @@ We want $> 0$, i.e. above the axis:
 $$x < -2 \quad\text{or}\quad x > 3$$
 :::
 
+:::figure quadratic-inequality
+The sketch is the method, not a decoration. The solution to $x^2 - x - 6 > 0$ is wherever the curve
+sits **above** the axis — two separate intervals, which is why the answer needs an "or".
+:::
+
 :::example Worked example 5 — Solve $2x^2 + 5x \leq 3$
 **Solution.**
 
