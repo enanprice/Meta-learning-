@@ -450,6 +450,53 @@ figure.figure figcaption b { color: var(--text); font-weight: 600; }
   figure.figure { padding: 8px 8px 8px; }
 }
 
+/* ------------------------------------------------------- exam paper layout */
+/* Paper questions are deliberately plainer than the teaching boxes: a paper
+   should read like a paper, and print like one. */
+.box.paperq {
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 16px 0 6px;
+  margin: 0;
+}
+.box.paperq p.box-title {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: .35em;
+}
+.box.paperq .marks {
+  float: right;
+  font-family: var(--sans);
+  font-size: .82rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+.paper-total {
+  margin: 26px 0 0;
+  padding-top: 12px;
+  border-top: 2px solid var(--line);
+  font-family: var(--sans);
+  font-weight: 650;
+  text-align: right;
+}
+.paper-meta {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  padding: 14px 16px;
+  margin: 18px 0 8px;
+  font-family: var(--sans);
+  font-size: .88rem;
+}
+.paper-meta ul { margin: 8px 0 0; padding-left: 1.2em; }
+@media print {
+  .box.paperq { break-inside: avoid; }
+  .paper-meta { break-after: avoid; }
+}
+
 @media print {
   .sidebar, .topbar, .pager, .done-toggle, .toc { display: none; }
   .content { margin: 0; max-width: none; }

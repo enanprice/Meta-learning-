@@ -36,6 +36,7 @@ SECTION_TITLES = {
     "03-statistics": "Statistics",
     "04-mechanics": "Mechanics",
     "05-exam-skills": "Exam Skills & Reference",
+    "06-practice-papers": "Practice Papers",
 }
 
 SECTION_BLURBS = {
@@ -45,6 +46,7 @@ SECTION_BLURBS = {
     "03-statistics": "Sampling, data, probability, distributions, and hypothesis testing.",
     "04-mechanics": "Kinematics, forces, moments, friction, projectiles and vector motion.",
     "05-exam-skills": "Formula booklet drills, command words, mark-scheme habits and revision planning.",
+    "06-practice-papers": "Three full-length exam-style papers with separate mark schemes, plus where to find the real past papers.",
 }
 
 

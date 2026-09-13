@@ -39,6 +39,7 @@ BOX_KINDS = {
     "recall": ("box recall", "Recall"),
     "method": ("box method", "Method"),
     "exam": ("box exam", "In the exam"),
+    "paperq": ("box paperq", "Question"),
 }
 
 
@@ -74,6 +75,8 @@ def inline(text: str) -> str:
     text = re.sub(r"(?<![\w*])\*([^*\n]+?)\*(?![\w*])", r"<em>\1</em>", text)
     text = re.sub(r"(?<![\w_])_([^_\n]+?)_(?![\w_])", r"<em>\1</em>", text)
     text = re.sub(r"\s+--\s+", " — ", text)
+    # [[4]] marks an exam paper's mark allocation; it floats right like a real paper.
+    text = re.sub(r"\[\[(\d+)\]\]", r'<span class="marks">(\1)</span>', text)
     return text
 
 
@@ -90,6 +93,7 @@ LIST_RE = re.compile(r"^(\s*)([-*]|\d+[.)])\s+(.*)$")
 HEADING_RE = re.compile(r"^(#{2,5})\s+(.*)$")
 TABLE_SEP_RE = re.compile(r"^\s*\|?[\s:-]*\|[\s:|-]*$")
 DIRECTIVE_RE = re.compile(r"^:::\s*(\w+)?\s*(.*)$")
+HTML_BLOCK_RE = re.compile(r"^\s*</?(div|section|figure|table|p|ul|ol|details|aside|header)\b")
 
 
 def parse(lines: list[str], headings: list, depth: int = 0) -> str:
@@ -130,6 +134,16 @@ def parse(lines: list[str], headings: list, depth: int = 0) -> str:
             i += 1
             continue
 
+        # A block starting with an HTML tag is passed through verbatim, so a page
+        # can drop in markup the Markdown subset has no syntax for.
+        if HTML_BLOCK_RE.match(line):
+            buf = []
+            while i < n and lines[i].strip():
+                buf.append(lines[i])
+                i += 1
+            out.append("\n".join(buf))
+            continue
+
         if line.lstrip().startswith(">"):
             buf = []
             while i < n and lines[i].lstrip().startswith(">"):
@@ -157,6 +171,7 @@ def parse(lines: list[str], headings: list, depth: int = 0) -> str:
         buf = []
         while i < n and lines[i].strip() and not HEADING_RE.match(lines[i]) \
                 and not LIST_RE.match(lines[i]) and not lines[i].lstrip().startswith((">", ":::")) \
+                and not HTML_BLOCK_RE.match(lines[i]) \
                 and not re.fullmatch(r"\s*(---|\*\*\*)\s*", lines[i]):
             buf.append(lines[i].strip())
             i += 1

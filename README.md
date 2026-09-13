@@ -3,7 +3,7 @@
 A complete set of topic guides for **Pearson Edexcel A Level Mathematics (9MA0)**, covering the whole
 two-year course: Pure (Year 12 and 13), Statistics and Mechanics.
 
-**50 topic guides · 50 diagrams · 293 practice questions with full solutions · 170 worked examples · ~100,000 words.**
+**50 topic guides · 50 diagrams · 3 full-length practice papers with mark schemes · 293 practice questions with full solutions · 170 worked examples · ~115,000 words.**
 
 Every topic guide follows the same structure:
 
@@ -50,6 +50,7 @@ The site includes:
 | **Statistics** | Sampling and data collection · Measures of location and spread · Representations of data · Correlation and regression · Probability · The binomial distribution · The normal distribution · Hypothesis testing · The large data set |
 | **Mechanics** | Modelling · Constant acceleration (SUVAT) · Forces and Newton's laws · Variable acceleration · Moments · Friction and inclined planes · Projectiles · Applications of forces · Vectors in mechanics |
 | **Exam Skills** | The formula booklet · Command words and mark schemes · Calculator skills · Building a revision plan |
+| **Practice Papers** | How to use them (and where to get the real past papers) · Paper 1 Pure + mark scheme · Paper 2 Pure + mark scheme · Paper 3 Statistics and Mechanics + mark scheme |
 
 ## How to actually use it
 
@@ -128,6 +129,19 @@ a content file with `:::figure some-id`.
 
 Run `python3 preview_figures.py` to render every figure onto one page, or
 `python3 preview_figures.py circle trig` to filter by substring.
+
+## Practice papers
+
+Three original, full-length **exam-style** papers written to the 9MA0 format — two Pure papers of 100
+marks and a Statistics and Mechanics paper of 50 + 50 — each with a mark scheme on a **separate page**
+in Edexcel's M/A/B notation, plus a marks-by-topic table so a score turns into a revision plan.
+
+They are not reproductions of real past papers: Edexcel questions are Pearson's copyright. The guide
+page lists where to get the genuine papers free, and these are meant to sit alongside them.
+
+Pages use a `:::paperq` block and a `[[4]]` marker for mark allocations, which renders as a
+right-floated `(4)` the way a real paper does. The print stylesheet strips the site chrome, so
+Ctrl/Cmd + P on a paper page gives you something close to a real question paper.
 
 ## A note on accuracy
 
