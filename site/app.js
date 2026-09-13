@@ -96,6 +96,52 @@
     if (state[href]) a.classList.add('done');
   });
 
+
+  // --- keep over-wide maths inside the column -----------------------------
+  // MathJax renders formulae at their natural width, which on a narrow screen
+  // can be wider than the text column and scroll the whole page sideways.
+  // After typesetting, tag any container that overflows so CSS can give it its
+  // own horizontal scrollbar. Measured rather than applied blanket, so the
+  // baseline of ordinary inline maths is left alone.
+  function tagWideMaths() {
+    var main = document.querySelector('.content');
+    if (!main) return;
+    var all = document.querySelectorAll('mjx-container');
+
+    // Pass 1: clear previous tags so everything is measured at natural width.
+    all.forEach(function (el) { el.classList.remove('mjx-scroll'); });
+
+    // Pass 2: measure against the right edge of the text column. Reading a
+    // rect forces layout, so the widths here reflect the untagged state.
+    var edge = main.getBoundingClientRect().right - 18;
+    all.forEach(function (el) {
+      if (el.getAttribute('display') === 'true') return; // handled in CSS
+      if (el.getBoundingClientRect().right > edge) el.classList.add('mjx-scroll');
+    });
+  }
+
+  // app.js runs before the deferred MathJax script, so wait for the startup
+  // promise to appear rather than assuming it already exists.
+  function whenTypeset(fn) {
+    var tries = 0;
+    (function poll() {
+      if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+        window.MathJax.startup.promise.then(fn).catch(function () {});
+        return;
+      }
+      if (++tries > 120) { fn(); return; }   // ~30s, then give up and measure anyway
+      setTimeout(poll, 250);
+    })();
+  }
+
+  whenTypeset(tagWideMaths);
+
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(tagWideMaths, 150);
+  });
+
   // --- expand/collapse all solutions on a page ---------------------------
   var article = document.querySelector('.prose');
   if (article && article.querySelector('details.answer')) {

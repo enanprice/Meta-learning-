@@ -116,7 +116,10 @@ def parse(lines: list[str], headings: list, depth: int = 0) -> str:
             text = m.group(2).strip()
             hid = slugify(text)
             if level <= 3:
-                headings.append((level, re.sub(r"[*_`]", "", re.sub(SENTINEL + r"\d+" + SENTINEL, "", text)).strip(), hid))
+                # Keep the maths placeholders here; render_markdown restores them
+                # afterwards so headings containing formulae read correctly in the
+                # on-this-page list rather than losing the formula entirely.
+                headings.append((level, re.sub(r"[*_`]", "", text).strip(), hid))
             out.append(f'<h{level} id="{hid}">{inline(text)}'
                        f'<a class="anchor" href="#{hid}" aria-label="Link to this section">#</a></h{level}>')
             i += 1
@@ -271,6 +274,7 @@ def render_markdown(text: str) -> tuple[str, list]:
     text, store = protect(text)
     headings: list = []
     body = parse(text.split("\n"), headings)
+    headings = [(lvl, restore(label, store), hid) for lvl, label, hid in headings]
     return restore(body, store), headings
 
 

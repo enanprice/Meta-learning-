@@ -146,10 +146,10 @@ window.MathJax = {{
     tags: 'none'
   }},
   options: {{ skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }},
-  chtml: {{ scale: 1.0 }}
+  svg: {{ fontCache: 'global' }}
 }};
 </script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script defer src="vendor/tex-svg.js" onerror="var f=document.createElement('script');f.defer=true;f.src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';document.head.appendChild(f);"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -321,9 +321,11 @@ def main() -> int:
     )
 
     write(OUT / "search-index.json", json.dumps(search_index, ensure_ascii=False))
-    for asset in ASSETS.glob("*"):
+    for asset in ASSETS.iterdir():
         if asset.is_file():
             shutil.copy2(asset, OUT / asset.name)
+        elif asset.is_dir():
+            shutil.copytree(asset, OUT / asset.name)
 
     print(f"Built {len(flat)} topic pages + index into {OUT}")
     if "--serve" in sys.argv:
