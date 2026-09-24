@@ -1,0 +1,460 @@
+<title>Reasoning Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#EEF1F0; --paper:#FFFFFF; --ink:#15191C; --mid:#8C979C; --muted:#56636A;
+  --line:#D3DADC; --accent:#0E6B66; --accent-ink:#FFFFFF; --accent-soft:#D5EBE8;
+  --good:#2B7A33; --bad:#B3261E; --warn:#9A6200;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Public Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1214; --paper:#171D20; --ink:#E3E9EB; --mid:#6E7A80; --muted:#9BA7AC;
+    --line:#2A3337; --accent:#4DBDB2; --accent-ink:#0B1413; --accent-soft:#15302D;
+    --good:#72C377; --bad:#F2786F; --warn:#E3B04F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1214; --paper:#171D20; --ink:#E3E9EB; --mid:#6E7A80; --muted:#9BA7AC;
+  --line:#2A3337; --accent:#4DBDB2; --accent-ink:#0B1413; --accent-soft:#15302D;
+  --good:#72C377; --bad:#F2786F; --warn:#E3B04F;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:760px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,6vw,2.8rem);letter-spacing:-.02em}
+h2{font-size:1.45rem}
+h3{font-size:1.05rem}
+p{margin:0}
+.eyebrow{font:600 .72rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:24px}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:4px;padding:12px 22px;font-weight:600}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* intro */
+header.intro{padding-block:48px 24px;display:flex;flex-direction:column;gap:14px}
+.lede{font-size:1.1rem;max-width:62ch}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.facts div{background:var(--paper);padding:14px 16px}
+.facts b{display:block;font:600 1.3rem/1.2 var(--mono);font-variant-numeric:tabular-nums}
+.facts span{font-size:.85rem;color:var(--muted)}
+.caveat{border-left:3px solid var(--warn);padding:4px 0 4px 16px;max-width:64ch}
+.rules{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+/* test chrome */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.bar-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.timer{font:600 1.15rem/1 var(--mono);font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad)}
+.strip{display:flex;flex-wrap:wrap;gap:10px 14px}
+.grp{display:flex;gap:4px;align-items:center}
+.grp small{font:600 .62rem/1 var(--mono);letter-spacing:.08em;color:var(--muted);margin-right:2px}
+.bub{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--mid);background:transparent;padding:0}
+.bub.done{background:var(--ink);border-color:var(--ink)}
+.bub.cur{outline:2px solid var(--accent);outline-offset:2px}
+.qhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.qnum{font:600 .8rem/1 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.prompt{font-size:1.15rem;font-weight:500}
+.seq{font:600 clamp(1.2rem,4.5vw,1.6rem)/1.4 var(--mono);letter-spacing:.02em;overflow-wrap:anywhere}
+
+.matrix{display:grid;grid-template-columns:repeat(3,1fr);width:min(330px,100%);border:2px solid var(--ink);margin-inline:auto}
+.matrix>div{aspect-ratio:1;border:1px solid var(--line);display:grid;place-items:center;max-width:100%}
+.matrix>div.missing{font:700 2rem var(--display);color:var(--accent);background:var(--accent-soft)}
+svg.fig{width:100%;height:100%;display:block}
+.rotwrap{display:flex;justify-content:center}
+.rotwrap .src{width:min(160px,45vw);aspect-ratio:1;border:2px solid var(--ink);background:var(--paper)}
+
+.opts{display:grid;gap:10px}
+.opts.fig6{grid-template-columns:repeat(3,1fr)}
+.opts.fig4{grid-template-columns:repeat(4,1fr)}
+.opts.text{grid-template-columns:1fr}
+@media (max-width:480px){.opts.fig4{grid-template-columns:repeat(2,1fr)}}
+.opt{display:flex;align-items:center;gap:12px;background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:6px;padding:10px 12px;text-align:left;min-width:0}
+.opt:hover{border-color:var(--mid)}
+.opt .lt{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--mid);display:grid;place-items:center;font:600 .78rem/1 var(--mono)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .lt{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opts.fig6 .opt,.opts.fig4 .opt{flex-direction:column;padding:8px}
+.opt .pic{width:100%;aspect-ratio:1;max-width:100%}
+.nav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hint{font-size:.82rem;color:var(--muted)}
+
+/* shapes */
+.s-solid{fill:var(--ink);stroke:var(--ink)}
+.s-grey{fill:var(--mid);stroke:var(--ink)}
+.s-empty{fill:none;stroke:var(--ink)}
+.sw{stroke-width:3;stroke-linejoin:round}
+.ln{stroke:var(--ink);stroke-width:5;stroke-linecap:round;fill:none}
+.dot{fill:var(--ink)}
+.cell{fill:var(--ink);stroke:var(--paper);stroke-width:1.5}
+
+/* results */
+.score{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.big{font:700 3.2rem/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.big small{font-size:1.2rem;color:var(--muted);font-weight:500}
+.scale{position:relative;height:44px;margin-top:8px}
+.scale .track{position:absolute;left:0;right:0;top:14px;height:6px;background:var(--line);border-radius:3px}
+.scale .band{position:absolute;top:10px;height:14px;background:var(--accent);opacity:.35;border-radius:3px}
+.scale .pt{position:absolute;top:8px;width:4px;height:18px;margin-left:-2px;background:var(--accent);border-radius:2px}
+.scale .tick{position:absolute;top:28px;font:.7rem/1 var(--mono);color:var(--muted);transform:translateX(-50%)}
+.secs{display:flex;flex-direction:column;gap:10px}
+.secrow{display:grid;grid-template-columns:130px 1fr 52px;gap:12px;align-items:center}
+.secrow .meter{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.secrow .meter i{display:block;height:100%;background:var(--accent)}
+.secrow b{font:600 .9rem var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:480px){.secrow{grid-template-columns:96px 1fr 44px}}
+.review{display:flex;flex-direction:column;gap:0}
+.rv{display:grid;grid-template-columns:36px 1fr;gap:12px;padding-block:14px;border-top:1px solid var(--line)}
+.rv .mark{font:600 .8rem/1.6 var(--mono)}
+.rv .mark.ok{color:var(--good)} .rv .mark.no{color:var(--bad)}
+.rv .ans{font-size:.88rem;color:var(--muted)}
+.real li{margin-bottom:6px}
+@media (prefers-reduced-motion:no-preference){.opt{transition:border-color .12s,background .12s}}
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script>
+(() => {
+const TIME_LIMIT = 30 * 60; // seconds
+const LETTERS = 'ABCDEF';
+
+/* ---------- figure rendering ---------- */
+const svg = inner => `<svg class="fig" viewBox="0 0 100 100" aria-hidden="true">${inner}</svg>`;
+function shape(s, cx, cy, r, rot, fill) {
+  const cls = `s-${fill} sw`;
+  const t = rot ? ` transform="rotate(${rot} ${cx} ${cy})"` : '';
+  const P = pts => `<polygon class="${cls}"${t} points="${pts.map(([x, y]) => `${(cx + x * r).toFixed(1)},${(cy + y * r).toFixed(1)}`).join(' ')}"/>`;
+  switch (s) {
+    case 'circle': return `<circle class="${cls}" cx="${cx}" cy="${cy}" r="${r * .9}"/>`;
+    case 'square': return P([[-.78, -.78], [.78, -.78], [.78, .78], [-.78, .78]]);
+    case 'triangle': return P([[0, -1], [.9, .62], [-.9, .62]]);
+    case 'diamond': return P([[0, -1], [.85, 0], [0, 1], [-.85, 0]]);
+    case 'arrow': return P([[0, -1], [.62, -.15], [.22, -.15], [.22, 1], [-.22, 1], [-.22, -.15], [-.62, -.15]]);
+  }
+}
+const SPOTS = {
+  1: [[50, 50]], 2: [[29, 50], [71, 50]], 3: [[50, 29], [29, 69], [71, 69]],
+  4: [[29, 29], [71, 29], [29, 71], [71, 71]]
+};
+const LINES = [[15,15,85,15],[85,15,85,85],[15,85,85,85],[15,15,15,85],[15,15,85,85],[85,15,15,85],[15,50,85,50],[50,15,50,85]];
+function cellSvg(c) {
+  if (c.l) return svg(c.l.map(i => { const [a,b,d,e] = LINES[i]; return `<line class="ln" x1="${a}" y1="${b}" x2="${d}" y2="${e}"/>`; }).join(''));
+  if (c.d) return svg(c.d.map(i => `<circle class="dot" cx="${25 + (i % 3) * 25}" cy="${25 + Math.floor(i / 3) * 25}" r="8"/>`).join(''));
+  const n = c.n || 1, base = n === 1 ? 30 : n === 2 ? 17 : 16;
+  const r = base * (c.z || 1);
+  return svg(SPOTS[n].map(([x, y]) => shape(c.s, x, y, r, c.r || 0, c.f || 'solid')).join(''));
+}
+/* polyominoes for the rotation items */
+const norm = cs => { const mx = Math.min(...cs.map(p => p[0])), my = Math.min(...cs.map(p => p[1])); return cs.map(([x, y]) => [x - mx, y - my]).sort((a, b) => a[0] - b[0] || a[1] - b[1]); };
+const key = cs => JSON.stringify(norm(cs));
+const rot90 = cs => cs.map(([x, y]) => [y, -x]);
+const mirror = cs => cs.map(([x, y]) => [-x, y]);
+const rotN = (cs, k) => { for (let i = 0; i < k; i++) cs = rot90(cs); return cs; };
+function polySvg(cs) {
+  cs = norm(cs);
+  const w = Math.max(...cs.map(p => p[0])) + 1, h = Math.max(...cs.map(p => p[1])) + 1;
+  const u = 76 / Math.max(w, h), ox = (100 - w * u) / 2, oy = (100 - h * u) / 2;
+  return svg(cs.map(([x, y]) => `<rect class="cell" x="${ox + x * u}" y="${oy + y * u}" width="${u}" height="${u}"/>`).join(''));
+}
+
+/* ---------- items ---------- */
+const M = (cells, answer, distract, why) => ({ sec: 0, kind: 'matrix', cells, answer, distract, why });
+const T = (sec, prompt, seq, options, answer, why) => ({ sec, kind: 'text', prompt, seq, options, answer, why });
+const R = (cells, k, why) => ({ sec: 3, kind: 'rotate', cells, k, why });
+const sh = (s, n, f, z, r) => ({ s, n, f, z, r });
+
+const SECTIONS = [
+  { name: 'Matrices', blurb: 'Find the tile that completes the 3 × 3 pattern. Rules run across rows, down columns, or both.' },
+  { name: 'Number series', blurb: 'Find the number that comes next.' },
+  { name: 'Verbal & logic', blurb: 'Analogies, letter series and deductions. Take the statements as true even if they sound odd.' },
+  { name: 'Spatial', blurb: 'Pick the option that is the same shape turned on the page. Flipped (mirror-image) versions are wrong.' }
+];
+
+const ITEMS = [
+  // --- Matrices ---
+  M([sh('circle',1),sh('circle',2),sh('circle',3), sh('square',1),sh('square',2),sh('square',3), sh('triangle',1),sh('triangle',2)],
+    sh('triangle',3), [sh('triangle',2), sh('square',3), sh('triangle',3,'empty'), sh('circle',3), sh('triangle',4)],
+    'Each row keeps one shape and the count climbs 1, 2, 3. Row three is triangles, so three triangles.'),
+  M([sh('circle',1,'solid'),sh('square',1,'solid'),sh('triangle',1,'solid'), sh('square',1,'grey'),sh('triangle',1,'grey'),sh('circle',1,'grey'), sh('triangle',1,'empty'),sh('circle',1,'empty')],
+    sh('square',1,'empty'), [sh('square',1,'solid'), sh('circle',1,'empty'), sh('triangle',1,'empty'), sh('square',1,'grey'), sh('diamond',1,'empty')],
+    'Every row uses circle, square and triangle once, and each row has one fill. Row three is outlines and is missing its square.'),
+  M([sh('arrow',1,'solid',1,0),sh('arrow',1,'solid',1,45),sh('arrow',1,'solid',1,90), sh('arrow',1,'solid',1,90),sh('arrow',1,'solid',1,135),sh('arrow',1,'solid',1,180), sh('arrow',1,'solid',1,180),sh('arrow',1,'solid',1,225)],
+    sh('arrow',1,'solid',1,270), [sh('arrow',1,'solid',1,90), sh('arrow',1,'solid',1,225), sh('arrow',1,'solid',1,315), sh('arrow',1,'solid',1,0), sh('arrow',1,'solid',1,180)],
+    'The arrow turns 45° clockwise at each step. Row three starts pointing down, so it ends pointing left.'),
+  M([sh('diamond',1,'solid',.55),sh('diamond',1,'grey',.8),sh('diamond',1,'empty',1.1), sh('circle',1,'grey',.55),sh('circle',1,'empty',.8),sh('circle',1,'solid',1.1), sh('square',1,'empty',.55),sh('square',1,'solid',.8)],
+    sh('square',1,'grey',1.1), [sh('square',1,'solid',1.1), sh('square',1,'empty',1.1), sh('square',1,'grey',.55), sh('diamond',1,'grey',1.1), sh('square',1,'grey',.8)],
+    'Rows fix the shape, columns fix the size (small, medium, large), and each row uses solid, grey and outline once. Row three still needs grey: a large grey square.'),
+  M([{d:[0]},{d:[8]},{d:[0,8]}, {d:[1,3]},{d:[5,7]},{d:[1,3,5,7]}, {d:[2,4]},{d:[6]}],
+    {d:[2,4,6]}, [{d:[2,4]}, {d:[2,6]}, {d:[2,4,6,8]}, {d:[4,6]}, {d:[0,2,4,6]}],
+    'The third tile is the first two laid on top of each other.'),
+  M([sh('circle',1,'solid'),sh('triangle',2,'grey'),sh('square',3,'empty'), sh('triangle',2,'solid'),sh('square',3,'grey'),sh('circle',1,'empty'), sh('square',3,'solid'),sh('circle',1,'grey')],
+    sh('triangle',2,'empty'), [sh('triangle',3,'empty'), sh('triangle',2,'solid'), sh('circle',2,'empty'), sh('square',2,'empty'), sh('triangle',1,'empty')],
+    'Three rules at once. Each row uses one, two and three shapes once; each row uses circle, triangle and square once; each column has its own fill (solid, grey, outline).'),
+  M([sh('circle',1,'solid'),sh('circle',2,'grey'),sh('circle',3,'empty'), sh('square',2,'empty'),sh('square',2,'solid'),sh('square',4,'grey'), sh('triangle',3,'grey'),sh('triangle',1,'empty')],
+    sh('triangle',4,'solid'), [sh('triangle',3,'solid'), sh('triangle',4,'empty'), sh('triangle',4,'grey'), sh('square',4,'solid'), sh('triangle',2,'solid')],
+    'The count in column three is the sum of the first two (1+2, 2+2, 3+1). Each row uses each fill once, and row three is missing solid.'),
+  M([{l:[0,1,4]},{l:[1,2,5]},{l:[0,2,4,5]}, {l:[2,3,6]},{l:[0,3,6]},{l:[0,2]}, {l:[0,4,5,7]},{l:[1,4,7]}],
+    {l:[0,1,5]}, [{l:[0,1,4,5,7]}, {l:[4,7]}, {l:[0,5]}, {l:[0,1,5,7]}, {l:[1,5]}],
+    'Overlay the first two tiles. A line in both cancels out; a line in only one survives. In row three one diagonal and the vertical centre line appear in both and cancel, leaving the top, the right side and the other diagonal.'),
+
+  // --- Number series ---
+  T(1, 'What comes next?', '3, 7, 11, 15, ?', ['18','19','20','21','23'], '19', 'Add 4 each time.'),
+  T(1, 'What comes next?', '2, 6, 18, 54, ?', ['108','150','162','216','72'], '162', 'Multiply by 3 each time.'),
+  T(1, 'What comes next?', '2, 3, 5, 8, 12, 17, ?', ['21','22','23','24','25'], '23', 'The gaps grow by one: +1, +2, +3, +4, +5, then +6.'),
+  T(1, 'What comes next?', '4, 9, 7, 12, 10, 15, ?', ['8','12','13','17','20'], '13', 'Alternate +5 and −2.'),
+  T(1, 'What comes next?', '2, 5, 11, 23, 47, ?', ['71','93','94','95','96'], '95', 'Double and add 1.'),
+  T(1, 'What comes next?', '1, 3, 2, 6, 5, 15, 14, ?', ['13','16','28','42','45'], '42', 'Alternate ×3 and −1.'),
+  T(1, 'What comes next?', '3, 4, 7, 11, 18, 29, ?', ['36','40','45','47','58'], '47', 'Each term is the sum of the two before it (18 + 29).'),
+  T(1, 'What comes next?', '2, 12, 36, 80, 150, ?', ['216','240','252','264','294'], '252', 'The nth term is n³ + n². For n = 6 that is 216 + 36. (Or take differences three times: they settle at a constant 6.)'),
+
+  // --- Verbal & logic ---
+  T(2, 'Bird is to nest as bee is to …', null, ['honey','hive','flower','swarm','wax'], 'hive', 'Where each one lives.'),
+  T(2, 'Which word does not belong?', null, ['apple','cherry','carrot','grape','plum'], 'carrot', 'The rest are fruits; a carrot is a root vegetable.'),
+  T(2, 'What letter comes next?', 'B, E, H, K, ?', ['L','M','N','O','P'], 'N', 'Skip two letters each time.'),
+  T(2, 'Tom is taller than Ana. Ana is taller than Ben. Carl is shorter than Ben. Who is the second shortest?', null, ['Tom','Ana','Ben','Carl','It cannot be determined'], 'Ben', 'Tallest to shortest: Tom, Ana, Ben, Carl.'),
+  T(2, 'Which word is most nearly the opposite of “ephemeral”?', null, ['fleeting','fragile','enduring','ethereal','sudden'], 'enduring', 'Ephemeral means lasting a very short time.'),
+  T(2, 'All Zips are Zaps. No Zaps are Zops. Which must be true?', null, ['Some Zips are Zops','No Zips are Zops','All Zops are Zips','Some Zaps are not Zips','None of these'], 'No Zips are Zops', 'Every Zip is a Zap, and no Zap is a Zop, so no Zip can be a Zop. "Some Zaps are not Zips" is possible but not forced: Zips and Zaps could be the same group.'),
+  T(2, 'What letter comes next?', 'A, C, F, J, O, ?', ['S','T','U','V','W'], 'U', 'The gaps grow: +2, +3, +4, +5, then +6. O is the 15th letter; the 21st is U.'),
+  T(2, 'No A are B. Some C are B. Which must be true?', null, ['Some C are A','Some C are not A','No C are A','All A are C','Some A are not C'], 'Some C are not A', 'The C that are B cannot be A, because no A are B. Nothing else follows.'),
+
+  // --- Spatial ---
+  R([[1,0],[2,0],[0,1],[1,1],[1,2]], 1, 'The correct option is a quarter turn clockwise. The others are the mirror image turned various ways.'),
+  R([[0,0],[0,1],[1,1],[2,1],[2,2],[3,1]], 2, 'The correct option is a half turn. The others are flipped.'),
+  R([[0,0],[1,0],[1,1],[1,2],[2,2],[3,2],[3,1]], 3, 'The correct option is a quarter turn anticlockwise. The others are flipped.'),
+  R([[0,0],[1,0],[2,0],[2,1],[2,2],[3,2],[1,2],[1,3]], 1, 'The correct option is a quarter turn clockwise. The others are flipped.')
+];
+
+/* ---------- build option lists ---------- */
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function buildOptions(it) {
+  if (it.kind === 'text') return shuffle(it.options.map(o => ({ html: esc(o), label: o, correct: o === it.answer })));
+  if (it.kind === 'matrix') return shuffle([{ html: cellSvg(it.answer), correct: true }, ...it.distract.map(d => ({ html: cellSvg(d), correct: false }))]);
+  const rots = new Set([0,1,2,3].map(k => key(rotN(it.cells, k))));
+  const flips = [0,1,2,3].map(k => rotN(mirror(it.cells), k)).filter(c => !rots.has(key(c)));
+  const pick = shuffle(flips).slice(0, 3);
+  return shuffle([{ html: polySvg(rotN(it.cells, it.k)), correct: true }, ...pick.map(c => ({ html: polySvg(c), correct: false }))]);
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ---------- state ---------- */
+const app = document.getElementById('app');
+let S = null, tick = null;
+
+function start() {
+  S = { opts: ITEMS.map(buildOptions), ans: ITEMS.map(() => null), i: 0, t0: Date.now(), done: false };
+  tick = setInterval(updateTimer, 500);
+  renderQ();
+}
+const remaining = () => Math.max(0, TIME_LIMIT - Math.floor((Date.now() - S.t0) / 1000));
+const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+function updateTimer() {
+  const r = remaining(), el = document.getElementById('timer');
+  if (el) { el.textContent = fmt(r); el.classList.toggle('low', r <= 120); }
+  if (r === 0) finish();
+}
+
+/* ---------- intro ---------- */
+function renderIntro() {
+  const sample = ITEMS[0];
+  app.innerHTML = `
+  <header class="intro">
+    <span class="eyebrow">Fluid reasoning · 28 items · 30 minutes</span>
+    <h1>Reasoning Test</h1>
+    <p class="lede">Four short subtests modelled on the kinds of item used in real cognitive batteries: matrix reasoning, number series, verbal logic and mental rotation. Items get harder as you go.</p>
+  </header>
+  <div class="stack">
+    <div class="facts">
+      <div><b>28</b><span>questions</span></div>
+      <div><b>30:00</b><span>time limit</span></div>
+      <div><b>4</b><span>subtests</span></div>
+      <div><b>≈ 1 min</b><span>per item on average</span></div>
+    </div>
+    <p class="caveat"><b>Read this before you start.</b> This test gives you a score out of 28 and a rough IQ-style estimate, but the estimate is not calibrated. A real IQ is measured against a large reference sample under supervised conditions, and no web test does that. Use the result as a signal, not a label.</p>
+    <section class="sheet stack">
+      <h2>How to take it</h2>
+      <ol class="rules">
+        <li>Sit somewhere quiet and do it in one go. No pen and paper, calculator or search.</li>
+        <li>You can skip and come back. Unanswered items count as wrong, so guess before time runs out.</li>
+        <li>Keyboard: <b>A–F</b> or <b>1–6</b> to answer, <b>←</b> / <b>→</b> to move.</li>
+        <li>The test submits itself when the clock hits zero.</li>
+      </ol>
+    </section>
+    <section class="sheet stack">
+      <span class="eyebrow">Example item · Matrices</span>
+      <p>Each row follows a rule. Pick the tile that belongs in the empty square.</p>
+      <div class="matrix">${sample.cells.map(c => `<div>${cellSvg(c)}</div>`).join('')}<div class="missing">?</div></div>
+      <p class="muted">Here each row keeps one shape and the count goes 1, 2, 3, so the answer is three triangles. This item is also question 1 of the real test.</p>
+    </section>
+    <div><button class="btn" id="go">Start the 30-minute test</button></div>
+  </div>`;
+  document.getElementById('go').onclick = start;
+}
+
+/* ---------- question ---------- */
+function renderQ() {
+  const i = S.i, it = ITEMS[i], opts = S.opts[i], sec = SECTIONS[it.sec];
+  const firstOfSec = ITEMS.findIndex(x => x.sec === it.sec);
+  const strip = SECTIONS.map((s, si) => `<span class="grp"><small>${s.name.split(' ')[0].toUpperCase().slice(0, 4)}</small>${
+    ITEMS.map((x, xi) => x.sec === si ? `<button class="bub${S.ans[xi] !== null ? ' done' : ''}${xi === i ? ' cur' : ''}" data-go="${xi}" aria-label="Question ${xi + 1}${S.ans[xi] !== null ? ', answered' : ''}"></button>` : '').join('')}</span>`).join('');
+
+  let stem = '';
+  if (it.kind === 'matrix') stem = `<div class="matrix">${it.cells.map(c => `<div>${cellSvg(c)}</div>`).join('')}<div class="missing">?</div></div>`;
+  else if (it.kind === 'rotate') stem = `<div class="rotwrap"><div class="src">${polySvg(it.cells)}</div></div>`;
+  else stem = `<p class="prompt">${esc(it.prompt)}</p>${it.seq ? `<p class="seq">${esc(it.seq)}</p>` : ''}`;
+  const cls = it.kind === 'text' ? 'text' : opts.length === 4 ? 'fig4' : 'fig6';
+
+  app.innerHTML = `
+  <div class="bar">
+    <div class="bar-top"><span class="eyebrow">${sec.name}</span><span class="timer" id="timer">${fmt(remaining())}</span></div>
+    <div class="strip">${strip}</div>
+  </div>
+  <div class="stack" style="padding-top:20px">
+    <div class="qhead"><span class="qnum">Question ${i + 1} of ${ITEMS.length}</span>${i === firstOfSec ? `<span class="hint">${sec.blurb}</span>` : ''}</div>
+    ${it.kind === 'rotate' ? '<p class="prompt">Which option is this shape turned, not flipped?</p>' : ''}
+    ${it.kind === 'matrix' ? '<p class="prompt">Which tile completes the pattern?</p>' : ''}
+    ${stem}
+    <div class="opts ${cls}" role="radiogroup" aria-label="Answer options">
+      ${opts.map((o, oi) => `<button class="opt${S.ans[i] === oi ? ' sel' : ''}" role="radio" aria-checked="${S.ans[i] === oi}" data-o="${oi}"><span class="lt">${LETTERS[oi]}</span>${it.kind === 'text' ? `<span>${o.html}</span>` : `<span class="pic">${o.html}</span>`}</button>`).join('')}
+    </div>
+    <div class="nav">
+      <button class="btn ghost" id="prev" ${i === 0 ? 'disabled' : ''}>← Back</button>
+      <span style="display:flex;gap:10px;flex-wrap:wrap">
+        ${i < ITEMS.length - 1 ? `<button class="btn ghost" id="finishEarly">Finish now</button><button class="btn" id="next">Next →</button>` : `<button class="btn" id="finish">Finish and score</button>`}
+      </span>
+    </div>
+    <p class="hint" id="unans"></p>
+  </div>`;
+
+  app.querySelectorAll('[data-o]').forEach(b => b.onclick = () => choose(+b.dataset.o));
+  app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(+b.dataset.go));
+  const $ = id => document.getElementById(id);
+  $('prev').onclick = () => go(i - 1);
+  if ($('next')) $('next').onclick = () => go(i + 1);
+  if ($('finish')) $('finish').onclick = confirmFinish;
+  if ($('finishEarly')) $('finishEarly').onclick = confirmFinish;
+}
+function choose(oi) {
+  S.ans[S.i] = oi;
+  renderQ();
+}
+function go(n) { if (n >= 0 && n < ITEMS.length) { S.i = n; renderQ(); window.scrollTo({ top: 0 }); } }
+let armed = false;
+function confirmFinish() {
+  const left = S.ans.filter(a => a === null).length;
+  if (left && !armed) {
+    armed = true;
+    document.getElementById('unans').innerHTML = `<b style="color:var(--bad)">${left} unanswered.</b> They count as wrong. Press finish again to submit anyway, or use the bubbles above to go back.`;
+    setTimeout(() => armed = false, 6000);
+    return;
+  }
+  finish();
+}
+
+/* ---------- scoring ---------- */
+// Uncalibrated assumption, stated on the results page: typical adult ≈ 15/28, SD ≈ 5.
+const ASSUMED_MEAN = 15, ASSUMED_SD = 5;
+function finish() {
+  if (S.done) return;
+  S.done = true; clearInterval(tick);
+  const used = Math.min(TIME_LIMIT, Math.floor((Date.now() - S.t0) / 1000));
+  const right = ITEMS.map((_, i) => S.ans[i] !== null && S.opts[i][S.ans[i]].correct);
+  const raw = right.filter(Boolean).length;
+  const est = Math.round(100 + 15 * (raw - ASSUMED_MEAN) / ASSUMED_SD);
+  const lo = Math.max(55, est - 10), hi = Math.min(145, est + 10);
+  const ceiling = raw >= 27, floor = raw <= 5;
+  const secStats = SECTIONS.map((s, si) => { const idx = ITEMS.map((x, i) => x.sec === si ? i : -1).filter(i => i >= 0); return { name: s.name, n: idx.length, k: idx.filter(i => right[i]).length }; });
+  const X = v => ((Math.min(145, Math.max(55, v)) - 55) / 90 * 100).toFixed(1);
+
+  const answerText = (i, oi) => {
+    if (oi === null) return 'no answer';
+    const it = ITEMS[i], o = S.opts[i][oi];
+    return it.kind === 'text' ? `${LETTERS[oi]} (${o.html})` : LETTERS[oi];
+  };
+  const correctIdx = i => S.opts[i].findIndex(o => o.correct);
+
+  app.innerHTML = `
+  <header class="intro">
+    <span class="eyebrow">Result · finished in ${fmt(used)}</span>
+    <h1>You scored ${raw} out of ${ITEMS.length}</h1>
+  </header>
+  <div class="stack">
+    <section class="sheet score">
+      <div class="stack" style="gap:6px">
+        <span class="eyebrow">Raw score</span>
+        <div class="big">${raw}<small> / ${ITEMS.length}</small></div>
+        <p class="muted">This part is real: it is exactly what you got right.</p>
+      </div>
+      <div class="stack" style="gap:6px">
+        <span class="eyebrow">Rough IQ-style band</span>
+        <div class="big">${ceiling ? '≥ 130' : floor ? '≤ 75' : `${lo}–${hi}`}</div>
+        <div class="scale" aria-hidden="true">
+          <div class="track"></div>
+          <div class="band" style="left:${X(lo)}%;width:${(X(hi) - X(lo)).toFixed(1)}%"></div>
+          <div class="pt" style="left:${X(est)}%"></div>
+          ${[70, 85, 100, 115, 130].map(v => `<span class="tick" style="left:${X(v)}%">${v}</span>`).join('')}
+        </div>
+      </div>
+    </section>
+
+    <p class="caveat"><b>How much to trust the band: not much.</b> It assumes a typical adult scores about ${ASSUMED_MEAN}/28 with a spread of about ${ASSUMED_SD}. That is my estimate from how items like these usually behave, not something measured on a sample. The ±10 width is there because 28 items can't pin a score down more tightly than that even with proper norms. ${ceiling ? 'You hit the ceiling, which means this test is too easy to measure you. It says nothing about how far above it you are.' : ''}${floor ? 'Very low scores on an unsupervised online test usually mean distraction, rushing or unfamiliarity with the format, not low ability.' : ''}</p>
+
+    <section class="sheet stack">
+      <h2>By subtest</h2>
+      <div class="secs">${secStats.map(s => `<div class="secrow"><span>${s.name}</span><span class="meter"><i style="width:${(s.k / s.n * 100).toFixed(0)}%"></i></span><b>${s.k}/${s.n}</b></div>`).join('')}</div>
+      <p class="muted">A big gap between subtests is more informative than the total. Matrices and series lean on pattern-finding; the verbal items also lean on vocabulary and reading, which depend on schooling and first language.</p>
+    </section>
+
+    <section class="sheet stack">
+      <h2>If you want an actual number</h2>
+      <ul class="real">
+        <li><b>A clinical assessment</b> (WAIS-IV/WAIS-5 for adults, WISC-V under 17) with a registered psychologist. Two to three hours, one-to-one, normed on thousands of people. This is the only kind of result a school, clinic or court treats as an IQ.</li>
+        <li><b>Mensa's supervised admission test.</b> Cheaper, done in a group, and it reports a percentile against proper norms. It is built to sort people above or below the top 2%, so it is coarse lower down.</li>
+        <li><b>Be sceptical of any free site that prints a precise IQ</b>, especially one that asks for payment to show it. They are not normed, and many inflate scores on purpose.</li>
+      </ul>
+      <p class="muted">Also worth knowing: scores on a test like this move with sleep, practice and familiarity with the format. If you retake it now, you will score higher, and that increase is practice, not a smarter brain.</p>
+    </section>
+
+    <section class="sheet stack">
+      <h2>Review every item</h2>
+      <div class="review">${ITEMS.map((it, i) => `
+        <div class="rv">
+          <span class="mark ${right[i] ? 'ok' : 'no'}">${String(i + 1).padStart(2, '0')} ${right[i] ? '✓' : '✗'}</span>
+          <div class="stack" style="gap:4px">
+            <span>${it.kind === 'text' ? esc(it.prompt) + (it.seq ? ` <b style="font-family:var(--mono)">${esc(it.seq)}</b>` : '') : it.kind === 'matrix' ? 'Matrix' : 'Rotation'}</span>
+            <span class="ans">You: ${answerText(i, S.ans[i])} · Correct: ${answerText(i, correctIdx(i))}</span>
+            <span class="ans">${esc(it.why)}</span>
+          </div>
+        </div>`).join('')}</div>
+    </section>
+    <div><button class="btn ghost" id="again">Back to the start</button></div>
+  </div>`;
+  document.getElementById('again').onclick = () => { S = null; renderIntro(); window.scrollTo({ top: 0 }); };
+  window.scrollTo({ top: 0 });
+}
+
+/* ---------- keyboard ---------- */
+document.addEventListener('keydown', e => {
+  if (!S || S.done || e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key.toUpperCase(), n = S.opts[S.i].length;
+  let oi = LETTERS.indexOf(k); if (oi < 0 && /^[1-6]$/.test(k)) oi = +k - 1;
+  if (oi >= 0 && oi < n) { choose(oi); e.preventDefault(); }
+  else if (e.key === 'ArrowRight') go(S.i + 1);
+  else if (e.key === 'ArrowLeft') go(S.i - 1);
+});
+
+renderIntro();
+})();
+</script>
