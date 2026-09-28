@@ -23,6 +23,7 @@ def main() -> None:
     fragment = (
         template.replace("{{STYLES}}", (SRC / "styles.css").read_text())
         .replace("{{DATA}}", data)
+        .replace("{{MOTIFS}}", (SRC / "motifs.js").read_text())
         .replace("{{APP}}", (SRC / "app.js").read_text())
     )
     head, body = fragment.split("<!--BODY-->")
