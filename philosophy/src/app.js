@@ -254,7 +254,7 @@
     function x(y) { return left + (y - min) * px; }
     var h = '<div class="page"><span class="label">Timeline</span><h1>Who was alive when</h1>';
     h += '<p>Every thinker on one scale, 600 BCE to today. Dashed bars are lives whose dates are traditional or uncertain. Scroll sideways; tap a name to read.</p>';
-    h += '<p class="note">Two things jump out. First, the gap: almost nothing here between Augustine and Aquinas, which says more about which traditions got written down and translated than about who was thinking. Second, the crowd after 1800, when writing, printing and universities multiplied.</p></div>';
+    h += '<p class="note">Two things jump out. First, the thin stretch between Augustine and Aquinas, where only Boethius and Avicenna appear. That says more about which traditions got written down and translated into European languages than about who was thinking. Second, the crowd after 1800, when writing, printing and universities multiplied.</p></div>';
     h += '<div class="tl-wrap"><div class="tl" style="width:' + w + 'px;height:' + hgt + 'px"><div class="tl-axis">';
     for (var y = -500; y <= max; y += 250) {
       h += '<span class="tl-tick" style="left:' + x(y) + 'px">' + (y < 0 ? -y + ' BCE' : y === 0 ? '1 CE' : y) + '</span>';

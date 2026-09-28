@@ -207,7 +207,7 @@ main { padding-block: 28px 56px; outline: none; }
     <nav class="topnav" aria-label="Sections">
       <a href="#paths">Paths</a>
       <a href="#timeline">Timeline</a>
-      <a href="#about">How to use this</a>
+      <a href="#about">Guide</a>
       <button id="random-top" class="linkish" type="button">Random</button>
       <button id="theme-toggle" class="linkish" type="button" aria-label="Switch light or dark theme">Theme</button>
     </nav>
@@ -2579,7 +2579,1054 @@ Her personal conduct is also a problem. She and Sartre had relationships with yo
 }
 );
 
-window.PATHS = [];
+THINKERS.push(
+{
+  id: 'camus', name: `Albert Camus`, born: 1913, died: 1960, era: 'c20',
+  place: `Mondovi and Algiers (French Algeria); Paris`, role: `Novelist, essayist and philosopher`,
+  themes: ['meaning', 'death', 'suffering', 'ethics', 'politics'], keywords: ['absurd', 'absurdism', 'sisyphus', 'the stranger', 'the outsider', 'the plague', 'the rebel', 'suicide', 'revolt', 'invincible summer', 'algeria'],
+  tagline: `Life has no meaning you can find. Live anyway, fully, and in revolt. One must imagine Sisyphus happy.`,
+  summary: `Camus called the clash between our hunger for meaning and the universe’s silence “the absurd”. He refused both easy escapes: suicide, and the “leap” into religion or ideology that pretends the silence has been answered. Instead, live with the absurd in open eyes, with passion and revolt, like Sisyphus pushing his rock and finding the struggle itself enough. He hated being called an existentialist, and he broke with Sartre over the one thing he wouldn’t excuse: murder in the name of history.`,
+  life: `Albert Camus was born in 1913 in Mondovi, French Algeria, into a poor *pied-noir* family (European settlers in Algeria). His father was killed in the First World War when Albert was a baby. He grew up in a tiny flat in a working-class district of Algiers with his mother, who was partly deaf, illiterate and barely spoke; his domineering grandmother; and an uncle who was a cooper. There were no books in the house.
+
+A primary school teacher, Louis Germain, spotted his talent and coached him for a scholarship to the lycée. Camus never forgot it: when he won the Nobel Prize in 1957, the first letter he wrote was to Germain.
+
+He loved football, playing as goalkeeper for Racing Universitaire d’Alger, until at seventeen he was diagnosed with tuberculosis, which recurred throughout his life and ended any hope of a sports or academic career. He later said that what he knew most surely about morality and the obligations of men, he owed to football.
+
+He studied philosophy at the University of Algiers, worked as a journalist, and exposed the misery of Arab and Berber peasants in the Kabylie region, which got him effectively expelled from Algeria. In Paris during the Occupation, he edited *Combat*, a clandestine Resistance newspaper. In 1942 he published *The Stranger* and *The Myth of Sisyphus*, and became famous almost overnight.
+
+After the war, he and Sartre were the two most celebrated intellectuals in France. They broke bitterly in 1952 after Camus published *The Rebel*, which attacked revolutionary violence, including Soviet communism. Sartre’s journal savaged it; Camus replied; Sartre wrote a public letter ending their friendship. The Algerian War (1954–62) was agony for him: he opposed the colonial system but also the FLN’s terrorism against civilians, and was attacked from both sides for refusing to take one. “I believe in justice, but I will defend my mother before justice,” he said.
+
+He won the Nobel Prize in Literature in 1957, at 44, one of the youngest ever. On 4 January 1960 he was killed in a car crash near Villeblevin, south of Paris, in a car driven by his publisher Michel Gallimard. In his pocket was an unused train ticket; he had planned to take the train. In his briefcase was the unfinished manuscript of *The First Man*, an autobiographical novel about his childhood, published in 1994.`,
+  ideas: [
+    { t: `The one serious question`, b: `*The Myth of Sisyphus* opens with a famous provocation: “There is but one truly serious philosophical problem, and that is suicide. Judging whether life is or is not worth living amounts to answering the fundamental question of philosophy. All the rest, whether the world has three dimensions, whether the mind has nine or twelve categories, comes afterwards.”
+
+He isn’t being morbid. He is saying that philosophy that doesn’t answer the question of how to live is a game.` },
+    { t: `The absurd`, b: `We go through life on autopilot: “Rising, streetcar, four hours in the office or the factory, meal, streetcar, four hours of work, meal, sleep, and Monday Tuesday Wednesday Thursday Friday and Saturday according to the same rhythm.” Then one day, the “why” arises, and everything begins in that weariness tinged with amazement.
+
+The absurd is not the world, which is simply indifferent, and not us, who long for meaning, clarity and unity. It is the confrontation between them: “the confrontation between the human need and the unreasonable silence of the world.” We demand that the universe make sense, and it doesn’t answer.` },
+    { t: `No escape`, b: `Faced with the absurd, there are two tempting ways out, and Camus rejects both.
+
+**Physical suicide:** if life has no meaning, end it. But that doesn’t solve the absurd; it abolishes one of its terms. It is a surrender.
+
+**Philosophical suicide:** leaping into a faith or system that promises the meaning the world doesn’t give (God, History, Reason). Camus accuses Kierkegaard, Husserl and others of this: they faced the absurd, then jumped over it. It is a kind of intellectual cheating.
+
+The honest response is to live with the absurd without appeal, keeping it alive in full consciousness.` },
+    { t: `Revolt, freedom, passion`, b: `Living with the absurd has three consequences. **Revolt:** a constant, lucid refusal to be reconciled, a defiance that gives life its value. **Freedom:** without eternal meaning or a future to live for, you are free from the rules and hopes that bound you. **Passion:** since there is no afterlife and no higher purpose, what counts is to live as much as possible, with intensity. Not the best life, but the most life.` },
+    { t: `Sisyphus`, b: `In Greek myth, the gods condemned Sisyphus to push a boulder up a mountain, only to watch it roll back down, forever. Camus calls him the absurd hero. The interesting moment is not the pushing but the walk back down, when Sisyphus is conscious of his fate. That is the hour of consciousness. In that moment he is superior to his fate. He is stronger than his rock.
+
+“The struggle itself towards the heights is enough to fill a man’s heart. One must imagine Sisyphus happy.”` },
+    { t: `The Stranger`, b: `The novel opens: “Mother died today. Or maybe yesterday; I can’t be sure.” Meursault, a clerk in Algiers, is honest to the point of indifference. He doesn’t cry at his mother’s funeral, starts an affair the next day, and on a blinding afternoon on the beach, almost without reason, shoots an Arab man. At his trial, he is condemned less for the murder than for not weeping at his mother’s funeral: for not playing the game. In his cell, facing the guillotine, he finally opens himself to “the gentle indifference of the world” and feels happy.
+
+Camus said: “In our society any man who does not weep at his mother’s funeral runs the risk of being sentenced to death.” The book is about a man who refuses to lie, even about his own feelings.` },
+    { t: `The Plague`, b: `In the Algerian town of Oran, plague breaks out. The town is sealed off. People respond differently: the doctor Rieux fights the disease day after day without heroics or illusions; the journalist Rambert tries to escape to his lover in Paris and then stays to help; the priest Paneloux preaches that the plague is God’s punishment, then watches a child die. It is an allegory of the Occupation and of any collective evil, and a portrait of solidarity: decent people doing the work in front of them. Asked why he does it, Rieux says it is just a matter of common decency: “the only means of fighting a plague is common decency.”
+
+It became a bestseller again in 2020.` },
+    { t: `The Rebel: limits`, b: `In *The Rebel* (1951), Camus moved from the individual to politics. “I rebel, therefore we exist.” Rebellion starts when a slave says no: there is a line you cannot cross. That no implies a yes, to a shared human dignity. But revolutions betray rebellion when they decide that the end justifies any means, and murder becomes logical in the name of history or the future. Camus traced this from the French Revolution through Nazism to Stalinism. Genuine rebellion knows its limits. It refuses to become what it fights.
+
+This is what broke his friendship with Sartre, who thought it naive and useful to the bourgeoisie. Camus thought refusing to justify murder was the whole point.` }
+  ],
+  works: [
+    { t: `The Stranger (L’Étranger, also The Outsider)`, y: `1942`, b: `About 120 pages. One of the most read novels of the century. Read it in a sitting.` },
+    { t: `The Myth of Sisyphus`, y: `1942`, b: `His philosophical essay on the absurd. The opening chapter and the short final chapter on Sisyphus are essential. The middle sections, on Don Juan, actors and conquerors as absurd heroes, are more dated.` },
+    { t: `The Plague`, y: `1947`, b: `His most humane novel.` },
+    { t: `The Rebel`, y: `1951`, b: `A long essay on revolt and revolution. Uneven, but the introduction and conclusion are powerful.` },
+    { t: `The Fall`, y: `1956`, b: `A dark, brilliant monologue by a former Paris lawyer, now in an Amsterdam bar, confessing his hypocrisy to a stranger (and so to you). Many think it is his best book.` },
+    { t: `Nuptials and Summer`, y: `1938; 1954`, b: `Lyrical essays about Algeria, sun, sea and the body. “Return to Tipasa” in *Summer* has the invincible summer. They show where his philosophy came from: a love of this world, not a despair about it.` },
+    { t: `The First Man`, y: `1994, posthumous`, b: `The unfinished autobiographical novel found in the wreckage. Moving and raw.` }
+  ],
+  quotes: [
+    { q: `There is but one truly serious philosophical problem, and that is suicide.`, s: `*The Myth of Sisyphus*, opening` },
+    { q: `The struggle itself towards the heights is enough to fill a man’s heart. One must imagine Sisyphus happy.`, s: `*The Myth of Sisyphus*, last lines` },
+    { q: `Mother died today. Or maybe yesterday; I can’t be sure.`, s: `*The Stranger*, opening (Matthew Ward translation)` },
+    { q: `In the midst of winter, I found there was, within me, an invincible summer.`, s: `“Return to Tipasa” (1952), in *Summer*; translations vary` },
+    { q: `I rebel, therefore we exist.`, s: `*The Rebel*, chapter 1` },
+    { q: `The only means of fighting a plague is common decency.`, s: `*The Plague*, Part II` },
+    { q: `Real generosity toward the future lies in giving all to the present.`, s: `*The Rebel*, conclusion` },
+    { q: `At any street corner the feeling of absurdity can strike any man in the face.`, s: `*The Myth of Sisyphus*` }
+  ],
+  fakes: [
+    { q: `Don’t walk behind me; I may not lead. Don’t walk in front of me; I may not follow. Just walk beside me and be my friend.`, n: `Not Camus. It seems to come from an old camp song or a Jewish folk saying. It has been on posters under his name for decades.` },
+    { q: `The only way to deal with an unfree world is to become so absolutely free that your very existence is an act of rebellion.`, n: `Not found in his works. It is a modern paraphrase of the spirit of *The Rebel*, with an internet-era swagger he didn’t have.` },
+    { q: `You will never be happy if you continue to search for what happiness consists of. You will never live if you are looking for the meaning of life.`, n: `A loose, mistranslated version of a line from his early notebooks. Treat with caution.` }
+  ],
+  critique: `Philosophers have often been unimpressed by *The Myth of Sisyphus* as argument. Camus asserts rather than proves that the absurd can’t be escaped, and his rejection of religion as “philosophical suicide” can look like a refusal to take religious thinkers seriously. Why is leaping into faith cheating, but leaping into a lifelong revolt not? Sartre’s circle thought him a gifted writer and a lightweight philosopher.
+
+The postcolonial critique is sharper. In *The Stranger*, the man Meursault kills has no name; he is just “the Arab”. In *The Plague*, set in an Algerian city, Arab characters barely appear. Edward Said argued that Camus’s fiction naturalises French colonial rule, and that his refusal to support Algerian independence was, in the end, a defence of his own people’s position. The Algerian writer Kamel Daoud answered *The Stranger* in 2013 with *The Meursault Investigation*, told by the murdered man’s brother.
+
+And “imagine Sisyphus happy” can sound like consolation for people who don’t have it hard. Try telling someone doing punishing, meaningless work for poverty wages that the struggle itself is enough to fill a heart.
+
+Still, history has been kind to his political judgement. On the question that split him from Sartre, whether revolutionary regimes that murder should be defended, most people now think Camus was right.`,
+  start: `Read *The Stranger* (Vintage, trans. Matthew Ward; or Sandra Smith’s Penguin version, *The Outsider*). Then the opening and closing chapters of *The Myth of Sisyphus* (Penguin, trans. Justin O’Brien). Then *The Plague* or *The Fall*. Robert Zaretsky’s *A Life Worth Living: Albert Camus and the Quest for Meaning* is a short, excellent guide.`,
+  related: ['sartre', 'dostoevsky', 'kierkegaard', 'nietzsche', 'kafka', 'beauvoir']
+},
+{
+  id: 'simone-weil', name: `Simone Weil`, born: 1909, died: 1943, era: 'c20',
+  place: `Paris; Marseille; London`, role: `Philosopher, activist and mystic`,
+  themes: ['god', 'suffering', 'ethics', 'love', 'politics'], keywords: ['attention', 'affliction', 'gravity and grace', 'decreation', 'need for roots', 'factory', 'mysticism', 'iliad', 'force'],
+  tagline: `Attention is the rarest and purest form of generosity.`,
+  summary: `Simone Weil was a philosopher who insisted on living what she thought: she worked in factories, fought in Spain, and starved herself in solidarity with occupied France. Her central idea is attention: a patient, receptive, self-forgetting focus that is the root of prayer, study and love. She wrote about affliction (suffering that crushes the soul), about force as the true subject of the *Iliad*, and about the human need for roots. In an age of distraction, she may be the most urgent philosopher on this list.`,
+  life: `Simone Weil was born in Paris in 1909 into a secular, prosperous Jewish family; her father was a doctor. Her brother André became one of the greatest mathematicians of the century, and she grew up feeling intellectually overshadowed. At fourteen she fell into a depression and thought of dying because she believed she would never reach the kingdom of truth that geniuses like her brother could enter. She came out of it with a conviction that anyone at all, even if their natural abilities are almost nothing, can enter that kingdom, if only they long for truth and make a constant effort of attention.
+
+As a child, at six, she refused to eat sugar because French soldiers at the front had none. She studied under the philosopher Alain at the Lycée Henri-IV, then at the École Normale Supérieure, where she was nicknamed “the Red Virgin”. Simone de Beauvoir recalled meeting her there: Weil said the only thing that mattered was a revolution that would feed everyone. Beauvoir said the problem was to find a reason for existence. Weil looked at her and said: “It’s easy to see you’ve never been hungry.”
+
+She taught philosophy at girls’ lycées, gave away most of her salary, joined workers’ protests and was known to local officials as a troublemaker. In 1934–35 she took a year off to work in factories, including a Renault plant, to understand the condition of workers from inside. It nearly broke her. She wrote that the experience branded her as a slave, “the way the Romans branded the most despised slaves on their foreheads with red-hot iron”.
+
+In 1936 she went to Spain to fight with the anarchists in the Civil War. She was so short-sighted and clumsy that her comrades feared for her; after a few weeks she stepped into a pot of boiling oil and had to be evacuated. She was also horrified by the killing she saw on her own side.
+
+Then came a series of mystical experiences: in a Portuguese fishing village, at Assisi, and at the Benedictine abbey of Solesmes, where, suffering a crushing migraine, she felt Christ himself come down and take possession of her while she recited George Herbert’s poem “Love”. She became intensely Christian but refused baptism, wanting to remain at the threshold, in solidarity with all those outside the Church.
+
+When France fell in 1940, her family fled to Marseille, then to New York in 1942. She hated being safe and managed to get to London to work for the Free French, hoping to be parachuted into France. They gave her a desk job instead, writing reports; one became *The Need for Roots*. She refused to eat more than the official rations in occupied France. Suffering from tuberculosis and malnutrition, she died in a sanatorium in Ashford, Kent, in August 1943, aged 34. The coroner’s verdict was that she “did kill and slay herself by refusing to eat whilst the balance of her mind was disturbed”.
+
+Almost nothing she wrote was published in her lifetime. Albert Camus, who edited several of her books for Gallimard after the war, called her “the only great spirit of our time”.`,
+  ideas: [
+    { t: `Attention`, b: `Weil’s central idea. In a famous essay on school studies, she argues that the real purpose of schoolwork, even of geometry problems you never solve, is to develop the faculty of attention. Attention is not muscular effort, frowning and straining. It is almost the opposite: “Attention consists of suspending our thought, leaving it detached, empty, and ready to be penetrated by the object.” It is waiting, not grabbing. Receptive, not grasping.
+
+This matters because attention is the substance of prayer, and of love. “The love of our neighbour in all its fullness simply means being able to say to him: What are you going through?” To really look at an afflicted person, without flinching away, without turning them into a case or a category, is almost a miracle. “Those who are unhappy have no need for anything in this world but people capable of giving them their attention.”
+
+In a letter to the poet Joë Bousquet she wrote: “Attention is the rarest and purest form of generosity.” If you want one reason to stop scrolling, this is it: the feed trains exactly the opposite capacity, a flitting, grasping half-attention that is never still long enough to receive anything.` },
+    { t: `Affliction`, b: `Weil distinguished ordinary suffering from *malheur*, affliction. Affliction is suffering that uproots a life: it combines physical pain, social degradation and distress of the soul. It makes a person anonymous, a thing. Worse, the afflicted person comes to feel contempt and disgust for themselves, and others instinctively turn away. Affliction is “a marvel of divine technique” that, if accepted, can open the soul to God; but it can also destroy the soul entirely. Weil never romanticised it.` },
+    { t: `Force: The Iliad`, b: `In her essay “The Iliad, or the Poem of Force” (1940), written as France fell, Weil argues that the true hero and subject of Homer’s epic is force: the power to turn a human being into a thing. At its most extreme, force makes a person a corpse. But it also turns the living into things: the slave, the suppliant, the defeated. And it petrifies those who wield it just as much as those who suffer it. No one in the *Iliad* is spared; everyone is humbled by force in the end. The poem’s greatness is that it looks at this with bitterness and without contempt for anyone.` },
+    { t: `Gravity and grace`, b: `All the natural movements of the soul are governed by laws like physical gravity: we are pulled downward by self-interest, the need for compensation, the urge to pass on the harm done to us. “Grace is the only exception.” Grace comes from outside, like light, and makes us capable of acting against the pull of gravity: forgiving, giving without return, attending. To receive grace, we must first create a void in ourselves, an empty space it can enter.` },
+    { t: `Decreation`, b: `The most radical and difficult of her ideas. God, in creating the world, withdrew himself to make room for it. We are called to imitate this: to “decreate” the self, to give up the ego’s claim to be the centre of the world, so that God (or reality, or other people) can be seen as they are. This can look like self-hatred, and her death looks to many like its tragic end. But it also contains the root of her attention: the self has to get out of the way for anything else to be seen.` },
+    { t: `The need for roots`, b: `Written for the Free French as a plan for rebuilding France after the war, *The Need for Roots* begins not with rights but with obligations, and with the needs of the soul: order, liberty, obedience, responsibility, equality, hierarchy, honour, punishment, freedom of opinion, security, risk, private property, collective property, truth. The deepest need is rootedness: participation in a community that preserves treasures from the past and hopes for the future. Uprootedness (by conquest, by money, by modern industrial work, by deracinated education) is the most dangerous disease of human societies, because the uprooted uproot others.` }
+  ],
+  works: [
+    { t: `Gravity and Grace`, y: `1947, posthumous`, b: `Short excerpts from her notebooks, selected by her friend Gustave Thibon. Aphoristic and luminous, the best entry point. Read a page at a time.` },
+    { t: `Waiting for God`, y: `1950, posthumous`, b: `Letters to the Dominican priest Joseph-Marie Perrin and essays, including “Reflections on the Right Use of School Studies” (on attention) and “The Love of God and Affliction”. Her spiritual autobiography is here too.` },
+    { t: `The Iliad, or the Poem of Force`, y: `1940`, b: `About 30 pages. One of the great essays of the century.` },
+    { t: `The Need for Roots`, y: `1949, posthumous`, b: `Her political masterpiece. T. S. Eliot wrote the preface to the English edition.` },
+    { t: `Factory Journal`, y: `written 1934–35`, b: `Her notes from the Renault assembly line.` }
+  ],
+  quotes: [
+    { q: `Attention is the rarest and purest form of generosity.`, s: `Letter to Joë Bousquet, 13 April 1942` },
+    { q: `Those who are unhappy have no need for anything in this world but people capable of giving them their attention.`, s: `*Waiting for God*` },
+    { q: `The love of our neighbour in all its fullness simply means being able to say to him: “What are you going through?”`, s: `“Reflections on the Right Use of School Studies”, in *Waiting for God*` },
+    { q: `Attention, taken to its highest degree, is the same thing as prayer.`, s: `*Gravity and Grace*` },
+    { q: `To be rooted is perhaps the most important and least recognised need of the human soul.`, s: `*The Need for Roots*` },
+    { q: `The true hero, the true subject, the centre of the Iliad is force.`, s: `“The Iliad, or the Poem of Force”` },
+    { q: `Imaginary evil is romantic and varied; real evil is gloomy, monotonous, barren, boring. Imaginary good is boring; real good is always new, marvellous, intoxicating.`, s: `*Gravity and Grace*` }
+  ],
+  fakes: [],
+  critique: `Weil is hard to argue with because she lived her ideas at such cost. But that cost is also the problem. Her self-denial, refusal of food and longing for self-annihilation look to many readers like anorexia and depression given theological form. It is possible to admire her and still think that “decreation” is a dangerous ideal to hold up for anyone.
+
+Her attitude to Judaism is the most troubling part of her work. Born Jewish, she rejected the Hebrew Bible’s God as a god of force and power, praised Christianity for breaking with it, and in 1940s France wrote little about the persecution of Jews. Some critics, including Susan Sontag and George Steiner, found this deeply disturbing. She was also hostile to the Roman Empire and to much of the Old Testament, reading history in extreme, sometimes careless ways.
+
+Her political thought can be anti-modern and authoritarian in places: *The Need for Roots* recommends that the state punish publications that spread lies, and dislikes political parties so much that she proposed abolishing them. And she wrote, like many mystics, in a register of absolutes that makes her thrilling to read and hard to live by.`,
+  start: `Start with the essay “Reflections on the Right Use of School Studies with a View to the Love of God” in *Waiting for God* (Harper Perennial). It is short and life-changing for many. Then *Gravity and Grace* (Routledge), a few pages at a time. Then “The Iliad, or the Poem of Force”. Palle Yourgrau’s *Simone Weil* (Reaktion) and Robert Zaretsky’s *The Subversive Simone Weil* are short, good introductions.`,
+  related: ['pascal', 'augustine', 'camus', 'beauvoir', 'arendt', 'william-james']
+},
+{
+  id: 'arendt', name: `Hannah Arendt`, born: 1906, died: 1975, era: 'c20',
+  place: `Hanover and Königsberg; Paris; New York`, role: `Political philosopher`,
+  themes: ['politics', 'ethics', 'mind'], keywords: ['banality of evil', 'eichmann in jerusalem', 'origins of totalitarianism', 'human condition', 'thinking', 'loneliness', 'natality', 'action', 'labor work action', 'refugee'],
+  tagline: `Great evil is often done by ordinary people who simply never stopped to think.`,
+  summary: `Arendt, a Jewish refugee from Nazi Germany, spent her life trying to understand how totalitarianism happened. She argued that it rested on isolated, lonely masses who had lost a shared world, and on ideology that replaced thinking with logic. Covering the trial of Adolf Eichmann, she coined the phrase “the banality of evil”: the organiser of mass murder was not a monster but a thoughtless careerist. Her remedy was thinking, judging and political action: acting together, in public, to begin something new.`,
+  life: `Hannah Arendt was born in 1906 near Hanover and grew up in Königsberg (Kant’s city), in an assimilated, secular Jewish family. Her father died of syphilis when she was seven. Precociously brilliant, she read Kant at fourteen.
+
+At eighteen she went to Marburg to study with Martin Heidegger, then 35 and married. They began a secret affair that lasted several years. She moved on to study with Karl Jaspers in Heidelberg, who became a lifelong friend and mentor, and wrote her doctoral thesis on love in Augustine.
+
+As the Nazis rose, she began researching Jewish history and antisemitism. In 1933, she was arrested by the Gestapo for collecting evidence of antisemitic propaganda for a Zionist organisation, held for eight days, and released, possibly because of a sympathetic officer. She fled without papers across the border to Czechoslovakia, then to Paris, where she worked helping Jewish refugee children escape to Palestine. She was stateless from 1937.
+
+In 1940, when Germany invaded France, she was interned as an “enemy alien” in the camp at Gurs. In the chaos of France’s collapse she walked out, and with her second husband, Heinrich Blücher, escaped through Spain to Lisbon and got to New York in 1941. She arrived speaking little English, and worked as a journalist and editor.
+
+*The Origins of Totalitarianism* (1951) made her famous. She became an American citizen, taught at Chicago, the New School and elsewhere, and became one of the leading public intellectuals in America. In 1961 she went to Jerusalem to report on the trial of Adolf Eichmann for *The New Yorker*. The resulting book caused a firestorm: many Jewish readers were outraged by her tone, her description of Eichmann, and especially her criticism of Jewish councils in Nazi-occupied Europe for cooperating with deportations. She lost many friends.
+
+After the war she renewed contact with Heidegger, which puzzled and angered some of her friends. She died of a heart attack in 1975, aged 69, in her apartment in New York. On her typewriter was a sheet of paper with the title of the last part of her final work, *The Life of the Mind*: “Judging”.`,
+  ideas: [
+    { t: `Totalitarianism is new`, b: `Arendt argued that Nazism and Stalinism were not simply extreme versions of old tyranny. They were a new form of government. Tyranny aims at power and uses terror against opponents. Totalitarianism aims at total domination: the transformation of human nature itself, and uses terror against anyone at all, including the innocent and its own loyal members, to prove that everything is possible. Its laboratory was the concentration camp, where people were reduced to bundles of reactions, superfluous, interchangeable.` },
+    { t: `Loneliness and ideology`, b: `What made totalitarianism possible? Arendt pointed to masses of people who had lost their place in a shared world: uprooted by war, inflation, unemployment and the collapse of old classes and communities. Such people are not just isolated (cut off from political action) but lonely: cut off from others altogether, from the common world that tells us what is real. “What prepares men for totalitarian domination is that loneliness... has become an everyday experience.”
+
+Lonely people, having lost the common sense that comes from sharing a world with others, become susceptible to ideology: a system that explains everything from a single premise with iron logic, and that is immune to experience. “The ideal subject of totalitarian rule is not the convinced Nazi or the convinced Communist, but people for whom the distinction between fact and fiction and the distinction between true and false no longer exist.”
+
+She wrote that in 1951. It is hard to read now without thinking of algorithmic feeds, loneliness statistics and conspiracy theories.` },
+    { t: `The banality of evil`, b: `Adolf Eichmann had organised the logistics of the deportation of millions of Jews to death camps. Everyone expected a monster. Arendt found something more disturbing: a thoroughly ordinary bureaucrat, ambitious, eager to please his superiors, speaking in clichés, proud of his organisational skills, who seemed genuinely unable to think from anyone else’s point of view. He was not stupid. He was thoughtless.
+
+“The deeds were monstrous, but the doer was quite ordinary, commonplace, and neither demonic nor monstrous.” This is what she meant by the banality of evil. Not that the evil was trivial, but that it didn’t require deep wickedness. It could be done by people who simply went along, used officialese to avoid feeling anything, and never stopped to ask what they were doing.
+
+The lesson is uncomfortable because it points at ordinary people, including us.` },
+    { t: `Thinking`, b: `If evil can come from thoughtlessness, can thinking prevent it? In her last work, *The Life of the Mind*, Arendt explored this. Thinking, in the Socratic sense, is the silent dialogue between me and myself. It doesn’t produce results; it dissolves fixed opinions, habits and rules. And it gives you a partner you have to live with. Socrates said he would rather be at odds with the whole world than, being one, be at odds with himself. A person who thinks can’t easily do certain things, because they would then have to live with a murderer. Eichmann never had that conversation.` },
+    { t: `Labour, work and action`, b: `In *The Human Condition* (1958), Arendt distinguished three kinds of human activity. **Labour** is what we do to stay alive: eating, cleaning, producing what is consumed. It leaves nothing lasting. **Work** is making durable things (houses, tools, artworks) that build a lasting world. **Action** is what we do together in public: speaking, deciding, beginning things, politics in the fullest sense. Action is where we show who we are.
+
+She worried that modern society had turned everything into labour: we are job-holders and consumers, and even our leisure is spent consuming. The political space for action, where citizens appear to each other and act together, had shrunk.` },
+    { t: `Natality`, b: `Against philosophers who start from death (Heidegger’s being-toward-death), Arendt started from birth. Every human being is a new beginning, capable of starting something unforeseen. “The miracle that saves the world... is ultimately the fact of natality.” This is why action is possible, and why no system can predict or control us entirely. It is the root of her hope.` },
+    { t: `The right to have rights`, b: `As a stateless refugee, Arendt knew that “human rights” meant little to people with no government to protect them. The stateless had rights on paper and none in fact. What they had lost was the “right to have rights”: membership in a political community that would guarantee them.` }
+  ],
+  works: [
+    { t: `The Origins of Totalitarianism`, y: `1951`, b: `Three parts: antisemitism, imperialism, and totalitarianism. Long and dense. Part Three, and especially the final chapter “Ideology and Terror”, is the essential section.` },
+    { t: `The Human Condition`, y: `1958`, b: `Labour, work, action, and the modern loss of a shared world. Her most philosophical book.` },
+    { t: `Eichmann in Jerusalem: A Report on the Banality of Evil`, y: `1963`, b: `The trial report. Very readable, and still controversial. The postscript is where she defends and clarifies her view.` },
+    { t: `Between Past and Future`, y: `1961`, b: `Essays, including “Truth and Politics”, about lying in politics, and “The Crisis in Education”.` },
+    { t: `The Life of the Mind`, y: `1978, posthumous`, b: `Unfinished: “Thinking” and “Willing” were completed, “Judging” was not.` },
+    { t: `We Refugees`, y: `1943`, b: `A short essay on the experience of exile. Painful and funny.` }
+  ],
+  quotes: [
+    { q: `The sad truth is that most evil is done by people who never make up their minds to be good or evil.`, s: `*The Life of the Mind*, Volume I` },
+    { q: `The deeds were monstrous, but the doer was quite ordinary, commonplace, and neither demonic nor monstrous.`, s: `*The Life of the Mind*, Introduction, on Eichmann` },
+    { q: `The ideal subject of totalitarian rule is not the convinced Nazi or the convinced Communist, but people for whom the distinction between fact and fiction and the distinction between true and false no longer exist.`, s: `*The Origins of Totalitarianism*, “Ideology and Terror”` },
+    { q: `What prepares men for totalitarian domination in the non-totalitarian world is the fact that loneliness... has become an everyday experience.`, s: `*The Origins of Totalitarianism*, “Ideology and Terror”` },
+    { q: `The miracle that saves the world, the realm of human affairs, from its normal, “natural” ruin is ultimately the fact of natality.`, s: `*The Human Condition*, §34` },
+    { q: `No punishment has ever possessed enough power of deterrence to prevent the commission of crimes.`, s: `*Eichmann in Jerusalem*, Epilogue` }
+  ],
+  fakes: [],
+  critique: `The banality of evil has been challenged by later research. Eichmann in Jerusalem was performing a role for the court: the harmless functionary following orders. Bettina Stangneth’s *Eichmann Before Jerusalem* (2011), based on recordings he made among Nazi exiles in Argentina in the 1950s, shows a committed, unrepentant antisemite who boasted about his work and regretted only that he hadn’t finished it. Arendt, in other words, may have been fooled by the performance. Her concept may still be true of many perpetrators; it may not have been true of Eichmann.
+
+Her treatment of the Jewish councils was, many felt, cruelly unfair to people making impossible choices under unimaginable coercion, and her ironic tone about the trial struck survivors as heartless. Gershom Scholem accused her of having no love for the Jewish people. She replied that she had never loved any people or collective, only persons.
+
+Her political theory is also idealised. Her model of political action is drawn from the Athenian polis, which excluded women, slaves and foreigners, and she was dismissive of “the social question” (poverty) as a proper concern of politics. Her 1959 essay “Reflections on Little Rock”, opposing federally enforced school desegregation, was sharply criticised, and she later partly conceded that she had not understood the situation.`,
+  start: `Read *Eichmann in Jerusalem* (Penguin). It is her most readable book. Then the last chapter of *The Origins of Totalitarianism*, “Ideology and Terror”. Then, for the philosophy, the Prologue of *The Human Condition*. Elisabeth Young-Bruehl’s *Hannah Arendt: For Love of the World* is the classic biography; Lyndsey Stonebridge’s *We Are Free to Change the World* (2024) is a vivid recent guide.`,
+  related: ['heidegger', 'kant', 'augustine', 'socrates', 'simone-weil', 'foucault']
+},
+{
+  id: 'foucault', name: `Michel Foucault`, born: 1926, died: 1984, era: 'c20',
+  place: `Poitiers; Paris; Uppsala; Tunis; Berkeley`, role: `Philosopher and historian of ideas`,
+  themes: ['politics', 'knowledge', 'mind'], keywords: ['power', 'knowledge', 'discipline and punish', 'panopticon', 'surveillance', 'biopower', 'history of sexuality', 'madness', 'care of the self', 'normal', 'discourse'],
+  tagline: `Power doesn’t just forbid. It watches, measures and shapes who you think you are.`,
+  summary: `Foucault studied how societies define madness, crime, illness and sexuality, and showed that these categories have histories: they were produced by particular institutions at particular times. His most famous argument is that modern power doesn’t mainly work by force or prohibition but by surveillance, measurement and normalisation, like the “panopticon” prison, where prisoners, never sure if they are being watched, learn to watch themselves. Power produces knowledge and knowledge produces power. It is a useful lens for a world of tracking, data and self-monitoring.`,
+  life: `Paul-Michel Foucault was born in 1926 in Poitiers, the son of a prominent surgeon who wanted him to follow into medicine. He went to the École Normale Supérieure, where he was brilliant and deeply unhappy. He was gay in a hostile society, and attempted suicide at least once; his father had him seen by a psychiatrist. His interest in madness, psychiatry and the policing of “normality” had personal roots.
+
+He studied philosophy and psychology, briefly joined the Communist Party, and worked in psychiatric hospitals. He then spent years outside France, teaching in Uppsala in Sweden, Warsaw and Hamburg, and later Tunis. In Uppsala he found in the university library a huge collection of old medical texts, which became the basis for his doctoral thesis, published as *History of Madness* (1961).
+
+*The Order of Things* (1966) became an unlikely bestseller in France. Its last line, that “man” is a recent invention who may soon be erased “like a face drawn in sand at the edge of the sea”, made him a star. In 1970 he was elected to the Collège de France, the most prestigious academic post in the country, with the title “Professor of the History of Systems of Thought”. His lectures were packed with hundreds of people.
+
+He was politically active: he co-founded the Prison Information Group in 1971, which let prisoners speak about conditions inside, and demonstrated for many causes. In 1971 he debated Noam Chomsky on Dutch television about human nature and justice. In the late 1970s he reported enthusiastically, and wrongly, on the Iranian revolution.
+
+He spent increasing time in the United States, especially Berkeley. He died in Paris in 1984, aged 57, of an AIDS-related illness, one of the first prominent people in France to die of it.`,
+  ideas: [
+    { t: `The history of the obvious`, b: `Foucault’s method is to take something that seems natural and timeless, like madness, criminality, sexuality or the “normal” person, and show that our way of understanding it was produced at a particular historical moment, through particular institutions and practices. He called this a “history of the present”: understanding how we got to think the way we do, so that we see it is not inevitable.
+
+In *History of Madness*, he argued that in the seventeenth century, the “Great Confinement” locked up the mad together with the poor, the idle and the debauched as “unreason”. Only later did madness become a medical category, “mental illness”, with psychiatry as its authority. Each shift, he argued, was a new form of control dressed as progress.` },
+    { t: `From the scaffold to the timetable`, b: `*Discipline and Punish* (1975) opens with a horrific scene: the public execution in 1757 of Robert-François Damiens, who tried to kill Louis XV, torn apart by horses in front of a crowd. Then it jumps eighty years to a timetable for young prisoners in Paris: rise at six, prayer, work, meals, lessons, bed, every minute accounted for.
+
+The first seems barbaric and the second humane. Foucault’s point is that punishment didn’t simply become gentler. It changed targets. It moved from the body to the soul, from spectacle to surveillance, from punishing the crime to reforming the criminal, and from occasional, brutal displays of sovereign power to continuous, detailed control.` },
+    { t: `The panopticon`, b: `In 1791 the English philosopher Jeremy Bentham designed an ideal prison: the panopticon (“all-seeing”). A ring of cells surrounds a central watchtower. Each cell is lit from behind, so the guard can see every prisoner, but the prisoners can’t see into the tower. They never know whether they are being watched at a given moment, so they must behave as if they always are.
+
+For Foucault, this is the diagram of modern power. The prisoner “becomes the principle of his own subjection”: he watches himself. The same logic spreads through schools, factories, barracks and hospitals: constant observation, examination, ranking, records. You become a case, a file. And you learn to discipline yourself.
+
+It isn’t hard to see where this goes. Every app that tracks your steps, grades, followers and screen time is a small panopticon. The strange twist is that we now install them willingly.` },
+    { t: `Normalisation`, b: `Disciplinary power works less by forbidding than by normalising. It measures people against a norm (the average student, the healthy body, the normal sexuality), ranks them, and pushes them to conform. The examination (in school, medicine, psychiatry) combines surveillance and judgement, turning individuals into cases to be documented and corrected. The “normal” becomes a quiet but pervasive form of power.` },
+    { t: `Power/knowledge`, b: `Power and knowledge are bound together. The human sciences (psychiatry, criminology, psychology, sociology) didn’t just discover truths about people; they developed within institutions of control (the asylum, prison, school), and the knowledge they produced made new kinds of control possible. Who gets to define what is true, normal or healthy is always a question of power. And power isn’t just something the state or the ruling class *has*. It is everywhere, in all relationships, and it is productive: it creates identities, desires and forms of knowledge, not only forbidding them.` },
+    { t: `Biopower`, b: `Old sovereign power was the power to take life: to execute. Modern power, from the eighteenth century, is “biopower”: power over life itself, managing populations through statistics, public health, birth rates, life expectancy, hygiene. It “makes live and lets die”. Pandemic policy, health metrics and demographic management are all in this territory.` },
+    { t: `The care of the self`, b: `In his last years, Foucault turned to ancient Greek and Roman ethics, the Stoics and Epicureans, and found in them an ethics based not on obeying rules but on *epimeleia heautou*, the care of the self: practices by which individuals shape themselves into a certain kind of person. He suggested we might make our lives a kind of work of art. It was, in part, a search for freedom within a world of power.` }
+  ],
+  works: [
+    { t: `History of Madness (Madness and Civilization)`, y: `1961`, b: `How the West separated reason from madness. The abridged English translation, *Madness and Civilization*, is easier to read than the full text.` },
+    { t: `The Birth of the Clinic`, y: `1963`, b: `How modern medicine learned to see the body.` },
+    { t: `The Order of Things`, y: `1966`, b: `A difficult history of the human sciences, opening with a famous analysis of Velázquez’s painting *Las Meninas* and a joke about a fictional Chinese encyclopedia from Borges.` },
+    { t: `Discipline and Punish`, y: `1975`, b: `His most readable and influential book. The chapter “Panopticism” is essential.` },
+    { t: `The History of Sexuality, Volume I`, y: `1976`, b: `Challenges the idea that the Victorians repressed sex. Instead, modern society talks about sex obsessively, turning it into the “truth” of who we are. Volumes II and III turn to ancient ethics.` }
+  ],
+  quotes: [
+    { q: `He who is subjected to a field of visibility, and who knows it, assumes responsibility for the constraints of power; he becomes the principle of his own subjection.`, s: `*Discipline and Punish*, “Panopticism”` },
+    { q: `Is it surprising that prisons resemble factories, schools, barracks, hospitals, which all resemble prisons?`, s: `*Discipline and Punish*, “Panopticism”` },
+    { q: `Where there is power, there is resistance.`, s: `*The History of Sexuality*, Volume I` },
+    { q: `Visibility is a trap.`, s: `*Discipline and Punish*, “Panopticism”` },
+    { q: `Man is an invention of recent date. And one perhaps nearing its end.`, s: `*The Order of Things*, conclusion` },
+    { q: `Do not ask who I am and do not ask me to remain the same.`, s: `*The Archaeology of Knowledge*, Introduction` }
+  ],
+  fakes: [],
+  critique: `Historians have challenged much of Foucault’s history. The “Great Confinement” was less universal than he claimed, and his account of madness romanticised it. Critics like H. C. Erik Midelfort argued that his evidence often didn’t support his sweeping claims. He could be cavalier with facts in the service of a striking argument.
+
+The philosophical problem is normative. If power is everywhere and all knowledge is bound up with power, from what position can Foucault criticise anything? Why is resistance better than domination, if there is no standard of truth or justice outside power? Jürgen Habermas and Nancy Fraser argued that Foucault relied on values (freedom, dignity) he couldn’t justify within his own framework. In the 1971 debate, Chomsky defended a universal human nature and ideas of justice; Foucault suggested that such ideas were themselves products of power. Many viewers thought Chomsky had the better of it.
+
+His prose can be obscure, and his followers made it worse. And his political judgement failed badly on Iran.
+
+There are also serious allegations. In 2021 the writer Guy Sorman claimed that Foucault had sexually abused young boys in Tunisia in the late 1960s. The claims have not been independently corroborated and have been disputed by others who were there, but they have been widely reported, and Foucault signed the same 1977 petition as Sartre and Beauvoir on the age of consent.`,
+  start: `Read the chapter “Panopticism” in *Discipline and Punish* (Penguin, trans. Alan Sheridan), then the opening chapter on the execution of Damiens. Gary Gutting’s *Foucault: A Very Short Introduction* is clear and fair. The Chomsky–Foucault debate (1971) is on YouTube and is a good way to see him think.`,
+  related: ['nietzsche', 'marx', 'arendt', 'heidegger', 'epictetus']
+}
+);
+
+THINKERS.push(
+{
+  id: 'william-james', name: `William James`, born: 1842, died: 1910, era: 'psych',
+  place: `New York; Cambridge, Massachusetts`, role: `Psychologist and philosopher`,
+  themes: ['mind', 'god', 'meaning', 'knowledge'], keywords: ['principles of psychology', 'stream of consciousness', 'habit', 'attention', 'pragmatism', 'varieties of religious experience', 'will to believe', 'free will', 'depression'],
+  tagline: `My experience is what I agree to attend to.`,
+  summary: `William James founded American psychology and the philosophy of pragmatism. He described consciousness as a “stream”, argued that habit is the “flywheel of society”, and saw that what we attend to becomes our life. In philosophy he held that the truth of an idea lies in its practical consequences, and that we are sometimes entitled to believe beyond the evidence. He wrote the best book ever written on religious experience, and got out of a suicidal depression by deciding to believe in free will.`,
+  life: `William James was born in 1842 in New York, into a rich, eccentric, intellectual family. His father, Henry James Sr., was a theologian who dragged his children back and forth across Europe for an unusual education. His brother was the novelist Henry James; his sister Alice was a brilliant diarist.
+
+William wanted to be a painter, then studied chemistry, anatomy and medicine at Harvard, went on a scientific expedition to Brazil with the naturalist Louis Agassiz (and got smallpox), and earned a medical degree in 1869. He never practised.
+
+In his twenties he suffered a severe depression, with thoughts of suicide. He later described, in disguise, a vision in an asylum of an epileptic patient, sitting like an idiot with knees drawn up, “entirely idiotic”, and the horrible thought: “That shape am I, potentially.” He was saved partly by reading the French philosopher Charles Renouvier on free will. On 30 April 1870 he wrote in his diary: “My first act of free will shall be to believe in free will.”
+
+In 1872 he began teaching physiology at Harvard, then psychology, and set up one of the first psychology laboratories in the world. He spent twelve years writing *The Principles of Psychology* (1890), which became a classic the moment it appeared. He was a warm, witty, generous teacher; his students included Theodore Roosevelt, Gertrude Stein and W. E. B. Du Bois.
+
+He moved from psychology to philosophy, developing pragmatism with his friend Charles Sanders Peirce, and became the most famous philosopher in America. He was also a serious investigator of psychic phenomena and mediums, open-minded to the point of credulity, his critics said. He died of heart failure in 1910 at his summer home in New Hampshire.`,
+  ideas: [
+    { t: `The stream of consciousness`, b: `Earlier psychologists described the mind as a collection of separate ideas, like beads on a string. James said that’s not what experience is like. “Consciousness does not appear to itself chopped up in bits. It is nothing jointed; it flows. A ‘river’ or a ‘stream’ are the metaphors by which it is most naturally described.” Thoughts have fringes, halos, overlaps. The phrase “stream of consciousness” was taken up by novelists like Virginia Woolf and James Joyce.` },
+    { t: `Habit`, b: `The chapter on habit in *The Principles* is one of the most practically useful things ever written on psychology. The nervous system is plastic: it takes the shape of what we do repeatedly. Habit makes actions easier, more accurate and less tiring. It is “the enormous flywheel of society, its most precious conservative agent”. It keeps people in their stations, the fisherman at sea, the miner in the dark.
+
+So the great thing, James says, is to “make our nervous system our ally instead of our enemy”: make useful actions automatic as early as possible. His rules: start a new habit with as strong and decided an initiative as possible; never suffer an exception until the new habit is securely rooted (“every lapse is like the letting fall of a ball of string which one is carefully winding up”); act on every resolution at the first opportunity; and keep the faculty of effort alive by a little gratuitous exercise every day.
+
+And a warning: “We are spinning our own fates, good or evil, and never to be undone. Every smallest stroke of virtue or of vice leaves its never so little scar.” The drunk who says “I won’t count this time” is wrong. It is being counted.` },
+    { t: `Attention is life`, b: `“My experience is what I agree to attend to. Only those items which I notice shape my mind.” Out of the vast chaos of stimuli, attention selects what becomes our world. And voluntary attention (holding your focus on something that doesn’t naturally hold it) is, James thought, the core of will and character. “The faculty of voluntarily bringing back a wandering attention, over and over again, is the very root of judgement, character, and will. No one is *compos sui* [master of himself] if he have it not. An education which should improve this faculty would be the education *par excellence*.”
+
+He was writing in 1890. A feed designed to capture involuntary attention works directly against the faculty he thought made us free.` },
+    { t: `Emotions follow the body`, b: `Common sense says we see a bear, feel afraid, and run. James (and the Danish physiologist Carl Lange) turned it around: we see the bear, our body reacts (heart pounding, running), and the emotion is our perception of those bodily changes. “We feel sorry because we cry, angry because we strike, afraid because we tremble.” The theory has been heavily modified, but the insight that emotions are deeply bodily has proved right, and it has a practical side: acting as if you feel something can help you feel it.` },
+    { t: `Pragmatism`, b: `How do you settle a philosophical dispute? Ask what practical difference it would make if one side or the other were true. If none, the dispute is idle. The meaning of an idea is found in its consequences for experience and action. Truth is what “works”: ideas become true insofar as they help us get into satisfactory relations with other parts of our experience. James illustrated with a squirrel on a tree trunk and a man walking around the tree while the squirrel moves to stay opposite him. Does the man go “round” the squirrel? It depends entirely on what you practically mean by “round”.` },
+    { t: `The will to believe`, b: `Can it be right to believe something without sufficient evidence? The Victorian mathematician W. K. Clifford said no, never. James disagreed. When you face a choice that is **live** (both options are real possibilities for you), **forced** (you can’t avoid deciding), and **momentous** (it matters, and won’t come again), and the evidence can’t settle it, then your passional nature not only may but must decide. Refusing to believe is itself a choice, with its own risks. Religious belief is his main example. Some facts, he adds, can only come true if we first believe in them, like trust in a friendship.` },
+    { t: `Religious experience`, b: `In *The Varieties of Religious Experience* (1902), James studied religion not as doctrine or institution but as personal experience: conversions, mystical states, saintliness, the “sick soul” and the “healthy-minded” temperament. He collected hundreds of first-hand accounts. He concluded that religious experiences, whatever their source, are real in their effects: they transform lives. The “sick soul”, who feels the world’s evil deeply and needs to be “twice-born”, sees more of reality than the cheerful once-born optimist. He included himself, in disguise, as a case.` }
+  ],
+  works: [
+    { t: `The Principles of Psychology`, y: `1890`, b: `Two volumes, 1,400 pages. Beautifully written. The chapters on habit (4), the stream of thought (9), the self (10), attention (11), emotion (25) and will (26) are the essential ones.` },
+    { t: `Psychology: The Briefer Course`, y: `1892`, b: `An abridgement, nicknamed “Jimmy” (the big one was “James”).` },
+    { t: `The Will to Believe`, y: `1897`, b: `The title essay and others, including “Is Life Worth Living?”` },
+    { t: `The Varieties of Religious Experience`, y: `1902`, b: `His Gifford Lectures in Edinburgh. Accessible, fascinating, and full of real people’s stories. Lectures 6 and 7 (“The Sick Soul”) are unforgettable.` },
+    { t: `Pragmatism`, y: `1907`, b: `Lectures for a general audience. The squirrel is in Lecture II.` }
+  ],
+  quotes: [
+    { q: `My experience is what I agree to attend to. Only those items which I notice shape my mind.`, s: `*Principles of Psychology*, chapter 11` },
+    { q: `The faculty of voluntarily bringing back a wandering attention, over and over again, is the very root of judgement, character, and will.`, s: `*Principles of Psychology*, chapter 11` },
+    { q: `My first act of free will shall be to believe in free will.`, s: `Diary, 30 April 1870` },
+    { q: `Habit is thus the enormous flywheel of society, its most precious conservative agent.`, s: `*Principles of Psychology*, chapter 4` },
+    { q: `The art of being wise is the art of knowing what to overlook.`, s: `*Principles of Psychology*, chapter 22` },
+    { q: `We are spinning our own fates, good or evil, and never to be undone.`, s: `*Principles of Psychology*, chapter 4` },
+    { q: `Believe that life is worth living, and your belief will help create the fact.`, s: `“Is Life Worth Living?” (1895)` }
+  ],
+  fakes: [
+    { q: `The greatest discovery of my generation is that a human being can alter his life by altering his attitudes.`, n: `Widely attributed to James, with no source found in his writings.` },
+    { q: `Act as if what you do makes a difference. It does.`, n: `No source has been found. It circulates on posters with his name.` }
+  ],
+  critique: `Pragmatism’s theory of truth draws the most fire. If truth is “what works”, then a comforting lie that helps someone cope might count as true. Bertrand Russell mocked James for making it “true” that Santa Claus exists if believing it works for children. James protested that he was misread, and that his account meant long-run working in the whole of experience, not short-term convenience. But the ambiguity is his.
+
+“The will to believe” has been called “the will to make-believe”. Critics worry that it licenses wishful thinking: any belief could be defended as a live, forced, momentous option.
+
+His psychical research made hard-headed colleagues despair, and some of his psychology has been superseded. But *The Principles* remains one of the few psychology books a century old that is still worth reading for its insight, not just as history.`,
+  start: `Read the chapter on habit from *The Principles of Psychology* (it’s free online and about 20 pages; it will change how you think about your routines). Then the chapter on attention. Then *The Varieties of Religious Experience* (Penguin or Library of America), especially the lectures on the sick soul. Robert Richardson’s *William James: In the Maelstrom of American Modernism* is a wonderful biography.`,
+  related: ['mill', 'pascal', 'simone-weil', 'jung', 'frankl']
+},
+{
+  id: 'freud', name: `Sigmund Freud`, born: 1856, died: 1939, era: 'psych',
+  place: `Příbor (Moravia); Vienna; London`, role: `Neurologist; founder of psychoanalysis`,
+  themes: ['mind', 'love', 'suffering', 'death'], keywords: ['psychoanalysis', 'unconscious', 'id', 'ego', 'superego', 'dreams', 'oedipus', 'repression', 'defence mechanisms', 'civilization and its discontents', 'death drive', 'libido', 'talking cure', 'transference'],
+  tagline: `You are not master in your own house.`,
+  summary: `Freud argued that much of what drives us is unconscious: desires, fears and memories we’ve pushed out of awareness, which return in dreams, slips of the tongue, symptoms and repeated patterns. He divided the mind into the id (instinctual drives), the ego (the negotiator with reality) and the superego (the internalised voice of parents and society). He invented psychoanalysis, the “talking cure”. Much of his theory is now rejected, but the idea that we don’t fully know our own motives has become common sense.`,
+  life: `Sigismund Schlomo Freud was born in 1856 in Freiberg, Moravia (now Příbor in the Czech Republic), the first child of his father’s third marriage. His father was a struggling wool merchant; his mother, twenty years younger, adored him (“my golden Sigi”). The family moved to Vienna when he was four, and he lived there for nearly eighty years.
+
+He trained as a doctor at the University of Vienna and did research in neurology, including early work on cocaine, which he recommended enthusiastically before its addictive dangers were known. Because of antisemitism and lack of money, he couldn’t pursue an academic career, and in 1886 set up private practice as a neurologist, treating “nervous diseases”, especially hysteria. He married Martha Bernays after a four-year engagement conducted largely by letter, and they had six children; his daughter Anna became a leading psychoanalyst.
+
+He had studied in Paris with Jean-Martin Charcot, who used hypnosis on hysterical patients, and worked with the Viennese doctor Josef Breuer, whose patient “Anna O.” (Bertha Pappenheim) found that talking about her symptoms relieved them. She called it “the talking cure” and “chimney sweeping”. Freud gave up hypnosis for “free association”: patients lying on a couch, saying whatever came into their heads, while he sat out of sight behind them.
+
+After his father’s death in 1896, Freud undertook a painful self-analysis, largely through his own dreams, and in 1899 published *The Interpretation of Dreams* (dated 1900). It sold 351 copies in six years. Slowly, a circle formed around him, the Wednesday Psychological Society, which grew into the international psychoanalytic movement. Jung, Adler and others joined, then broke away in bitter quarrels.
+
+In 1923 he was diagnosed with cancer of the jaw, caused by his lifelong habit of about twenty cigars a day. He had over thirty operations and wore a painful prosthesis, but never stopped smoking. When the Nazis annexed Austria in 1938, they burned his books and the Gestapo interrogated his daughter Anna. With help from Princess Marie Bonaparte and others, Freud escaped to London. Four of his sisters, who stayed behind, died in the camps. In September 1939, in great pain, he asked his doctor to end his life, and was given a lethal dose of morphine. He was 83.`,
+  ideas: [
+    { t: `The unconscious`, b: `Freud’s most important idea is that much of mental life happens outside awareness, and that the unconscious isn’t just a storage cupboard but a dynamic force. Wishes, fears and memories that are unacceptable to us are pushed out of consciousness (**repression**), but they don’t disappear. They press for expression and return in disguised form: in dreams, jokes, slips of the tongue (“Freudian slips”), forgetting, neurotic symptoms and repeated self-defeating patterns.
+
+Freud said humanity had suffered three great blows to its self-love. Copernicus showed the earth wasn’t the centre of the universe. Darwin showed humans weren’t separate from animals. And psychoanalysis showed that “the ego is not master in its own house”.` },
+    { t: `Dreams`, b: `“The interpretation of dreams is the royal road to a knowledge of the unconscious activities of the mind.” Every dream, Freud argued, is the disguised fulfilment of a wish. The **manifest content** (what you remember) is a disguise for the **latent content** (the hidden wish). The “dream-work” disguises the wish through condensation (several ideas fused into one image), displacement (emotional weight shifted onto something trivial), and symbolism. Analysis works backward, through free association, from the dream to the wish.` },
+    { t: `Id, ego and superego`, b: `In 1923 Freud offered a new model of the mind. The **id** (“it”) is the reservoir of instinctual drives, sexual and aggressive, operating on the pleasure principle: it wants satisfaction now, knows no logic, time or morality. The **superego** (“over-I”) is the internalised authority of parents and society: conscience, ideals, guilt. It can be ferociously harsh. The **ego** (“I”) is the part that deals with reality, and it has to mediate between the demands of the id, the superego and the outside world. Freud compared it to a rider on a horse who often has to guide the horse where it wants to go.` },
+    { t: `Defence mechanisms`, b: `To manage anxiety, the ego uses defences, most of them unconscious. **Repression**: pushing something out of awareness. **Projection**: attributing your own unacceptable feelings to others. **Reaction formation**: turning a feeling into its opposite (excessive politeness masking hostility). **Rationalisation**: inventing good reasons for what you did for other reasons. **Displacement**: redirecting emotion onto a safer target (shouting at the dog after a bad day at work). **Sublimation**: channelling forbidden drives into socially valued activity, such as art or work. Anna Freud systematised these, and they are the part of Freudian theory most widely accepted today.` },
+    { t: `Childhood and sexuality`, b: `Freud shocked his contemporaries by insisting that children have sexual feelings, understood broadly as pleasure-seeking drives centred on different parts of the body at different stages (oral, anal, phallic, latency, genital). Around ages three to five comes the **Oedipus complex**: the child’s desire for the parent of the opposite sex and rivalry with the same-sex parent. How it is resolved shapes personality and the superego. Much adult neurosis, he thought, goes back to childhood conflicts that were never worked through.` },
+    { t: `Transference`, b: `In analysis, patients come to feel towards the analyst the emotions they felt towards important people in their past, especially parents: love, hostility, dependence. This **transference** first seemed an obstacle; Freud came to see it as the key tool of treatment, because it brings old patterns into the room where they can be seen and worked through. It happens outside therapy too: we meet new people with templates from old relationships.` },
+    { t: `Civilisation and its discontents`, b: `In his late, gloomy masterpiece, Freud argued that civilisation requires us to renounce our instincts, especially aggression and unrestrained sexuality, and that this renunciation is the source of our unhappiness. The price of civilisation is guilt: our aggression, forbidden an outlet, is turned inward as the superego and torments us. Humans are not gentle creatures who want to be loved; “man is a wolf to man”. Civilisation is a fragile achievement, always threatened. He published it in 1930.` },
+    { t: `Love and work`, b: `Asked what a normal person should be able to do well, Freud is reported to have said: *lieben und arbeiten*, “to love and to work”. The saying comes from Erik Erikson’s reports, not Freud’s writings, but it is widely accepted as his view.` }
+  ],
+  works: [
+    { t: `The Interpretation of Dreams`, y: `1899 (dated 1900)`, b: `His favourite book, full of his own dreams. Long; chapters 2 and 4 give the method and theory.` },
+    { t: `The Psychopathology of Everyday Life`, y: `1901`, b: `Slips of the tongue, forgetting names, mislaying things. The most entertaining and accessible way into Freud.` },
+    { t: `Introductory Lectures on Psychoanalysis`, y: `1916–17`, b: `Lectures for a general audience at the University of Vienna. Clear and persuasive, the best overview.` },
+    { t: `Beyond the Pleasure Principle`, y: `1920`, b: `Introduces the “death drive”, a tendency towards destruction and repetition. Speculative and strange.` },
+    { t: `The Ego and the Id`, y: `1923`, b: `The structural model.` },
+    { t: `Civilisation and Its Discontents`, y: `1930`, b: `About 100 pages. His most philosophical work, and the one to read if you read one.` }
+  ],
+  quotes: [
+    { q: `The ego is not master in its own house.`, s: `“A Difficulty in the Path of Psychoanalysis” (1917)` },
+    { q: `The interpretation of dreams is the royal road to a knowledge of the unconscious activities of the mind.`, s: `*The Interpretation of Dreams*, chapter 7` },
+    { q: `Where id was, there ego shall be.`, s: `*New Introductory Lectures on Psychoanalysis*, Lecture 31 (1933)` },
+    { q: `The voice of the intellect is a soft one, but it does not rest till it has gained a hearing.`, s: `*The Future of an Illusion* (1927), chapter 10` },
+    { q: `Much will be gained if we succeed in transforming your hysterical misery into common unhappiness.`, s: `*Studies on Hysteria* (1895), with Breuer` }
+  ],
+  fakes: [
+    { q: `Sometimes a cigar is just a cigar.`, n: `No evidence Freud ever said this. It first appears decades after his death.` },
+    { q: `Unexpressed emotions will never die. They are buried alive and will come forth later in uglier ways.`, n: `Not found in his writings. It is a modern paraphrase of the idea of repression.` },
+    { q: `One day, in retrospect, the years of struggle will strike you as the most beautiful.`, n: `Commonly attributed, with no source in his works or letters that has been confirmed.` }
+  ],
+  critique: `The most serious problem is scientific. Karl Popper argued that psychoanalysis is unfalsifiable: any behaviour can be explained after the fact. If a patient accepts an interpretation, it’s confirmed; if they reject it, that’s “resistance”, which also confirms it. A theory that can’t be proved wrong isn’t science.
+
+Many of Freud’s specific claims have not survived testing. Dreams don’t appear to be disguised wish-fulfilments in general. There is little evidence for the Oedipus complex as a universal stage. Freud’s famous case histories have been re-examined, and some “cures” turn out to have failed; Frederick Crews and others have documented how he shaped his evidence. His treatment of women (the “Dora” case, his theories of female sexuality and “penis envy”) is widely seen as reflecting his own era’s prejudices. Most damningly, in 1897 he abandoned his early theory that hysteria was caused by childhood sexual abuse, deciding that patients’ memories were fantasies. Critics like Jeffrey Masson argued this led generations of therapists to disbelieve real abuse.
+
+What survives? A great deal, loosely. The existence of unconscious mental processes is now mainstream cognitive science, though the modern unconscious is less dramatic than Freud’s. Defence mechanisms are well supported. The importance of early relationships is central to attachment theory. And the idea that talking about your life, in a relationship with a trained listener, can help, underlies nearly every form of psychotherapy.
+
+Read Freud as a brilliant, sometimes wrong, always interesting interpreter of human nature, closer to Montaigne or Nietzsche than to a lab scientist, and he is worth it.`,
+  start: `Start with *Civilisation and Its Discontents* (Penguin, trans. David McLintock), or *The Psychopathology of Everyday Life* for something lighter. The *Introductory Lectures* are the best overview. Adam Phillips’s *Becoming Freud* is a short, elegant biography; Anthony Storr’s *Freud: A Very Short Introduction* is balanced; Frederick Crews’s *Freud: The Making of an Illusion* is the case for the prosecution.`,
+  related: ['jung', 'adler', 'schopenhauer', 'nietzsche', 'fromm', 'becker']
+},
+{
+  id: 'jung', name: `Carl Jung`, born: 1875, died: 1961, era: 'psych',
+  place: `Kesswil and Basel; Zurich; Küsnacht`, role: `Psychiatrist; founder of analytical psychology`,
+  themes: ['mind', 'meaning', 'god', 'suffering'], keywords: ['collective unconscious', 'archetypes', 'shadow', 'persona', 'anima', 'animus', 'self', 'individuation', 'introvert', 'extravert', 'synchronicity', 'red book', 'complex', 'active imagination', 'midlife', 'dreams'],
+  tagline: `Until you face your shadow, you’ll keep meeting it in other people.`,
+  summary: `Jung began as Freud’s heir and broke away to build his own psychology. Below the personal unconscious, he said, lies a collective unconscious shared by all humans, populated by archetypes (the Mother, the Hero, the Trickster, the Wise Old Man) that show up in myths, religions and dreams everywhere. The work of life is individuation: becoming a whole person by integrating what we’ve rejected, especially the shadow, the parts of ourselves we deny and project onto others. He also gave us the words introvert and extravert.`,
+  life: `Carl Gustav Jung was born in 1875 in Kesswil, a village on Lake Constance in Switzerland, and grew up near Basel. His father was a Reformed pastor who had lost his faith but kept preaching; his mother was unpredictable and claimed contact with spirits. Eight of his uncles were clergymen. Jung was a lonely, introverted child with an intense inner life. At about twelve, after being knocked down by a schoolmate, he started having fainting fits to avoid school, until he overheard his father worrying about how he would earn a living, and forced himself to recover. He later said this taught him what a neurosis is.
+
+He studied medicine in Basel and, fascinated by the combination of biology and spirit, chose psychiatry, then a despised specialty. In 1900 he joined the Burghölzli, the psychiatric hospital of Zurich University, under Eugen Bleuler (who coined the word “schizophrenia”). There he developed the word association test, finding that delays and odd responses revealed emotionally charged clusters of ideas he called **complexes**. He married Emma Rauschenbach, heiress to a fortune, who later became an analyst herself.
+
+His work supported Freud’s ideas, and in 1907 he went to Vienna. The two talked for thirteen hours straight. Freud, twenty years older, saw Jung as his “crown prince”, the non-Jewish heir who would carry psychoanalysis beyond Vienna. Jung became the first president of the International Psychoanalytic Association. But he couldn’t accept Freud’s insistence that the libido was entirely sexual, and he was interested in religion, myth and the occult, which Freud distrusted. His 1912 book *Symbols of Transformation* made the break public. By 1913 they were no longer speaking.
+
+The break plunged Jung into a period of crisis he called his “confrontation with the unconscious”. He resigned his university post, had terrifying visions (including a flood of blood covering Europe, shortly before the First World War), and deliberately induced fantasies, recording them in black notebooks and then, in calligraphy with painted illustrations, in a huge book bound in red leather. *The Red Book* stayed locked in a bank vault until 2009. He said everything he did later was drawn from this period.
+
+He built his own theory, “analytical psychology”, and a large international following. From 1923 he built a stone tower at Bollingen on Lake Zurich, without electricity or running water, where he chopped wood, cooked, carved stone and painted. He travelled to North Africa, New Mexico (visiting the Pueblo), Kenya and India to study how other cultures lived and thought.
+
+His long relationship with Toni Wolff, a former patient who became an analyst, was open knowledge; Emma tolerated it. In the 1930s he served as president of an international medical society for psychotherapy that the Nazis had brought under their control, which remains a controversial chapter (see below). He lived into old age as a kind of sage, receiving visitors at Küsnacht. In a 1959 BBC interview, asked whether he believed in God, he said: “I don’t need to believe. I know.” He died in 1961, aged 85. According to his biographers, lightning struck a tree in his garden shortly after.`,
+  ideas: [
+    { t: `The collective unconscious`, b: `Freud’s unconscious was personal: the repressed memories and wishes of an individual. Jung agreed this existed, but thought it rested on a deeper layer, the **collective unconscious**, shared by all human beings, inherited like the structure of the body. It isn’t made of specific memories but of predispositions: tendencies to experience and imagine the world in certain typical ways.
+
+His evidence: he kept finding the same symbols and motifs in patients’ dreams and psychotic fantasies, in the myths and religions of cultures that never had contact, and in alchemical texts. One patient described seeing a sun with a phallus from which the wind came; Jung later found almost the same image in an ancient Mithraic text the patient could not have known.` },
+    { t: `Archetypes`, b: `The contents of the collective unconscious are **archetypes**: universal patterns or forms that shape experience, like riverbeds that channel water. They aren’t images themselves but tendencies to produce images, which take on the clothing of each culture. Common ones include the Mother (nurturing and devouring), the Father, the Child, the Hero, the Trickster, the Wise Old Man, the Maiden, and the Self.
+
+You can see them in stories everywhere: in myths, fairy tales, religions and now films and games. The hero’s journey (a call to adventure, a descent, trials, a return transformed) was developed from Jungian ideas by Joseph Campbell, and George Lucas used Campbell for *Star Wars*.` },
+    { t: `The persona`, b: `The **persona** (Latin for an actor’s mask) is the face we present to the world: our social role, the version of ourselves shaped to fit expectations. Everyone needs one. The danger is identifying with it completely, so that you become your job, your title, your image, and lose touch with everything else in you. The persona is a compromise between the individual and society about what someone should appear to be. It is not who they are.
+
+Jung described people so identified with their persona that they are hollow behind it. A culture of online profiles, curated for approval, makes this easier than ever.` },
+    { t: `The shadow`, b: `The **shadow** is everything in us that we don’t want to be, and so refuse to see: our selfishness, aggression, envy, cowardice, lust, but also undeveloped talents and qualities we were taught were unacceptable. It is the dark side of the persona.
+
+We don’t get rid of the shadow by ignoring it. We **project** it: we see it in others and hate it there. The people who irritate us most are often showing us our own shadow. “Everything that irritates us about others can lead us to an understanding of ourselves.” Whole groups project their shadow onto scapegoats: other nations, races, political opponents.
+
+The work is to recognise and integrate the shadow, not to act it out but to own it. This is painful and humbling, and it makes a person less dangerous, because what is conscious can be managed. “One does not become enlightened by imagining figures of light, but by making the darkness conscious.”` },
+    { t: `Anima and animus`, b: `Jung believed each person carries an unconscious image of the other sex: in men, the **anima** (the feminine side), in women, the **animus** (the masculine side). They appear in dreams as figures of the other sex and are projected onto real people, which is why falling in love can feel like recognising someone you already knew, and why disillusionment follows when the real person doesn’t match. Integrating the anima or animus means taking back those projections and developing the qualities in yourself. (This part of his theory is heavily shaped by the gender assumptions of his time; see below.)` },
+    { t: `The Self and individuation`, b: `The **Self** is the archetype of wholeness: the centre and totality of the psyche, conscious and unconscious together, as opposed to the ego, which is only the centre of consciousness. It appears in dreams and art as mandalas (circular, symmetrical designs), divine children, jewels, or images of God.
+
+**Individuation** is the lifelong process of becoming who you are: not a perfect person, but a whole one. It means differentiating yourself from the persona, confronting the shadow, integrating the anima or animus, and coming into relationship with the Self. It isn’t selfish isolation: “Individuation does not shut one out from the world, but gathers the world to oneself.” For Jung, this is the real meaning of a human life.` },
+    { t: `The afternoon of life`, b: `Jung had a special interest in the second half of life. The first half is about building an ego: establishing yourself in work, relationships and society. But around forty, many people find that the goals of youth no longer satisfy, and they have a crisis. Jung thought this was not a malfunction but a summons.
+
+“We cannot live the afternoon of life according to the programme of life’s morning; for what was great in the morning will be little at evening, and what in the morning was true will at evening have become a lie.” The task of the second half is inward: meaning, wholeness, spiritual life, preparing for death. Many of his patients, he said, were not neurotic in any clinical sense but suffering from the senselessness and emptiness of their lives. This is where the idea of the “midlife crisis” comes from.` },
+    { t: `Introverts and extraverts`, b: `In *Psychological Types* (1921), Jung introduced the terms **introversion** (energy directed inward, towards the subjective world) and **extraversion** (energy directed outward, towards people and objects). He combined them with four functions: thinking, feeling, sensation and intuition. The Myers–Briggs Type Indicator was later built from this, by a mother and daughter with no training in psychology. Jung himself was sceptical of rigid typing, and warned that the types were never meant to stick labels on people.
+
+Introversion and extraversion have survived as a central dimension in scientific personality psychology (the Big Five). The rest of the typology hasn’t held up well.` },
+    { t: `Synchronicity`, b: `Jung noticed “meaningful coincidences”: events linked not by cause but by meaning. A patient was telling him about a dream of a golden scarab beetle when something tapped on the window; Jung opened it and caught a rose chafer, the nearest local equivalent of a scarab. He called such events **synchronicity**, and speculated with the physicist Wolfgang Pauli that mind and matter might be connected at a deep level. This is where most scientists part company with him.` },
+    { t: `Religion as psychological need`, b: `Unlike Freud, who saw religion as an illusion, Jung saw it as expressing something real in the psyche: the need for meaning, wholeness and connection to something beyond the ego. The loss of living religious symbols in modern life, he thought, left people spiritually starved and vulnerable to substitutes: mass movements, ideologies, obsessions. “Man cannot stand a meaningless life.”` }
+  ],
+  works: [
+    { t: `Memories, Dreams, Reflections`, y: `1962`, b: `His autobiography, dictated to his secretary Aniela Jaffé in his eighties and partly written by her. Far more readable than his theoretical books, and the best way to meet him: his childhood, his break with Freud, his visions, his travels, his thoughts on death. Start here.` },
+    { t: `Man and His Symbols`, y: `1964`, b: `Written for general readers at the end of his life (he finished his chapter just before he died), with chapters by his followers and hundreds of illustrations. The most accessible introduction to his ideas.` },
+    { t: `Modern Man in Search of a Soul`, y: `1933`, b: `Essays including “The Stages of Life” (the afternoon of life) and “Psychotherapists or the Clergy”. A good second book.` },
+    { t: `Two Essays on Analytical Psychology`, y: `1917–28`, b: `The clearest statement of his theories of the persona, the shadow and individuation.` },
+    { t: `Psychological Types`, y: `1921`, b: `Introversion and extraversion. Long and dense; chapter 10 is the famous summary.` },
+    { t: `The Archetypes and the Collective Unconscious`, y: `1934–1955`, b: `Volume 9i of his *Collected Works*, the essays on archetypes.` },
+    { t: `Aion`, y: `1951`, b: `On the Self, the shadow and the symbolism of Christ. Chapter 2 on the shadow is important.` },
+    { t: `The Red Book (Liber Novus)`, y: `written 1914–1930, published 2009`, b: `His record of his confrontation with the unconscious, with extraordinary paintings. A huge, strange, beautiful artefact. Not a starting point.` }
+  ],
+  quotes: [
+    { q: `Everything that irritates us about others can lead us to an understanding of ourselves.`, s: `*Memories, Dreams, Reflections*` },
+    { q: `One does not become enlightened by imagining figures of light, but by making the darkness conscious.`, s: `“The Philosophical Tree” (1945), *Collected Works* vol. 13` },
+    { q: `The psychological rule says that when an inner situation is not made conscious, it happens outside, as fate.`, s: `*Aion* (1951), *Collected Works* vol. 9ii, §126` },
+    { q: `We cannot live the afternoon of life according to the programme of life’s morning; for what was great in the morning will be little at evening, and what in the morning was true will at evening have become a lie.`, s: `“The Stages of Life” (1930), in *Modern Man in Search of a Soul*` },
+    { q: `The meeting of two personalities is like the contact of two chemical substances: if there is any reaction, both are transformed.`, s: `*Modern Man in Search of a Soul* (1933)` },
+    { q: `Your vision will become clear only when you can look into your own heart. Who looks outside, dreams; who looks inside, awakes.`, s: `Letter to Fanny Bowditch, 22 October 1916` },
+    { q: `Man cannot stand a meaningless life.`, s: `BBC *Face to Face* interview, 1959` },
+    { q: `I don’t need to believe. I know.`, s: `BBC *Face to Face* interview, 1959, asked if he believed in God` },
+    { q: `The shoe that fits one person pinches another; there is no recipe for living that suits all cases.`, s: `*Modern Man in Search of a Soul*` }
+  ],
+  fakes: [
+    { q: `Until you make the unconscious conscious, it will direct your life and you will call it fate.`, n: `The most shared “Jung quote” online, and not in his writings. It is a modern paraphrase of the genuine line from *Aion* above (“when an inner situation is not made conscious, it happens outside, as fate”). The idea is his; this sentence isn’t.` },
+    { q: `The privilege of a lifetime is to become who you truly are.`, n: `No source in his works has been found. It sounds like Jung, which is how it spread.` },
+    { q: `Knowing your own darkness is the best method for dealing with the darknesses of other people.`, n: `Close to something Jung wrote in a letter (1937), but the popular version is a paraphrase.` },
+    { q: `I am not what happened to me, I am what I choose to become.`, n: `Not found in Jung’s writings. It appears in self-help books from the 2000s.` }
+  ],
+  critique: `Jung’s theories are even harder to test than Freud’s. The collective unconscious is not a claim science has found a way to confirm; similar myths across cultures can be explained by common human experiences (everyone has a mother, everyone dies) and cultural diffusion, without an inherited layer of the psyche. Archetypes are so flexible that almost anything can be read as one. Synchronicity moves beyond science altogether. Critics have called Jung a mystic in a lab coat, and he often didn’t deny it.
+
+His ideas about gender (the anima and animus) rest on the assumption that men are essentially rational and women essentially relational, and much of his writing on women reflects the stereotypes of his era.
+
+The most serious charge concerns the 1930s. In 1933 Jung became president of the General Medical Society for Psychotherapy after it was brought under Nazi control, and edited its journal, which published a declaration of loyalty to Hitler by its German leader, Matthias Göring (a cousin of Hermann Göring). In 1934 Jung wrote that the “Aryan unconscious” had a higher potential than the “Jewish”, and that it had been a mistake to apply “Jewish categories” (meaning Freud’s) to Germans and Christians. He later said he had taken the post to protect Jewish psychotherapists, whom he did help to stay members and to emigrate, and by the late 1930s he was describing Hitler as possessed by the archetype of Wotan and criticising Nazism. Scholars still debate whether he was a naive opportunist, a sympathiser who later recovered his judgement, or something in between. He never fully reckoned with it in public. It deserves to be known.
+
+Finally, Jung is easy to use badly. “Shadow work” and “archetypes” have become wellness-industry vocabulary, and the Myers–Briggs test (which he didn’t design) is used by employers with little scientific basis. And much of his writing is vague enough to feel profound without being clear. The value in Jung is less in his system than in a handful of deep observations about projection, persona, meaning and the second half of life, which many people find true in their own experience.`,
+  start: `Start with *Memories, Dreams, Reflections* (Fontana or Vintage). It is the most human and readable of his books. Then *Man and His Symbols*, which has pictures on nearly every page. Then “The Stages of Life” in *Modern Man in Search of a Soul*. For a guide, Anthony Stevens’s *Jung: A Very Short Introduction* is excellent, and Deirdre Bair’s *Jung: A Biography* is the most thorough life, including the controversies. Robert A. Johnson’s *Owning Your Own Shadow* is a short, practical book on the shadow.`,
+  related: ['freud', 'nietzsche', 'schopenhauer', 'hesse', 'adler', 'buddha']
+}
+);
+
+THINKERS.push(
+{
+  id: 'adler', name: `Alfred Adler`, born: 1870, died: 1937, era: 'psych',
+  place: `Vienna; New York; Aberdeen`, role: `Psychiatrist; founder of individual psychology`,
+  themes: ['mind', 'love', 'ethics'], keywords: ['inferiority complex', 'individual psychology', 'social interest', 'courage', 'lifestyle', 'birth order', 'courage to be disliked', 'teleology', 'superiority', 'encouragement'],
+  tagline: `You aren’t driven by your past. You’re pulled by the goals you set, and you can change them.`,
+  summary: `Adler broke with Freud to argue that people are driven less by sex and the past than by goals: above all, the striving to overcome feelings of inferiority and to belong. Everyone feels inferior; the question is what you do about it. Healthy people channel it into “social interest”, contributing to others; unhealthy ones chase superiority over others. He gave us the “inferiority complex”, and a psychology built on courage, responsibility and the idea that you can choose how you interpret your life.`,
+  life: `Alfred Adler was born in 1870 in Rudolfsheim, near Vienna, the second of seven children of a Jewish grain merchant. He was a sickly child with rickets, which kept him from walking until he was four, and nearly died of pneumonia at five. A younger brother died in the bed next to him. He decided then to become a doctor, to fight death. He always felt overshadowed by his healthy, successful elder brother, also named Sigmund.
+
+He studied medicine in Vienna and became an ophthalmologist, then a general practitioner in a working-class district near the Prater amusement park, where his patients included circus performers and acrobats. He noticed that many of them had developed extraordinary strength and skill to compensate for a physical weakness. This became a core idea.
+
+In 1902 Freud invited him to join his Wednesday discussion group, and Adler became president of the Vienna Psychoanalytic Society. But he increasingly rejected Freud’s focus on sexuality, and in 1911 he left with a group of followers, founding his own school: “individual psychology” (individual in the sense of indivisible: the person as a whole).
+
+After serving as an army doctor in the First World War, he became convinced that the key to mental health was *Gemeinschaftsgefühl*, social feeling or community feeling. He set up dozens of child guidance clinics in Vienna’s schools, one of the first community mental health programmes anywhere. He was a lively, informal, accessible lecturer, happy to talk in cafés.
+
+With the rise of fascism, he moved to the United States in the 1930s, teaching at Columbia and the Long Island College of Medicine. He died suddenly of a heart attack in 1937 while on a lecture tour in Aberdeen, Scotland, aged 67. Freud, on hearing of it, wrote coldly to a friend that for a Jewish boy from a Viennese suburb, a death in Aberdeen was an unheard-of career.
+
+His ideas faded from view for decades, although they quietly shaped cognitive therapy and humanistic psychology. Then, in 2013, a Japanese book presenting them as a dialogue between a philosopher and a young man, *The Courage to Be Disliked* by Ichiro Kishimi and Fumitake Koga, sold millions of copies worldwide.`,
+  ideas: [
+    { t: `Everyone feels inferior`, b: `Every child starts life small, weak and dependent in a world of large, capable adults. So everyone begins with feelings of inferiority. This isn’t a disorder; it is the human condition, and it is the engine of development: we strive to grow, master skills and overcome our limits because we feel lacking.
+
+Problems arise when inferiority feelings become overwhelming (through physical weakness, neglect or pampering) and turn into an **inferiority complex**: the conviction that one is simply inferior, used as an excuse not to try. Or when they are covered up by a **superiority complex**: arrogance, boasting and domination, which are really compensation for feeling small.` },
+    { t: `We are pulled by goals, not pushed by causes`, b: `Freud explained behaviour by its causes in the past. Adler explained it by its purpose. His psychology is **teleological**: people act in pursuit of goals, often unconscious ones, which they set in childhood and which give their life a direction.
+
+The popular modern version, from *The Courage to Be Disliked*, puts it bluntly: trauma doesn’t determine you. A man who doesn’t leave his room doesn’t stay in because of anxiety; he creates anxiety in order to have a reason to stay in. That’s too blunt for many cases, but it is a striking reframe: instead of asking “why am I like this?”, ask “what am I getting from this?”` },
+    { t: `Style of life`, b: `By around five or six, each child develops a **style of life**: a characteristic set of beliefs about themselves, others and the world, and a strategy for finding significance. “I am only worthwhile if I am the best.” “I am only safe if I am in control.” “Others will take care of me.” These beliefs are built from the child’s interpretation of events, not the events themselves, and they operate as “private logic” for the rest of life, unless they are brought to awareness and changed.` },
+    { t: `Social interest`, b: `The measure of mental health, for Adler, is *Gemeinschaftsgefühl*, social interest: a feeling of belonging and a willingness to contribute to the good of others. Neurosis, crime and misery come from pursuing personal superiority at the expense of others; health comes from pursuing significance through contribution. “It is the individual who is not interested in his fellow men who has the greatest difficulties in life and provides the greatest injury to others.”` },
+    { t: `The three tasks of life`, b: `Every person faces three tasks: **work** (contributing through occupation), **friendship** (relations with others in community) and **love** (intimate partnership). How someone handles these reveals their style of life. Most problems, Adler thought, are really problems in one of these three areas.` },
+    { t: `Birth order`, b: `Adler thought a child’s position in the family shapes their style of life. The firstborn is “dethroned” by the arrival of a sibling and may become responsible, conservative, anxious to hold onto power. The second child is always racing to catch up. The youngest is pampered and may be ambitious or dependent. The only child may be used to adult attention. Later research has found the effects of birth order on personality to be small or nonexistent, but Adler’s underlying point, that each child interprets their family position and responds to it, still holds.` },
+    { t: `Encouragement and courage`, b: `Since discouragement lies behind most problems, the therapist’s job, and the parent’s and teacher’s, is encouragement: helping someone believe they are capable and belong. Adler warned against both pampering (which teaches children they needn’t contribute) and neglect (which teaches them they can’t). Praise for being good is less useful than recognition of effort and contribution. The goal is courage: the willingness to face life’s tasks even when success isn’t guaranteed.` }
+  ],
+  works: [
+    { t: `The Neurotic Character`, y: `1912`, b: `His early break with Freud.` },
+    { t: `Understanding Human Nature`, y: `1927`, b: `Lectures to a general audience in Vienna. Clear and lively, the best place to start with Adler himself.` },
+    { t: `What Life Could Mean to You (What Life Should Mean to You)`, y: `1931`, b: `A short, accessible late book on meaning, the three tasks, and social interest.` },
+    { t: `The Individual Psychology of Alfred Adler`, y: `1956`, b: `A systematic collection of his writings edited by Heinz and Rowena Ansbacher. The standard scholarly source.` },
+    { t: `Ichiro Kishimi and Fumitake Koga: The Courage to Be Disliked`, y: `2013`, b: `Not by Adler. A Socratic dialogue that presents his ideas in a strong, sometimes oversimplified form. It is responsible for most of the recent interest in him, and a good gateway, but read it knowing that it pushes Adler harder than he pushed himself.` }
+  ],
+  quotes: [
+    { q: `It is the individual who is not interested in his fellow men who has the greatest difficulties in life and provides the greatest injury to others.`, s: `*What Life Could Mean to You* (1931)` },
+    { q: `Meanings are not determined by situations, but we determine ourselves by the meanings we give to situations.`, s: `*What Life Could Mean to You*` },
+    { q: `To be a human being means to feel oneself inferior.`, s: `*Social Interest: A Challenge to Mankind* (1938)` },
+    { q: `The important thing is not what one is born with, but what use one makes of that equipment.`, s: `As rendered in *The Individual Psychology of Alfred Adler*, ed. Ansbacher` }
+  ],
+  fakes: [
+    { q: `The only normal people are the ones you don’t know very well.`, n: `Often attributed to Adler. It appears in American humour collections in the 1960s, with no source in his work.` },
+    { q: `Follow your heart but take your brain with you.`, n: `No source in Adler. It is a modern motivational saying.` }
+  ],
+  critique: `Adler’s ideas are commonsensical to the point that some critics wonder if there is a theory there at all. Many of his insights have been absorbed into general culture and other therapies, which is a kind of success, but also means individual psychology offers few precise, testable claims.
+
+His teleology can be taken too far. The popular version, in which trauma “does not exist” and every feeling is chosen for a purpose, can be harsh on people whose suffering has real causes, from abuse to brain chemistry. It can slide into blaming people for their own misery. Adler himself was more careful than his modern popularisers.
+
+His specific claims about birth order have largely failed empirical tests. And “social interest” is an appealing ideal, but vague: who decides what counts as a real contribution to the community?`,
+  start: `Start with *The Courage to Be Disliked* by Kishimi and Koga (it’s quick and engaging), then read Adler himself in *Understanding Human Nature* or *What Life Could Mean to You* to see the original, which is gentler and more nuanced. Edward Hoffman’s *The Drive for Self* is a good biography.`,
+  related: ['freud', 'jung', 'frankl', 'fromm', 'epictetus']
+},
+{
+  id: 'fromm', name: `Erich Fromm`, born: 1900, died: 1980, era: 'psych',
+  place: `Frankfurt; New York; Mexico City; Switzerland`, role: `Psychoanalyst and social philosopher`,
+  themes: ['love', 'politics', 'meaning', 'mind'], keywords: ['art of loving', 'escape from freedom', 'to have or to be', 'marketing orientation', 'authoritarianism', 'frankfurt school', 'love is an art', 'consumerism'],
+  tagline: `Love isn’t something you fall into. It’s an art you practise.`,
+  summary: `Fromm combined Freud and Marx to ask how society shapes the psyche. In *Escape from Freedom* he argued that modern people, freed from old ties, feel isolated and anxious, and flee freedom into authoritarianism, destructiveness or conformity. In *The Art of Loving* he argued that love is not a feeling you fall into but a skill that takes discipline, concentration and patience. And in *To Have or to Be?* he contrasted a life organised around possessing with one organised around being. His picture of the “marketing personality” reads like a description of self-branding.`,
+  life: `Erich Seligmann Fromm was born in 1900 in Frankfurt, the only child of an Orthodox Jewish family. His father was a wine merchant; both parents were anxious and neurotic, and Fromm grew up an introspective child steeped in the Talmud and the Hebrew prophets, whose vision of universal peace stayed with him. He said the First World War, which broke out when he was fourteen, made him want to understand how millions of people could be driven to kill each other.
+
+He studied sociology at Heidelberg under Alfred Weber, trained as a psychoanalyst in Berlin, and in the 1920s gave up Orthodox practice. He married his analyst, Frieda Reichmann, ten years older (they separated, amicably, after a few years). He joined the Institute for Social Research in Frankfurt, the “Frankfurt School”, where he led a study of German workers’ attitudes, finding that many who voted left had deeply authoritarian personalities: an early sign of how Nazism could win support.
+
+He left Germany in 1933, and settled in the United States, where he taught at Columbia, Bennington and elsewhere and practised as an analyst. He broke with the Frankfurt School (Adorno and Marcuse attacked his views as too optimistic and conformist) and with orthodox Freudians. *Escape from Freedom* (1941) made his name; *The Art of Loving* (1956) sold more than 25 million copies.
+
+He moved to Mexico City in 1950 for his wife Henny’s health, founded the Mexican psychoanalytic institute, and lived there for over twenty years. He was politically active: a co-founder of the anti-nuclear group SANE, a supporter of democratic socialism, and a critic of both Soviet communism and American consumer capitalism. He moved to Switzerland in 1974 and died there in 1980, five days before his 80th birthday.`,
+  ideas: [
+    { t: `Escape from freedom`, b: `Modern history, since the Renaissance and Reformation, has freed individuals from the bonds of medieval society: fixed social roles, the Church, the guild, the village. This “freedom from” is real. But it leaves people alone, isolated, insignificant and anxious. Unless they develop “freedom to” (the capacity to love and work creatively, to realise themselves), the burden of freedom becomes unbearable, and they look for ways to escape it.
+
+Fromm identified three main escapes. **Authoritarianism**: submitting to a powerful leader or dominating others, merging the self with something bigger. **Destructiveness**: destroying the world that threatens you. **Automaton conformity**: ceasing to be yourself and becoming exactly what others expect. He wrote this to explain the appeal of Nazism, but he thought the third escape was the characteristic American one.` },
+    { t: `Love is an art`, b: `*The Art of Loving* opens by noting that most people think the problem of love is being loved (being attractive), not loving (having the capacity). They think the difficulty is finding the right object, not developing the faculty. And they confuse the initial experience of “falling” in love with the permanent state of “standing” in love.
+
+Love, Fromm says, is an art, like medicine or carpentry, and it requires the same things: knowledge and practice, **discipline**, **concentration**, **patience** and supreme concern with mastering it. It is active, not passive: “Love is an activity, not a passive affect; it is a ‘standing in’, not a ‘falling for’.” Its basic elements are care, responsibility, respect and knowledge.
+
+And he points out something uncomfortable: the capacity for concentration, being alone with yourself without doing anything, is a precondition for love. Modern people, who can’t sit without reading, smoking or listening to the radio, find this almost impossible. He was writing in 1956.` },
+    { t: `Mature love`, b: `“Immature love says: ‘I love you because I need you.’ Mature love says: ‘I need you because I love you.’” Mature love preserves each person’s integrity and individuality. It isn’t two lonely people merging to escape their loneliness (what Fromm calls “symbiotic union”), which leads to domination or submission. It is two whole people choosing each other.
+
+He also argued that love isn’t primarily a relationship to one person but an orientation of character towards the world as a whole. If you love only one person and are indifferent to everyone else, your love is “an enlarged egotism”.` },
+    { t: `The marketing orientation`, b: `In *Man for Himself* (1947), Fromm described a character type he thought was spreading in modern capitalism: the **marketing orientation**. People experience themselves as commodities, whose value depends on their “saleability” on the personality market. Success depends less on skill or integrity than on how well you sell yourself: being likeable, adaptable, in demand. Self-esteem depends on market conditions: on whether others want you.
+
+The result is a person with no stable self, “a thing to be employed successfully on the market”, constantly adapting to what others want, and deeply insecure. Written in 1947, it is almost eerily precise about personal branding, follower counts and the self as content.` },
+    { t: `To have or to be`, b: `In his last major book, Fromm contrasted two modes of existence. In the **having** mode, you relate to everything, including knowledge, people and even yourself, as possessions to acquire, hold and consume. You learn by collecting facts, love by owning, and your identity is what you have. In the **being** mode, you relate through activity, sharing and experience: you learn by understanding, love by giving, and your identity is what you do and are. Modern consumer society, he argued, pushes relentlessly towards having, and this is why it produces so much anxiety.` }
+  ],
+  works: [
+    { t: `Escape from Freedom (The Fear of Freedom)`, y: `1941`, b: `His analysis of freedom and authoritarianism. Still highly relevant.` },
+    { t: `Man for Himself`, y: `1947`, b: `A humanistic ethics, including the marketing orientation.` },
+    { t: `The Sane Society`, y: `1955`, b: `Argues that a whole society can be sick, and that adjusting to it isn’t health.` },
+    { t: `The Art of Loving`, y: `1956`, b: `About 120 pages. His most famous book, and a good one: practical, wise and more demanding than its title suggests.` },
+    { t: `To Have or to Be?`, y: `1976`, b: `His last big statement.` }
+  ],
+  quotes: [
+    { q: `Love is an activity, not a passive affect; it is a “standing in”, not a “falling for”.`, s: `*The Art of Loving*, chapter 2` },
+    { q: `Immature love says: “I love you because I need you.” Mature love says: “I need you because I love you.”`, s: `*The Art of Loving*, chapter 2` },
+    { q: `If a person loves only one other person and is indifferent to the rest of his fellow men, his love is not love but a symbiotic attachment, or an enlarged egotism.`, s: `*The Art of Loving*, chapter 2` },
+    { q: `Man’s main task in life is to give birth to himself, to become what he potentially is.`, s: `*Man for Himself*, chapter 4` },
+    { q: `The danger of the past was that men became slaves. The danger of the future is that men may become robots.`, s: `*The Sane Society*, chapter 9` },
+    { q: `If I am what I have and if what I have is lost, who then am I?`, s: `*To Have or to Be?*` }
+  ],
+  fakes: [],
+  critique: `Fromm’s former colleagues at the Frankfurt School thought him a sell-out, softening Marx and Freud into a comfortable humanism. Marcuse accused him of promoting adjustment and positive thinking. Orthodox psychoanalysts thought he had abandoned the core of Freud (sexuality, the unconscious drives) for sociology and moralising.
+
+His work is also more moral exhortation than empirical science. Claims like “modern society is sick” or “the marketing orientation is spreading” are hard to test, and he can sound preachy. His confident diagnosis of entire societies often rests on impressions rather than evidence.
+
+And *The Art of Loving*, for all its wisdom, has passages on gender and sexuality that are dated, including a view of homosexuality as a failure to achieve polarised union.`,
+  start: `Read *The Art of Loving* (Harper Perennial). It is short and will make you rethink how you talk about love. Then *Escape from Freedom*, especially the chapters on the mechanisms of escape. Lawrence Friedman’s *The Lives of Erich Fromm* is the standard biography.`,
+  related: ['freud', 'marx', 'adler', 'arendt', 'becker']
+},
+{
+  id: 'frankl', name: `Viktor Frankl`, born: 1905, died: 1997, era: 'psych',
+  place: `Vienna; Theresienstadt, Auschwitz and Dachau subcamps`, role: `Psychiatrist and neurologist; founder of logotherapy`,
+  themes: ['meaning', 'suffering', 'death'], keywords: ['mans search for meaning', 'logotherapy', 'meaning', 'holocaust', 'concentration camp', 'last of human freedoms', 'attitude', 'existential vacuum', 'tragic optimism'],
+  tagline: `Everything can be taken from a person but one thing: the freedom to choose their attitude.`,
+  summary: `Frankl survived the Nazi concentration camps, where his parents, brother and wife died, and wrote *Man’s Search for Meaning* in nine days after his liberation. His conclusion: the primary human drive is not pleasure (Freud) or power (Adler) but meaning. We find it in three ways: by creating something or doing a deed, by experiencing something or loving someone, and by the attitude we take to unavoidable suffering. His therapy, logotherapy, helps people find meaning rather than dig into their past.`,
+  life: `Viktor Emil Frankl was born in Vienna in 1905, to a Jewish family; his father was a civil servant. As a teenager he corresponded with Freud, who published one of his papers, and then gravitated towards Adler, before being expelled from Adler’s circle for his independent views. He qualified as a doctor in 1930, specialising in neurology and psychiatry.
+
+In the early 1930s he organised counselling centres for young people in Vienna around the end of the school year, when student suicides spiked; in 1931 the city recorded no student suicides. He then ran a ward for suicidal women at a psychiatric hospital, treating thousands of patients.
+
+After the Nazi annexation of Austria in 1938, as a Jew, he was barred from treating non-Jewish patients. He became head of neurology at the Rothschild Hospital, the only hospital in Vienna still admitting Jews, where he reportedly falsified diagnoses to save mentally ill patients from the Nazi euthanasia programme. He obtained a visa to emigrate to the United States in 1941 but let it lapse, unwilling to leave his elderly parents. That year he married Tilly Grosser, a nurse.
+
+In September 1942 he, his wife and his parents were deported to the Theresienstadt ghetto. His father died there. In 1944 he and Tilly were transferred to Auschwitz, where they were separated. He was at Auschwitz only a few days before being sent to Kaufering and then Türkheim, subcamps of Dachau, where he worked as a labourer and, near the end, as a doctor. He had sewn the manuscript of his first book into his coat; it was taken from him on arrival at Auschwitz. He tried to reconstruct it on scraps of paper while ill with typhus. He was liberated by American troops in April 1945.
+
+Back in Vienna he learned that his mother had been killed at Auschwitz, his brother in a subcamp, and his wife at Bergen-Belsen, after liberation. Only his sister, who had emigrated to Australia, survived. In a few weeks he dictated the book that became *Man’s Search for Meaning*, and the reconstructed manuscript as well. He originally wanted to publish it anonymously.
+
+He became head of neurology at the Vienna Polyclinic, a post he held for 25 years, remarried, had a daughter, and wrote over thirty books. He lectured all over the world, took up mountain climbing, and got his pilot’s licence at 67. He died of heart failure in Vienna in 1997, aged 92. *Man’s Search for Meaning* has sold more than 16 million copies.`,
+  ideas: [
+    { t: `The last of the human freedoms`, b: `Frankl observed in the camps that the prisoners who survived were not always the strongest physically. Many who had some reason to keep living, someone waiting for them, a task to finish, lasted longer. And he saw prisoners who walked through the huts comforting others, giving away their last piece of bread. “They may have been few in number, but they offer sufficient proof that everything can be taken from a man but one thing: the last of the human freedoms, to choose one’s attitude in any given set of circumstances, to choose one’s own way.”
+
+This is not a claim that suffering doesn’t matter, or that people who broke down were weak. It is a claim that there is always something left that is ours.` },
+    { t: `The will to meaning`, b: `Freud said the basic human drive was the will to pleasure. Adler said it was the will to power. Frankl said it was the **will to meaning**: the need to find purpose. When that need is frustrated, people fall into an “existential vacuum”, a sense of emptiness and boredom, which they try to fill with pleasure, power, money, compulsions or addictions. He thought this vacuum was the characteristic illness of affluent modern societies.
+
+He liked to quote Nietzsche: “He who has a *why* to live can bear almost any *how*.”` },
+    { t: `Three sources of meaning`, b: `Meaning isn’t invented; it is discovered, in the world, and it is specific to each person and each moment. There are three main ways to find it.
+
+**By creating a work or doing a deed:** contributing something, doing your job well, making something that wouldn’t exist without you.
+
+**By experiencing something or encountering someone:** beauty, nature, art, and above all love. In the camp, marching in the dark to a work site, Frankl found himself talking in his mind to his wife, not knowing if she was alive. He understood, he wrote, how a man who has nothing left in this world still may know bliss, be it only for a brief moment, in the contemplation of his beloved.
+
+**By the attitude we take toward unavoidable suffering:** when a situation can’t be changed, we are challenged to change ourselves. Suffering without meaning is despair; suffering with meaning can be borne. But he insisted that meaning in suffering only applies when the suffering is unavoidable. If you can remove its cause, do that.` },
+    { t: `Life is asking you`, b: `Frankl reversed the usual question. We ask, “What is the meaning of life?” But “it did not really matter what we expected from life, but rather what life expected from us.” Life asks each of us a question, in each situation, and we answer by what we do. Meaning is not something to think about in general but to respond to in particular: this task, this person, this moment.` },
+    { t: `Happiness can’t be pursued`, b: `“Success, like happiness, cannot be pursued; it must ensue.” Like Mill, Frankl thought that aiming directly at happiness defeats it. Happiness is a side-effect of dedicating yourself to a cause greater than yourself or to a person other than yourself. The more you aim at it, the more you miss it.` },
+    { t: `Paradoxical intention`, b: `One of Frankl’s therapeutic techniques: for anxiety and phobias, ask the patient to intend, even to wish for, exactly what they fear, with humour. A man terrified of sweating in public is told to try to sweat as much as possible, to show people what a champion sweater he is. The fear loses its grip. It is a forerunner of techniques in modern cognitive behavioural therapy.` },
+    { t: `Tragic optimism`, b: `In a postscript, Frankl described “tragic optimism”: remaining hopeful in the face of the tragic triad of pain, guilt and death. Turn suffering into achievement; derive from guilt the opportunity to change; see in the transience of life an incentive to act responsibly. The past, he said, is not lost: what we have done and loved is safely stored, and nothing can undo it. “Having been is also a kind of being, and perhaps the surest kind.”` }
+  ],
+  works: [
+    { t: `Man’s Search for Meaning`, y: `1946; English 1959`, b: `Part one is his account of the camps; part two is a short introduction to logotherapy. About 150 pages. It regularly appears on lists of the most influential books ever written. Read it.` },
+    { t: `The Doctor and the Soul`, y: `1946`, b: `The book he had sewn into his coat, reconstructed. A fuller account of logotherapy.` },
+    { t: `The Unheard Cry for Meaning`, y: `1978`, b: `Essays on the existential vacuum in modern life.` }
+  ],
+  quotes: [
+    { q: `Everything can be taken from a man but one thing: the last of the human freedoms, to choose one’s attitude in any given set of circumstances, to choose one’s own way.`, s: `*Man’s Search for Meaning*, Part One` },
+    { q: `It did not really matter what we expected from life, but rather what life expected from us.`, s: `*Man’s Search for Meaning*, Part One` },
+    { q: `When we are no longer able to change a situation, we are challenged to change ourselves.`, s: `*Man’s Search for Meaning*, Part Two` },
+    { q: `Success, like happiness, cannot be pursued; it must ensue.`, s: `*Man’s Search for Meaning*, 1984 preface` },
+    { q: `In some ways suffering ceases to be suffering at the moment it finds a meaning.`, s: `*Man’s Search for Meaning*, Part Two` },
+    { q: `Having been is also a kind of being, and perhaps the surest kind.`, s: `*Man’s Search for Meaning*, postscript` },
+    { q: `Live as if you were living already for the second time and as if you had acted the first time as wrongly as you are about to act now!`, s: `*Man’s Search for Meaning*, Part Two` }
+  ],
+  fakes: [
+    { q: `Between stimulus and response there is a space. In that space is our power to choose our response. In our response lies our growth and our freedom.`, n: `The most famous “Frankl quote”, and not found in any of his books. Stephen Covey popularised it, saying he had read it in a book in a library in Hawaii and couldn’t remember the author. Frankl’s grandson and the Frankl Institute have said it is not his.` }
+  ],
+  critique: `Some historians have questioned how *Man’s Search for Meaning* presents Frankl’s experience. He was at Auschwitz for only a few days; most of his time was in Theresienstadt and in Dachau subcamps, which the book doesn’t make clear. Timothy Pytell’s biography also raised questions about his conduct during the war, including experimental procedures he carried out in 1942 on Jewish patients who had attempted suicide, and about how he later told his story. These are disputed, and none of it diminishes the horror he lived through. But it complicates the image of a pure witness.
+
+The deeper objection is to the book’s message. Survival in the camps depended overwhelmingly on luck: which selection line you were sent to, whether you got a kitchen job, whether you caught typhus. Primo Levi, who also survived Auschwitz, argued that the best did not survive; the survivors were, more often, the lucky or the compromised. Suggesting that meaning or attitude helped people survive can imply, however unintentionally, that those who died lacked something. Frankl knew this, and said so, but the popular reading often forgets it.
+
+And “choose your attitude” is easily misused. It can become a way of telling people suffering from poverty, injustice or illness that their problem is their mindset. Frankl himself insisted that you should change what can be changed before accepting what can’t.`,
+  start: `Read *Man’s Search for Meaning* (Beacon Press or Rider). It takes two or three evenings. Then read Primo Levi’s *If This Is a Man* (*Survival in Auschwitz*) for a different, more sceptical perspective from another survivor. The two together are one of the most important reading experiences you can have.`,
+  related: ['nietzsche', 'adler', 'epictetus', 'marcus-aurelius', 'camus', 'becker']
+},
+{
+  id: 'becker', name: `Ernest Becker`, born: 1924, died: 1974, era: 'psych',
+  place: `Springfield, Massachusetts; Vancouver`, role: `Cultural anthropologist and writer`,
+  themes: ['death', 'meaning', 'mind', 'politics'], keywords: ['denial of death', 'terror management', 'heroism', 'immortality project', 'causa sui', 'mortality', 'self esteem', 'culture'],
+  tagline: `Most of what we do is a way of not thinking about the fact that we will die.`,
+  summary: `Becker argued that the fear of death is the mainspring of human activity. We are animals who know we will die, and that knowledge is unbearable. So we build “immortality projects”: cultures, religions, nations, careers, legacies, identities, which let us feel we are part of something that won’t die. Much of human cruelty, he argued, comes from defending these projects against people whose worldviews threaten them. His book *The Denial of Death* won the Pulitzer Prize two months after he died.`,
+  life: `Ernest Becker was born in 1924 in Springfield, Massachusetts, to Jewish immigrant parents. At eighteen he joined the US Army and served as an infantryman in Europe; he was among the soldiers who liberated a Nazi concentration camp. The experience of seeing the dead, and what human beings had done to them, stayed with him.
+
+After the war he worked at the American Embassy in Paris, then studied cultural anthropology at Syracuse University. He was a brilliant, provocative, restless teacher, and had a difficult academic career. His contract at Syracuse wasn’t renewed after he defended the psychiatrist Thomas Szasz, a critic of institutional psychiatry. At Berkeley he was popular with students and was let go. At San Francisco State he resigned in protest over police on campus. He finally settled at Simon Fraser University in Vancouver in 1969.
+
+In 1972 he was diagnosed with colon cancer. He finished *The Denial of Death*, published in 1973, and was working on a sequel, *Escape from Evil*, when he died in March 1974, aged 49. The philosopher Sam Keen interviewed him on his deathbed; Becker said: “This is a test of everything I’ve written about death.” Two months later, *The Denial of Death* won the Pulitzer Prize for General Non-Fiction.`,
+  ideas: [
+    { t: `The human paradox`, b: `Human beings are, as Becker put it, split in two. We have a mind that can soar through space and time, imagine infinity, understand the universe. And we have a body that eats, defecates, bleeds, ages and dies. “Man is literally split in two: he has an awareness of his own splendid uniqueness in that he sticks out of nature with a towering majesty, and yet he goes back into the ground a few feet in order blindly and dumbly to rot and disappear forever.”
+
+We are, he said, “gods with anuses”. No other animal has to live with this contradiction.` },
+    { t: `The terror of death`, b: `Becker built on the work of Otto Rank, a disciple of Freud, and on Kierkegaard. Awareness of our mortality produces a terror so great that, if we faced it fully, we could not function. So we repress it. Most of our psychological structure (what Freud called character, and Becker called our “vital lie”) is a defence against this terror. We are not aware of it most of the time. That is the point.` },
+    { t: `Heroism and immortality projects`, b: `How do we manage the terror? By becoming heroes: by feeling that our lives have cosmic significance, that we are part of something that will outlast our deaths. Culture provides the script. Every society is a “hero system”: a structure of roles, rules and values that tells you how to count, how to matter, how to become someone whose existence is not merely animal.
+
+These **immortality projects** can be religious (heaven, salvation), national (dying for your country), familial (children, bloodlines), creative (works that outlast you), or economic (fortunes, companies, buildings with your name). Self-esteem, in this view, isn’t a luxury; it is our sense of being a hero in our culture’s terms, and it is a buffer against the fear of death.` },
+    { t: `Why we fight`, b: `The dark consequence: since our immortality projects are ultimately fictions, anyone who lives by a different one is a threat. Their existence suggests that ours might be arbitrary, and that we might just die after all. So we try to convert them, belittle them, or destroy them. Becker argued that much human evil, from religious wars to genocide, comes not from animal aggression but from people defending their hero systems. We kill to prove that our way of cheating death is the right one.` },
+    { t: `Terror management theory`, b: `Becker’s ideas became the basis of a major research programme in social psychology. In the 1980s, three psychologists, Sheldon Solomon, Jeff Greenberg and Tom Pyszczynski, developed “terror management theory” and tested it in hundreds of experiments. When people are reminded of their own death (even subtly), they tend to cling harder to their worldviews, judge outsiders more harshly, and seek self-esteem more intensely. Judges, reminded of death, set higher bail for a prostitute. The findings are not all robust (some have failed to replicate), but the basic pattern has been found many times.` },
+    { t: `What to do`, b: `Becker doesn’t offer a comforting answer. He thought some illusion is necessary; no one can live facing death directly all the time. But we can choose better illusions: ones that don’t require destroying others. He admired Kierkegaard’s path, facing the terror of death and leaping to faith, while admitting he couldn’t be sure it wasn’t another evasion. The minimum is honesty: to know that our projects are ways of coping, and to hold them a little more lightly.` }
+  ],
+  works: [
+    { t: `The Denial of Death`, y: `1973`, b: `About 300 pages. Dense but gripping: a synthesis of Freud, Rank and Kierkegaard. Chapters 1 to 4 are the core. It has an unusual afterlife: it features in the Woody Allen film *Annie Hall* (1977), where Alvy buys it for Annie.` },
+    { t: `Escape from Evil`, y: `1975, posthumous`, b: `Applies the theory to human evil and violence. Shorter and more direct.` },
+    { t: `Sheldon Solomon, Jeff Greenberg and Tom Pyszczynski: The Worm at the Core`, y: `2015`, b: `Not by Becker: a readable account of the experimental research his work inspired.` }
+  ],
+  quotes: [
+    { q: `Man is literally split in two: he has an awareness of his own splendid uniqueness... and yet he goes back into the ground a few feet in order blindly and dumbly to rot and disappear forever.`, s: `*The Denial of Death*, chapter 3` },
+    { q: `The idea of death, the fear of it, haunts the human animal like nothing else; it is a mainspring of human activity.`, s: `*The Denial of Death*, Preface` },
+    { q: `Society itself is a codified hero system.`, s: `*The Denial of Death*, chapter 1` },
+    { q: `Man cannot endure his own littleness unless he can translate it into meaningfulness on the largest possible level.`, s: `*Escape from Evil*` },
+    { q: `This is a test of everything I’ve written about death.`, s: `To Sam Keen, on his deathbed, 1974` }
+  ],
+  fakes: [],
+  critique: `Becker’s theory explains almost everything, which is a weakness. If all human activity is ultimately about denying death, the theory can’t be falsified: courage, cowardice, art, war, love and ambition all fit. Critics suggest people are also driven by curiosity, love, play and the simple pleasure of being alive, not only by terror.
+
+His reliance on Freud and Rank ties him to psychoanalytic ideas that many psychologists now reject, although terror management research has given parts of the theory an experimental base. Some of that research has had replication problems, notably a large 2019 study that failed to reproduce a classic mortality-salience effect.
+
+And *The Denial of Death* is bleak. Becker thought any heroism was, in some sense, a “vital lie”. Some readers find this liberating; others find it corrosive. It is worth knowing that his own answer, near the end, was closer to faith than despair.`,
+  start: `Read *The Denial of Death* (Free Press), chapters 1–4 and chapter 11. Then, for the evidence, *The Worm at the Core*. Sam Keen’s interview with Becker, “The Heroics of Everyday Life”, published in *Psychology Today* in 1974, is a moving short introduction.`,
+  related: ['kierkegaard', 'freud', 'pascal', 'epicurus', 'heidegger', 'tolstoy']
+}
+);
+
+THINKERS.push(
+{
+  id: 'dostoevsky', name: `Fyodor Dostoevsky`, born: 1821, died: 1881, era: 'novel',
+  place: `Moscow; Siberia; St Petersburg`, role: `Novelist`,
+  themes: ['god', 'suffering', 'ethics', 'meaning', 'mind', 'love'], keywords: ['brothers karamazov', 'crime and punishment', 'notes from underground', 'the idiot', 'demons', 'grand inquisitor', 'raskolnikov', 'underground man', 'everything is permitted', 'beauty will save the world', 'siberia', 'mock execution', 'gambling'],
+  tagline: `Put the biggest questions (God, freedom, guilt, suffering) into characters who can’t stop arguing about them.`,
+  summary: `Dostoevsky wasn’t a philosopher by trade, but his novels are some of the most powerful philosophy ever written. He dramatised the crisis Nietzsche named: what happens to morality if God is gone? He showed a man who murders to prove he is above ordinary morality (*Crime and Punishment*), a man who rejects reason itself out of spite (*Notes from Underground*), and a family torn apart by every question about faith and evil (*The Brothers Karamazov*). He believed only suffering, humility and love could save us, but he gave the other side its best lines.`,
+  life: `Fyodor Mikhailovich Dostoevsky was born in Moscow in 1821, the second of seven children of a doctor at a hospital for the poor. The family lived on the hospital grounds, and young Fyodor talked with the patients. His mother died of tuberculosis when he was fifteen. His father, a harsh, drinking, miserly man who had bought a small estate with serfs, died two years later, officially of apoplexy; family rumour, never proved, said he was murdered by his own serfs. The question of a father’s murder became the centre of Dostoevsky’s last novel.
+
+He trained as a military engineer in St Petersburg, hated it, and resigned to write. His first novel, *Poor Folk* (1846), was hailed as a masterpiece by the leading critic Vissarion Belinsky, and at 24 he was famous. His next books flopped, and the literary world turned on him.
+
+He joined the Petrashevsky Circle, a group of young intellectuals who discussed socialism and read banned books. In April 1849 they were arrested. After eight months in the Peter and Paul Fortress, he and his comrades were taken to Semyonovsky Square on 22 December, dressed in white execution shirts, and told they would be shot. The first three were tied to posts. At the last moment a messenger arrived with an order from the Tsar commuting the sentences; the whole execution had been staged. One of the prisoners went mad.
+
+Dostoevsky was sentenced to four years’ hard labour in a prison camp in Omsk, Siberia, followed by service as a common soldier. In the camp he lived shackled among murderers and thieves, with only one book allowed: the New Testament, given to him by the wives of the exiled Decembrists on his way. He had his first major epileptic seizures there. He came out transformed: disillusioned with Western radicalism, devoted to Christ and to the Russian people, whose capacity for suffering and faith he had seen up close.
+
+Back in St Petersburg in 1859, he threw himself into journalism, fell into passionate, tormented love affairs, and developed a gambling addiction that brought him repeatedly to ruin in the casinos of Germany. He lost his first wife and his beloved brother Mikhail in 1864, and took on his brother’s debts. To pay creditors, he signed a brutal contract to deliver a novel by a deadline or lose the rights to all his works; he dictated *The Gambler* in 26 days to a young stenographer, Anna Snitkina, and married her. She managed his finances, cured him of gambling, and made his last years stable.
+
+In that stability he wrote the great novels: *Crime and Punishment* (1866), *The Idiot* (1869), *Demons* (1872) and *The Brothers Karamazov* (1880). Their three-year-old son Alyosha died of epilepsy, inherited from his father, in 1878; the grief went into the *Karamazovs*. In 1880 he gave a speech on Pushkin in Moscow that caused the audience to weep and faint. He died in January 1881, aged 59. Tens of thousands followed his coffin.`,
+  ideas: [
+    { t: `If there is no God, is everything permitted?`, b: `The question runs through all his late novels. In *The Brothers Karamazov*, the intellectual Ivan Karamazov argues that if there is no God and no immortality, there is no basis for virtue: “everything is permitted”. His half-brother Smerdyakov, a servant who worships Ivan’s cleverness, takes him at his word and murders their father. Ivan, who wanted the murder in his heart but didn’t commit it, is driven mad by guilt.
+
+Dostoevsky’s point is not a tidy argument that atheism leads to murder. It is that ideas have consequences in real people, and that clever men who play with ideas about morality in theory may find others acting them out in practice. Nietzsche read Dostoevsky with excitement; Sartre called “everything is permitted” the starting point of existentialism. (The exact phrase, though, isn’t in the novel; see below.)` },
+    { t: `The extraordinary man`, b: `In *Crime and Punishment*, Raskolnikov, a poor ex-student in St Petersburg, has a theory. Humanity is divided into ordinary people, who must obey the law, and extraordinary people (Napoleon, for example), who have the right to “step over” moral boundaries for a great purpose. He murders an old pawnbroker, a “louse” who harms others, to prove to himself that he is extraordinary, and kills her innocent sister as well when she walks in.
+
+The rest of the novel is his psychological disintegration: fever, paranoia, the cat-and-mouse game with the detective Porfiry, and his relationship with Sonya, a young woman forced into prostitution to feed her family, whose humble faith finally leads him to confess. He discovers he is not a Napoleon. He is just a man who has killed two people. It is one of the most gripping novels ever written, and a devastating refutation, from the inside, of the idea that some people are above morality.` },
+    { t: `The Underground Man`, b: `*Notes from Underground* (1864) is a short, bitter monologue by an unnamed retired civil servant living in a St Petersburg “mousehole”. “I am a sick man... I am a spiteful man. I am an unattractive man. I think my liver is diseased.”
+
+He attacks the utopian rationalists of his time, who believed that if people only understood their real interests, they would behave reasonably, and society could be designed like a “crystal palace”. The Underground Man says people don’t want what is rational and good for them. They want to assert their free will, even against their own interests, even by being perverse, just to prove they aren’t piano keys. “Twice two makes four is an excellent thing, but if we are to give everything its due, twice two makes five is sometimes a very charming thing too.”
+
+He is repulsive, self-lacerating, and horribly recognisable: over-conscious, paralysed by thinking, spiteful because he is ashamed. Many consider it the first existentialist text.` },
+    { t: `Rebellion: the suffering of children`, b: `The most powerful argument against God in literature is in *The Brothers Karamazov*, and Dostoevsky, a believer, wrote it. In the chapter “Rebellion”, Ivan tells his devout younger brother Alyosha stories of real cruelty to children, drawn from newspaper reports: a little girl locked in a freezing outhouse by her parents; a boy torn apart by hounds in front of his mother on the orders of a general.
+
+Ivan says he doesn’t deny God. He even accepts that at the end of time there might be a harmony that explains everything. But no future harmony is worth the tears of one tortured child. “It’s not God that I don’t accept, Alyosha, only I most respectfully return him the ticket.”
+
+Alyosha has no argument in reply. The whole rest of the novel is Dostoevsky’s answer: not a counter-argument, but a picture of a life lived in active love.` },
+    { t: `The Grand Inquisitor`, b: `Ivan then tells Alyosha a prose poem he has composed. Christ returns to earth in sixteenth-century Seville during the Inquisition. He is recognised by the people and performs miracles. The Grand Inquisitor, a ninety-year-old cardinal, has him arrested, and visits him in his cell at night.
+
+He tells Christ that he was wrong to come back, and wrong in the first place. When Satan tempted him in the wilderness, offering bread, miracles and earthly power, Christ refused, wanting humans to follow him freely. But freedom is an unbearable burden for most people. They want bread, mystery and authority. So the Church has “corrected” Christ’s work: it has taken away people’s freedom and made them happy. “We have corrected your deed.” Tomorrow he will burn Christ at the stake.
+
+Christ says nothing. At the end, he silently kisses the old man on the lips. The Inquisitor opens the door and lets him go, but keeps to his idea.
+
+It is one of the most discussed passages in all of literature: a critique of the Church, of socialism, of every system that trades freedom for security, and, now, of every technology that offers comfort in exchange for choice.` },
+    { t: `Active love`, b: `Dostoevsky’s answer to Ivan is the elder Zosima, a monk, whose teachings fill a whole book of the novel. Hell, Zosima says, is “the suffering of being unable to love”. Each of us is responsible for everyone and for everything. And to a lady who asks how to believe, he answers: not by argument, but by active love. Love your neighbours actively and tirelessly, and as you advance in love you will grow sure of God and the immortality of your soul.
+
+But he warns that active love is “a harsh and dreadful thing compared with love in dreams”. Love in dreams wants quick results and applause; active love is labour and endurance. He also says, simply: “Above all, don’t lie to yourself.”` },
+    { t: `Beauty will save the world`, b: `In *The Idiot*, Prince Myshkin, a Christ-like, epileptic, utterly good man, returns to Russian society after years in a Swiss sanatorium, and his goodness causes nothing but chaos and destruction. A character reports that Myshkin once said “beauty will save the world”. It is one of the most quoted lines in Russian literature, and it is not clear, in the novel, whether it is true or tragically naive.` },
+    { t: `Polyphony`, b: `The literary theorist Mikhail Bakhtin argued that what made Dostoevsky unique was polyphony: his characters aren’t mouthpieces for the author. Each has an independent voice and ideology, and they argue on equal terms. Dostoevsky gave Ivan and the Grand Inquisitor arguments so strong that many readers think they win. That is why his novels are philosophy: they don’t tell you what to think; they force you to hear the best case for every side.` }
+  ],
+  works: [
+    { t: `Notes from Underground`, y: `1864`, b: `About 130 pages. Part One is the monologue; Part Two is the story of his humiliations. A short, intense introduction to Dostoevsky.` },
+    { t: `Crime and Punishment`, y: `1866`, b: `About 550 pages, but it reads like a thriller. If you read one Russian novel, many would say it should be this.` },
+    { t: `The Idiot`, y: `1869`, b: `His attempt to portray “a positively good man”. Sprawling, feverish and heartbreaking.` },
+    { t: `Demons (The Possessed, Devils)`, y: `1872`, b: `A dark satire about a revolutionary cell in a provincial town, based on a real murder. A prophetic study of terrorism and ideological fanaticism.` },
+    { t: `The Brothers Karamazov`, y: `1880`, b: `His masterpiece, about 800 pages: a murder mystery, a family drama and a religious and philosophical epic. Book 5 (“Pro and Contra”, containing “Rebellion” and “The Grand Inquisitor”) and Book 6 (Zosima) are the philosophical heart, but read the whole thing.` },
+    { t: `The House of the Dead`, y: `1862`, b: `A lightly fictionalised memoir of his years in the Siberian prison camp. Tolstoy thought it his best book.` }
+  ],
+  quotes: [
+    { q: `I am a sick man... I am a spiteful man. I am an unattractive man.`, s: `*Notes from Underground*, opening (Pevear and Volokhonsky)` },
+    { q: `Man is a creature that can get used to anything, and I think that is the best definition of him.`, s: `*The House of the Dead*, Part One, chapter 1` },
+    { q: `It’s not God that I don’t accept, Alyosha, only I most respectfully return him the ticket.`, s: `*The Brothers Karamazov*, Book 5, chapter 4, “Rebellion”` },
+    { q: `Above all, don’t lie to yourself. The man who lies to himself and listens to his own lie comes to a point that he cannot distinguish the truth within him, or around him, and so loses all respect for himself and for others.`, s: `*The Brothers Karamazov*, Book 2, chapter 2` },
+    { q: `What is hell? I maintain that it is the suffering of being unable to love.`, s: `*The Brothers Karamazov*, Book 6, chapter 3` },
+    { q: `Love in action is a harsh and dreadful thing compared with love in dreams.`, s: `*The Brothers Karamazov*, Book 2, chapter 4` },
+    { q: `Beauty will save the world.`, s: `*The Idiot*, Part 3, chapter 5, attributed to Myshkin by Ippolit` },
+    { q: `Pain and suffering are always inevitable for a large intelligence and a deep heart.`, s: `*Crime and Punishment*, Part 3, chapter 5` },
+    { q: `To go wrong in one’s own way is better than to go right in someone else’s.`, s: `*Crime and Punishment*, Part 3, chapter 1` }
+  ],
+  fakes: [
+    { q: `If there is no God, everything is permitted.`, n: `The idea is argued over throughout *The Brothers Karamazov*, and characters paraphrase Ivan’s view in several ways, but this exact sentence never appears in the novel. It is a compression that became famous through Sartre and others.` },
+    { q: `The degree of civilisation in a society can be judged by entering its prisons.`, n: `Commonly attributed to him. It isn’t found in this form, though *The House of the Dead* is about exactly that, and the idea appears in various writers.` }
+  ],
+  critique: `Dostoevsky’s politics are ugly in places. He became a fervent Russian nationalist and imperialist, hostile to Catholics, Poles and the West. His journalism, especially *A Writer’s Diary*, contains vicious antisemitism, and Jewish characters in his fiction are often caricatures. Many admirers find these parts hard to reconcile with the depth of compassion elsewhere in his work.
+
+As an artist, he has been criticised for melodrama, feverish plotting, repetitive dialogue and hasty prose (he usually wrote under deadline, by dictation, to pay debts). Nabokov despised him as a “rather mediocre” writer of cheap sensationalism, and thought his world was one of “neurotics and lunatics”. Many readers disagree, but it is a fair description of the surface.
+
+Philosophically, his answer to Ivan isn’t an argument, and he knew it. If you find Ivan’s “Rebellion” convincing, the novel doesn’t really refute it; it shows you a different way to live. Some think that is the only honest answer. Others think Ivan won, and that Dostoevsky, great enough to write Ivan, was not able to answer him.`,
+  start: `Start with *Notes from Underground*, then *Crime and Punishment*, then *The Brothers Karamazov*. The translations by Richard Pevear and Larissa Volokhonsky (Vintage) are the most common now; some readers prefer the older Constance Garnett (freer, smoother) or Oliver Ready (*Crime and Punishment*, Penguin, very lively). If you only have an evening, read “Rebellion” and “The Grand Inquisitor” (Book 5, chapters 4 and 5 of the *Karamazovs*) on their own. Joseph Frank’s *Dostoevsky: A Writer in His Time* is the great biography.`,
+  related: ['nietzsche', 'kierkegaard', 'camus', 'sartre', 'tolstoy', 'kafka']
+},
+{
+  id: 'tolstoy', name: `Leo Tolstoy`, born: 1828, died: 1910, era: 'novel',
+  place: `Yasnaya Polyana, near Tula, Russia`, role: `Novelist and moral philosopher`,
+  themes: ['death', 'meaning', 'god', 'ethics', 'politics'], keywords: ['war and peace', 'anna karenina', 'death of ivan ilyich', 'a confession', 'nonviolence', 'kingdom of god is within you', 'gandhi', 'christian anarchism', 'meaning of life'],
+  tagline: `Wrote two of the greatest novels ever, then decided they were worthless and went looking for the meaning of life.`,
+  summary: `Tolstoy wrote *War and Peace* and *Anna Karenina*, which many consider the greatest novels ever written. Then, at fifty, rich, famous and happy, he fell into a crisis: he could see no meaning in life that death wouldn’t destroy, and he hid ropes and guns from himself so he wouldn’t kill himself. His way out was a radical, stripped-down Christianity: love, nonviolence, simplicity, no state and no church. *The Death of Ivan Ilyich*, about a man who realises on his deathbed that he has lived wrongly, is the best short book about dying ever written.`,
+  life: `Count Lev Nikolayevich Tolstoy was born in 1828 at Yasnaya Polyana, his family’s estate south of Moscow, into one of Russia’s oldest aristocratic families. His mother died when he was two, his father when he was nine. He was raised by aunts.
+
+He dropped out of university, gambled, drank, womanised and ran up debts, all of which he recorded, with self-disgust, in his diaries. He tried to improve the lives of his serfs, who distrusted him. In 1851 he joined the army in the Caucasus, and then fought as an artillery officer in the siege of Sevastopol in the Crimean War. His *Sevastopol Sketches* made his name.
+
+In 1862 he married Sophia Behrs, who was eighteen, sixteen years younger than him. On the eve of the wedding he made her read his diaries, with their record of his past sexual escapades. She bore him thirteen children (eight survived childhood), ran the estate, and copied out the manuscript of *War and Peace* by hand, reportedly seven times. In the 1860s and 70s he wrote *War and Peace* (1869) and *Anna Karenina* (1877).
+
+Then came the crisis, described in *A Confession* (1882). Nothing seemed to have any meaning. He tried science, philosophy (Schopenhauer especially), and the Orthodox Church, and found no answer. He found it, he said, in the faith of the simple peasants who lived and died without despair, and in the Gospels, stripped of miracles and dogma.
+
+His new faith was radical. He renounced violence absolutely, including resistance to evil by force; rejected the state, courts, armies, private property and the Church; became a vegetarian, gave up alcohol and tobacco, wore peasant clothes, made his own boots, and ploughed fields with the peasants. He tried to give away his property and copyrights, which led to years of bitter conflict with Sophia, who had to support their large family. In 1901 the Orthodox Church excommunicated him. He became a world-famous moral authority; pilgrims came to Yasnaya Polyana from everywhere. His *The Kingdom of God Is Within You* (1894) profoundly influenced a young lawyer in South Africa, Mohandas Gandhi, with whom he corresponded.
+
+In October 1910, at 82, unable to bear the tension at home any longer, he left in the middle of the night, with his doctor, to live as a wanderer. He caught pneumonia on the train and died ten days later in the stationmaster’s house at Astapovo, a small railway station, surrounded by journalists and newsreel cameras. Sophia was kept from his bedside until he was unconscious.`,
+  ideas: [
+    { t: `The death of Ivan Ilyich`, b: `Ivan Ilyich Golovin is a successful judge who has lived exactly as one should: correct, pleasant, decorous, rising in his career, marrying suitably, furnishing his apartment tastefully. “Ivan Ilyich’s life had been most simple and most ordinary and therefore most terrible.”
+
+While hanging curtains, he bumps his side. The pain grows. He is dying, and no one will admit it. His family and colleagues are irritated by the inconvenience; they talk about the theatre. Only the peasant servant Gerasim is honest and tender with him, holding his legs up at night to ease the pain.
+
+Facing death, Ivan realises with horror that his whole life, which seemed so right, might have been “not the right thing”: a performance of respectability with nothing real inside it. In his final hours, he finally sees it, feels pity for his family, and the fear of death disappears. “In place of death there was light.”
+
+It is about seventy pages. It will make you look at your own life with new eyes, which is what Tolstoy intended.` },
+    { t: `The question that stops life`, b: `In *A Confession*, Tolstoy describes how his crisis began with questions he couldn’t answer: “Why? Well, and then?” He had fame, wealth, a loving family, health, and a mind at the height of its powers. But “What will come of what I am doing today or shall do tomorrow? What will come of my whole life? Is there any meaning in my life that the inevitable death awaiting me does not destroy?”
+
+He tells an Eastern fable. A traveller, chased by a wild beast, jumps into a dry well, and sees a dragon at the bottom waiting to eat him. He clings to a branch halfway down. Two mice, one black and one white (day and night), are gnawing through the branch. He sees drops of honey on the leaves and licks them. That is life, Tolstoy says: we lick the honey of pleasure while the mice gnaw and the dragon waits. And the honey no longer tasted sweet to him.` },
+    { t: `Faith as what you live by`, b: `Tolstoy found that reason alone gave only one answer: life is meaningless. But billions of people, especially the poor and simple, lived with meaning. What they had was faith: not a set of doctrines, but “the knowledge of the meaning of human life in consequence of which man does not destroy himself but lives.” Faith is the force of life. He decided that the answer to “why live?” can’t come from reason; it must come from a relation to the infinite, from God.` },
+    { t: `Nonviolence`, b: `Tolstoy took the Sermon on the Mount literally: “Resist not evil.” No violence, ever, for any reason, not even in self-defence or to protect others. So he rejected the state, whose power ultimately rests on violence (police, prisons, armies, executions), and the Church, which blessed it. In *The Kingdom of God Is Within You* he called on people to refuse military service and taxes. Gandhi called Tolstoy “the greatest apostle of non-violence that the present age has produced”, and translated his *Letter to a Hindu*.` },
+    { t: `History from below`, b: `In *War and Peace*, Tolstoy attacked the “great man” theory of history. Napoleon doesn’t make history; he is carried by it, like a figurehead on a ship, believing he steers. History is the sum of millions of small actions by ordinary people. The Russian general Kutuzov is wise precisely because he knows he can’t control events and doesn’t try to.` },
+    { t: `Happy families`, b: `*Anna Karenina* opens: “All happy families are alike; each unhappy family is unhappy in its own way.” The novel runs two stories in parallel: Anna’s passionate affair, which destroys her, and Levin’s awkward, searching marriage and his struggle with faith and meaning, which is Tolstoy’s own. At the end, Levin, after an ordinary conversation with a peasant, realises that he knows how to live, even without being able to explain it.` }
+  ],
+  works: [
+    { t: `War and Peace`, y: `1869`, b: `About 1,300 pages, following five aristocratic families through Napoleon’s invasion of Russia. Immense, alive, often very funny. It includes long essays on history that many readers skip.` },
+    { t: `Anna Karenina`, y: `1877`, b: `Often called the greatest novel ever written. Levin’s chapters are where the philosophy is.` },
+    { t: `A Confession`, y: `1882`, b: `About 80 pages. His crisis and search for meaning. One of the great spiritual autobiographies.` },
+    { t: `The Death of Ivan Ilyich`, y: `1886`, b: `About 70 pages. If you only read one thing by Tolstoy, read this.` },
+    { t: `The Kingdom of God Is Within You`, y: `1894`, b: `His case for Christian anarchism and nonviolence.` },
+    { t: `Master and Man, and Hadji Murat`, y: `1895; 1912`, b: `Two late short masterpieces.` }
+  ],
+  quotes: [
+    { q: `All happy families are alike; each unhappy family is unhappy in its own way.`, s: `*Anna Karenina*, opening line` },
+    { q: `Ivan Ilyich’s life had been most simple and most ordinary and therefore most terrible.`, s: `*The Death of Ivan Ilyich*, chapter 2` },
+    { q: `Is there any meaning in my life that the inevitable death awaiting me does not destroy?`, s: `*A Confession*, chapter 5` },
+    { q: `Everyone thinks of changing the world, but no one thinks of changing himself.`, s: `“Three Methods of Reform” (1900), paraphrased` },
+    { q: `The two most powerful warriors are patience and time.`, s: `*War and Peace*, Book 10, chapter 16, Kutuzov` }
+  ],
+  fakes: [
+    { q: `If you want to be happy, be.`, n: `Frequently attributed to Tolstoy, with no source found in his works.` }
+  ],
+  critique: `Tolstoy’s moral teaching was absolute, and he couldn’t live it. He preached chastity and fathered thirteen children. He renounced property but kept living on his estate, served by the family and staff he wouldn’t support. His treatment of Sophia, who had to hold the family together while he condemned her for wanting to, was often cruel. George Orwell, in an essay on *King Lear*, compared the old Tolstoy to Lear: a man who renounced power but still expected to be obeyed, and whose renunciation was itself a kind of pride.
+
+His total rejection of violence is hard to hold. It means not defending a child from an attacker, not resisting an invasion. Orwell pointed out that Gandhi’s nonviolence worked against the British, who had a free press and a conscience; it would not have worked against Stalin or Hitler.
+
+His later hostility to art, including his own great novels (he denounced *War and Peace* and Shakespeare, and defined good art as that which conveys simple religious feeling to ordinary people), strikes most readers as a tragic narrowing of a great mind.`,
+  start: `Read *The Death of Ivan Ilyich* (Penguin or Vintage, trans. Pevear and Volokhonsky). Then *A Confession*. Then, when you have time for a long novel, *Anna Karenina* (Rosamund Bartlett’s Oxford translation is excellent). Rosamund Bartlett’s *Tolstoy: A Russian Life* is a good biography.`,
+  related: ['dostoevsky', 'schopenhauer', 'wittgenstein', 'thoreau', 'becker']
+}
+);
+
+THINKERS.push(
+{
+  id: 'kafka', name: `Franz Kafka`, born: 1883, died: 1924, era: 'novel',
+  place: `Prague`, role: `Writer`,
+  themes: ['meaning', 'mind', 'suffering', 'politics', 'god'], keywords: ['the trial', 'the metamorphosis', 'the castle', 'kafkaesque', 'bureaucracy', 'guilt', 'before the law', 'letter to his father', 'gregor samsa', 'josef k', 'zurau aphorisms', 'max brod'],
+  tagline: `A man wakes up as a giant insect, and what worries him is being late for work.`,
+  summary: `Kafka wrote nightmares in the calm, precise language of an office report. His characters are accused by courts they can never reach, summoned by authorities that never explain themselves, transformed into vermin, and they respond by trying to be reasonable. He gave us the word “Kafkaesque” for the experience of being trapped in a system that is absurd, opaque and indifferent. He asked that everything he wrote be burned. His best friend refused, and that is why you can read him.`,
+  life: `Franz Kafka was born in 1883 in Prague, then part of the Austro-Hungarian Empire, into a German-speaking Jewish family. His father, Hermann, had grown up in poverty and built a successful fancy-goods business through sheer force of will. He was loud, powerful, domineering and contemptuous; Franz was thin, sensitive and anxious. Kafka spent his life in his father’s shadow. At 36, he wrote a hundred-page letter to him, *Letter to His Father*, beginning “You asked me recently why I maintain that I am afraid of you.” He gave it to his mother to deliver. She gave it back.
+
+He studied law, and in 1908 took a job at the Workers’ Accident Insurance Institute for the Kingdom of Bohemia, a semi-governmental agency, where he worked until illness forced him to retire. He was good at the job: he assessed industrial risks, wrote reports on safety measures (his reports argued for safer woodworking machines) and was promoted several times. His hours ended at two in the afternoon, and he wrote at night, often until dawn. He described himself as having “no literary interests, but consisting of literature”.
+
+He was engaged three times, twice to the same woman, Felice Bauer, to whom he wrote hundreds of letters, sometimes two or three a day; he broke both engagements, torn between desire for a normal life and conviction that marriage would destroy his writing. He had an intense love affair, mostly by letter, with Milena Jesenská, a married Czech journalist and his translator.
+
+In 1917 he was diagnosed with tuberculosis. He spent months with his beloved sister Ottla on her farm in the village of Zürau, where he wrote a sequence of aphorisms. In his final year he fell in love with Dora Diamant, a young woman from a Polish Hasidic family, and lived with her in Berlin, happier than he had ever been. His tuberculosis spread to his larynx, making eating and drinking agonising, and he died in a sanatorium near Vienna in June 1924, aged 40, essentially of starvation. He was correcting proofs of his story “A Hunger Artist”, about a man who starves himself as a performance.
+
+He published only a few short works in his lifetime and was little known. He left instructions to his friend Max Brod to burn everything else “unread”. Brod had told him he would never do it, and didn’t. He published *The Trial*, *The Castle* and *Amerika*, and in 1939 escaped Prague on the last train before the Nazis closed the border, with Kafka’s manuscripts in a suitcase. All three of Kafka’s sisters were murdered in the Holocaust, as was Milena.`,
+  ideas: [
+    { t: `The Metamorphosis`, b: `“When Gregor Samsa woke one morning from troubled dreams, he found himself transformed in his bed into a monstrous vermin.” That’s the first sentence. No explanation is ever given. What makes the story unbearable is Gregor’s reaction: he worries about missing his train and losing his job as a travelling salesman, on which his family depends. He tries to be considerate. His family, horrified, lock him in his room. His sister feeds him, at first with care, then with disgust. His father throws apples at him; one lodges in his back and rots. Eventually Gregor dies, and his family, relieved, take a tram into the country, and notice that their daughter has grown into a pretty young woman.
+
+People read it as a story about illness, disability, depression, alienated labour, a son’s relationship to a family that depends on him and then discards him, or the experience of becoming a burden. Kafka insisted that the insect must never be drawn on the cover.` },
+    { t: `The Trial`, b: `“Someone must have slandered Josef K., for one morning, without having done anything wrong, he was arrested.” Josef K., a bank official, is told he is under arrest, but allowed to go about his life. He is never told what he is accused of. The Court meets in attics of tenement buildings; its law books turn out to contain obscene drawings; its officials are petty, lecherous, lazy and unreachable. Everyone seems to know about his case; no one can help. He wastes his energy trying to understand and influence the process. On the eve of his 31st birthday, two men in frock coats take him to a quarry and stab him in the heart. His last words: “Like a dog!”
+
+It has been read as a prophecy of totalitarian state terror, a satire of bureaucracy, a religious parable about guilt before God, and a psychological portrait of a person tormented by guilt they can’t name. It is all of these.` },
+    { t: `Before the Law`, b: `Inside *The Trial* is a parable Kafka also published separately. A man from the country comes to the door of the Law and asks to enter. The doorkeeper says: not now. The man waits for days, years, his whole life. He bribes the doorkeeper, who takes the bribes “so that you won’t think you’ve left anything undone”. Dying, the man asks why, in all these years, no one else has come asking for admittance. The doorkeeper roars: “No one else could be admitted here, since this entrance was meant only for you. I am now going to shut it.”
+
+It is two pages long and people have written books about it. It seems to be about how we wait for permission to live, for someone to let us in, and never realise that the door was ours to go through.` },
+    { t: `The Castle`, b: `K., a land surveyor, arrives in a snowbound village to take up a job he was hired for by the Castle that rules it. But nobody in the village can confirm he was hired, and the Castle is impossible to reach. He spends the whole unfinished novel trying to get an audience with an official named Klamm, seducing Klamm’s mistress to get closer, dealing with absurd messengers and village politics. The Castle never answers. It is Kafka’s most complete image of a hidden authority that governs everything and cannot be reached, which some read as God and others as the modern state.` },
+    { t: `Guilt`, b: `Kafka’s characters are never quite sure what they have done, but they feel guilty anyway, and their guilt makes them cooperate with their accusers. His diaries and letters are full of self-accusation. “Guilt is never to be doubted,” says an officer in “In the Penal Colony”, whose machine inscribes a prisoner’s sentence into his body with needles over twelve hours. The prisoner doesn’t know his sentence; he learns it through his wounds.` },
+    { t: `The Kafkaesque`, b: `The adjective has come to mean any situation of absurd, menacing, bureaucratic complexity: phone trees that loop forever, forms that require the form you’re trying to get, systems that punish you for violations you can’t discover, algorithms that ban your account without appeal. What makes something Kafkaesque isn’t just frustration. It is that the system seems to have its own logic, and that you find yourself trying to follow it, and apologising.` },
+    { t: `A book must be the axe`, b: `At twenty, Kafka wrote to his friend Oskar Pollak: “I think we ought to read only the kind of books that wound or stab us. If the book we’re reading doesn’t wake us up with a blow on the head, what are we reading for? So that it will make us happy, as you write? Good Lord, we would be happy precisely if we had no books... A book must be the axe for the frozen sea within us.” It is an excellent description of what reading, as opposed to scrolling, is for.` }
+  ],
+  works: [
+    { t: `The Metamorphosis`, y: `1915`, b: `About 60 pages. The place to start.` },
+    { t: `The Trial`, y: `written 1914–15, published 1925`, b: `Unfinished; Brod assembled the chapters. About 200 pages.` },
+    { t: `The Castle`, y: `written 1922, published 1926`, b: `Unfinished, breaking off mid-sentence. Slower and stranger than *The Trial*.` },
+    { t: `Short stories`, y: ``, b: `“The Judgement” (written in one night in 1912, the breakthrough), “In the Penal Colony”, “A Hunger Artist”, “A Report to an Academy” (an ape describes becoming human), “The Burrow”, “Josephine the Singer”. Many are only a few pages.` },
+    { t: `Letter to His Father`, y: `1919`, b: `Never delivered. A devastating, fair-minded, painful account of a father and son. Essential for understanding him.` },
+    { t: `The Zürau Aphorisms`, y: `1917–18`, b: `109 short aphorisms written on slips of paper while he was ill. Philosophy in its most compressed form.` },
+    { t: `Diaries and Letters to Felice / Milena`, y: ``, b: `Some of his best writing is here, including the diary entry on the day the war started: “Germany has declared war on Russia. Swimming in the afternoon.”` }
+  ],
+  quotes: [
+    { q: `Someone must have slandered Josef K., for one morning, without having done anything wrong, he was arrested.`, s: `*The Trial*, opening (Breon Mitchell translation)` },
+    { q: `When Gregor Samsa woke one morning from troubled dreams, he found himself transformed in his bed into a monstrous vermin.`, s: `*The Metamorphosis*, opening (translations vary)` },
+    { q: `A book must be the axe for the frozen sea within us.`, s: `Letter to Oskar Pollak, 27 January 1904` },
+    { q: `A cage went in search of a bird.`, s: `*Zürau Aphorisms* 16` },
+    { q: `From a certain point onward there is no longer any turning back. That is the point that must be reached.`, s: `*Zürau Aphorisms* 5` },
+    { q: `Germany has declared war on Russia. Swimming in the afternoon.`, s: `*Diaries*, 2 August 1914` },
+    { q: `No one else could be admitted here, since this entrance was meant only for you. I am now going to shut it.`, s: `“Before the Law”` },
+    { q: `There is an infinite amount of hope, but not for us.`, s: `Reported by Max Brod, recalling a conversation with Kafka` }
+  ],
+  fakes: [
+    { q: `I am a cage, in search of a bird.`, n: `A common misquotation of Zürau aphorism 16, which reads: “A cage went in search of a bird.” The misquote turns it into a line about the self; the original is stranger.` },
+    { q: `Don’t bend; don’t water it down; don’t try to make it logical; don’t edit your own soul according to the fashion. Rather, follow your most intense obsessions mercilessly.`, n: `Not in Kafka’s stories, letters or diaries. Its origin is unclear, and it circulates mostly on writing-advice sites.` },
+    { q: `Anyone who keeps the ability to see beauty never grows old.`, n: `Widely attributed; it appears in Gustav Janouch’s *Conversations with Kafka*, a book of reported conversations whose reliability many scholars doubt.` }
+  ],
+  critique: `Kafka didn’t offer a philosophy, and it is easy to over-interpret him. Every school (existentialist, Marxist, Freudian, theological, Jewish mystical, postcolonial) has claimed his work, and each finds its own key. The novelist Vladimir Nabokov, who taught *The Metamorphosis*, insisted on reading it as literature, not allegory: he even worked out, from the text, that Gregor is a beetle, not a cockroach, and that he could have flown out of the window if he had known he had wings.
+
+Some readers find his world airless and passive: characters who never fight back, who cooperate with their own destruction. Brod presented him as a religious seeker and saint, which later scholars saw as distortion; others have gone to the opposite extreme and made him a prophet of the Holocaust, which he didn’t live to see.
+
+It is also worth noting the ethics of the posthumous works. Kafka explicitly asked that they be burned, twice. Brod betrayed his friend’s wish, and the world is richer for it. Whether he was right to is a real question.`,
+  start: `Read *The Metamorphosis* (Susan Bernofsky’s translation, Norton, is good) and the two-page “Before the Law”. Then *The Trial* (Breon Mitchell’s translation, Schocken). Then *Letter to His Father*. Reiner Stach’s three-volume biography is the definitive life; his *Is That Kafka? 99 Finds* is a delightful short book of surprising facts. Roberto Calasso’s *K.* is a beautiful essay on the novels.`,
+  related: ['dostoevsky', 'kierkegaard', 'camus', 'nietzsche', 'arendt']
+},
+{
+  id: 'hesse', name: `Hermann Hesse`, born: 1877, died: 1962, era: 'novel',
+  place: `Calw (Germany); Montagnola (Switzerland)`, role: `Novelist and poet`,
+  themes: ['mind', 'meaning', 'god'], keywords: ['siddhartha', 'steppenwolf', 'demian', 'glass bead game', 'narcissus and goldmund', 'self discovery', 'jung', 'river', 'nobel'],
+  tagline: `Wrote the novels generations of restless young people read to find themselves.`,
+  summary: `Hesse’s novels are about one journey, told over and over: a sensitive young man breaking away from convention to find his own path to wholeness. In *Siddhartha* a young Brahmin leaves every teacher, including the Buddha, to learn from life and a river. In *Steppenwolf* a lonely intellectual discovers that his self is not two (man and wolf) but thousands. Shaped by his own Jungian analysis, by Indian thought and by Nietzsche, Hesse is less a philosopher than a guide to the inner search, and his warning is that no one can walk it for you.`,
+  life: `Hermann Hesse was born in 1877 in Calw, in the Black Forest, into a family of Pietist missionaries; his mother had been born in India, and his grandfather was a scholar of Indian languages. He was a difficult, rebellious child. At fourteen, sent to a prestigious Protestant seminary at Maulbronn, he ran away after a few months, declaring “I want to be a poet or nothing at all.” He tried to kill himself and spent time in a mental institution.
+
+He worked as a mechanic in a clock-tower factory, then as a bookseller in Tübingen and Basel, reading voraciously and writing poetry. His first novel, *Peter Camenzind* (1904), was a success, and he married and moved to the countryside by Lake Constance.
+
+The First World War shattered him. He published an essay urging German intellectuals not to give in to nationalist hatred, and was denounced as a traitor by the German press. Then his father died, his youngest son fell seriously ill, and his wife had a breakdown. In 1916 he went into psychoanalysis with J. B. Lang, a student of Jung, and later briefly with Jung himself. The result was *Demian* (1919), published under a pseudonym, which became a sensation among young Germans returning from the war.
+
+He moved to Montagnola in the Italian-speaking part of Switzerland, where he lived for the rest of his life, painting watercolours of the landscape and writing. *Siddhartha* (1922) and *Steppenwolf* (1927) followed. During the Nazi years his books were suppressed in Germany; he helped refugees, including Thomas Mann and Bertolt Brecht. He won the Nobel Prize in Literature in 1946. He died in 1962, aged 85.
+
+His books were rediscovered by the American counterculture of the 1960s: *Siddhartha* became a hippie bible, and the rock band Steppenwolf took their name from his novel.`,
+  ideas: [
+    { t: `Wisdom can’t be taught`, b: `In *Siddhartha*, a young Brahmin leaves his father to become a wandering ascetic, then meets Gotama, the Buddha. He recognises him as enlightened, but refuses to become his disciple. He tells Gotama that his teaching can’t contain the secret of what the Buddha himself experienced in the hour of his enlightenment, because that can’t be communicated in words. Each person must find it themselves.
+
+“Wisdom cannot be imparted. Wisdom that a wise man attempts to impart always sounds like foolishness to someone else... Knowledge can be communicated, but not wisdom. One can find it, live it, be fortified by it, do wonders through it, but one cannot communicate and teach it.”` },
+    { t: `Learning by living`, b: `Siddhartha then plunges into the world he had rejected. He learns love from the courtesan Kamala and business from a merchant, becomes rich, gambles, drinks, and grows disgusted with himself. On the verge of drowning himself in a river, he hears the sacred syllable Om and wakes. He becomes a ferryman, learning from an old ferryman, Vasudeva, and from the river itself. The river teaches him that time is an illusion: the river is everywhere at once, at its source and its mouth. All voices together, joy and grief, good and evil, make the one great song of the world.` },
+    { t: `The self is many`, b: `In *Steppenwolf*, Harry Haller, a lonely, middle-aged intellectual, believes he is two beings: a cultured, bourgeois man and a savage wolf of the steppes who despises him. He is miserable, contemptuous of modern life, and plans to kill himself on his fiftieth birthday. He is given a strange pamphlet, the “Treatise on the Steppenwolf”, which tells him that the division into two is itself a simplification. A person is not two but hundreds, thousands of selves, a whole “chaos of forms”. Through a young woman named Hermine, jazz, dancing and the “Magic Theatre”, he learns to laugh at himself, and at the solemn seriousness with which he takes his suffering.` },
+    { t: `Become who you are`, b: `*Demian* opens: “I wanted only to try to live in accord with the promptings which came from my true self. Why was that so very difficult?” Its hero, Emil Sinclair, is led by his mysterious friend Max Demian away from the comfortable world of his parents towards the “dark” world he has been taught to fear, and towards his own destiny. “The bird fights its way out of the egg. The egg is the world. Who would be born must first destroy a world.” The debt to Nietzsche and Jung is plain.` },
+    { t: `Spirit and senses`, b: `Hesse’s novels often pair two characters: a thinker and a lover of life, spirit and senses, discipline and freedom. In *Narcissus and Goldmund* (1930), a monk-scholar and an artist-wanderer love each other across their differences. In *The Glass Bead Game* (1943), his last novel, set in a future intellectual order devoted to a game that synthesises all knowledge, the master Joseph Knecht finally leaves the order for the world, and dies. The whole of Hesse is the question of how to hold the two together.` }
+  ],
+  works: [
+    { t: `Demian`, y: `1919`, b: `A coming-of-age novel about breaking from convention. Short and intense.` },
+    { t: `Siddhartha`, y: `1922`, b: `About 150 pages. Simple, lyrical, beloved. Read it slowly.` },
+    { t: `Steppenwolf`, y: `1927`, b: `His strangest and most modern book.` },
+    { t: `Narcissus and Goldmund`, y: `1930`, b: `The friendship of a monk and an artist.` },
+    { t: `The Glass Bead Game`, y: `1943`, b: `His longest and most ambitious work, which won him the Nobel.` }
+  ],
+  quotes: [
+    { q: `Wisdom cannot be imparted. Wisdom that a wise man attempts to impart always sounds like foolishness to someone else.`, s: `*Siddhartha*, Part Two, “Govinda”` },
+    { q: `The bird fights its way out of the egg. The egg is the world. Who would be born must first destroy a world.`, s: `*Demian*, chapter 5` },
+    { q: `I wanted only to try to live in accord with the promptings which came from my true self. Why was that so very difficult?`, s: `*Demian*, epigraph` },
+    { q: `I can think. I can wait. I can fast.`, s: `*Siddhartha*, Part Two, “Kamala”` }
+  ],
+  fakes: [
+    { q: `Some of us think holding on makes us strong; but sometimes it is letting go.`, n: `Commonly attributed to Hesse; no source in his works has been found.` }
+  ],
+  critique: `Hesse is often dismissed as a writer for adolescents: earnest, self-absorbed, and repetitive, telling the same story of a sensitive young man finding himself in book after book. His women tend to be mothers, muses or lovers who exist to help the hero grow. His version of Indian thought in *Siddhartha* is a European Romantic’s, not a scholar’s, and it has been criticised for flattening and appropriating it.
+
+There is also a danger in his message. “Follow your own path, reject convention, become yourself” can turn into self-indulgence and contempt for ordinary life. Hesse knew this, which is what *Steppenwolf* is about: the self-important outsider who needs to learn to laugh at himself. But not every reader gets that far.
+
+At his best, though, Hesse is honest about the difficulty of the inner search and about its costs, and he never pretends someone else can do it for you, including him.`,
+  start: `Read *Siddhartha* (Penguin, trans. Hilda Rosner; or Joachim Neugroschel). Then *Steppenwolf* (trans. Basil Creighton, revised by Walter Sorell). Read *Demian* if you are young or remember being young. Gunnar Decker’s *Hesse: The Wanderer and His Shadow* is the recent biography.`,
+  related: ['jung', 'buddha', 'nietzsche', 'laozi', 'zhuangzi']
+}
+);
+
+// Curated routes through the thinkers. Each step is [id, why this one comes next].
+window.PATHS = [
+  {
+    name: `Start here if you’ve never read philosophy`,
+    intro: `Five short, readable thinkers who each changed how people live. Every one of them wrote something you could finish in a weekend.`,
+    steps: [
+      ['socrates', `Where it starts: a man who asked questions until Athens killed him.`],
+      ['epictetus', `The most practical philosophy ever written, by a former slave.`],
+      ['montaigne', `The friendliest mind in the tradition. Honest about being confused.`],
+      ['pascal', `The man who diagnosed distraction in 1660.`],
+      ['camus', `What to do when life doesn’t explain itself.`]
+    ]
+  },
+  {
+    name: `The Stoics, and what came of them`,
+    intro: `Stoicism is the most popular ancient philosophy online, and mostly misunderstood there. Read them in order and you’ll see it isn’t about suppressing emotion. It’s about knowing what’s yours.`,
+    steps: [
+      ['socrates', `The Stoics’ hero: a good person can’t be harmed.`],
+      ['diogenes', `The wild ancestor who showed how little you need.`],
+      ['epictetus', `The core teaching: what’s up to you and what isn’t.`],
+      ['seneca', `The warm, worldly version, and the question of hypocrisy.`],
+      ['marcus-aurelius', `The emperor practising it in private.`],
+      ['boethius', `Stoic comfort on death row.`],
+      ['spinoza', `Freedom as understanding why you feel what you feel.`],
+      ['frankl', `The last of the human freedoms, tested in the worst place on earth.`]
+    ]
+  },
+  {
+    name: `Meaning after God`,
+    intro: `The great argument of the last 200 years. If the old answers are gone, where does meaning come from, or does it? This is the path for anyone who came here for Nietzsche.`,
+    steps: [
+      ['pascal', `The wager, and the terror of infinite spaces.`],
+      ['schopenhauer', `Life as endless wanting. The pessimist Nietzsche started from.`],
+      ['kierkegaard', `Anxiety, despair, and the leap.`],
+      ['dostoevsky', `If there is no God, is everything permitted? Characters who find out.`],
+      ['nietzsche', `God is dead. Now create values, or sink into the last man.`],
+      ['tolstoy', `A famous man who has everything and can’t see why he should live.`],
+      ['heidegger', `Living as “the They” live, and facing your own death.`],
+      ['sartre', `Condemned to be free.`],
+      ['camus', `The absurd, and Sisyphus happy.`],
+      ['frankl', `Meaning found, not invented, even in a camp.`],
+      ['becker', `Why we build immortality projects, and fight over them.`]
+    ]
+  },
+  {
+    name: `Know yourself: the psychology path`,
+    intro: `How philosophers’ questions about the soul turned into psychology, and what survived the trip. Read Jung here, in context.`,
+    steps: [
+      ['plato', `The first model of the divided soul: reason, spirit, appetite.`],
+      ['augustine', `The will at war with itself.`],
+      ['schopenhauer', `The blind will beneath the mind.`],
+      ['nietzsche', `Ressentiment and the psychology of morality.`],
+      ['william-james', `Habit, attention and the stream of consciousness.`],
+      ['freud', `The unconscious. You are not master in your own house.`],
+      ['adler', `Inferiority, goals and courage.`],
+      ['jung', `Persona, shadow, individuation.`],
+      ['fromm', `Love as an art, and the self as a product.`],
+      ['frankl', `The will to meaning.`],
+      ['becker', `The fear of death beneath it all.`]
+    ]
+  },
+  {
+    name: `Attention: the anti-scrolling path`,
+    intro: `The thinkers who saw distraction coming, and what they thought you should do about it. Probably the most useful path on this site for why you’re here.`,
+    steps: [
+      ['seneca', `Everywhere means nowhere. We don’t lack time; we waste it.`],
+      ['pascal', `All our problems come from not being able to sit quietly in a room.`],
+      ['kierkegaard', `The Present Age: everyone a spectator, no one committed.`],
+      ['thoreau', `If you’ve read one news story, you don’t need another.`],
+      ['william-james', `My experience is what I agree to attend to.`],
+      ['heidegger', `Idle talk, curiosity and the They.`],
+      ['simone-weil', `Attention as the rarest form of generosity.`],
+      ['foucault', `The panopticon you carry in your pocket.`],
+      ['arendt', `Loneliness, and losing the line between fact and fiction.`]
+    ]
+  },
+  {
+    name: `East and West`,
+    intro: `Ancient China and India asked many of the same questions as Greece, and sometimes got further. Read these side by side.`,
+    steps: [
+      ['heraclitus', `Everything flows.`],
+      ['laozi', `Stop forcing. Water wins by yielding.`],
+      ['zhuangzi', `The butterfly dream and the cook who never blunted his knife.`],
+      ['confucius', `Character built through ritual and relationships.`],
+      ['aristotle', `Character built through habit. Compare with Confucius.`],
+      ['buddha', `Suffering, craving and no self.`],
+      ['hume', `A Scottish sceptic who found no self either.`],
+      ['schopenhauer', `The first great Western philosopher to read the Upanishads.`],
+      ['hesse', `A novelist’s journey from Europe towards the East.`]
+    ]
+  },
+  {
+    name: `Power, freedom and the state`,
+    intro: `Who should rule, why obey, and what happens when it goes wrong. Each thinker is answering the one before.`,
+    steps: [
+      ['plato', `Philosopher-kings and the noble lie.`],
+      ['aristotle', `The political animal.`],
+      ['machiavelli', `Power as it actually works.`],
+      ['hobbes', `Without a state, life is nasty, brutish and short.`],
+      ['locke', `Rights, consent, and the right to revolt.`],
+      ['rousseau', `Born free, everywhere in chains.`],
+      ['mill', `The harm principle and free speech.`],
+      ['marx', `Class, alienation, and changing the world.`],
+      ['arendt', `How totalitarianism happened, and the banality of evil.`],
+      ['foucault', `Power that watches instead of punishes.`]
+    ]
+  },
+  {
+    name: `Read the novels`,
+    intro: `Some of the deepest philosophy of the last two centuries is in fiction. These pages point to the books; the books do the work.`,
+    steps: [
+      ['voltaire', `*Candide*: an evening of savage comedy about optimism.`],
+      ['dostoevsky', `*Notes from Underground*, then *Crime and Punishment*.`],
+      ['tolstoy', `*The Death of Ivan Ilyich*: seventy pages on how not to live.`],
+      ['kafka', `*The Metamorphosis* and *The Trial*.`],
+      ['hesse', `*Siddhartha*.`],
+      ['camus', `*The Stranger*, then *The Plague*.`],
+      ['sartre', `*Nausea* and the play *No Exit*.`]
+    ]
+  }
+];
 
 </script>
 <script>
@@ -2839,7 +3886,7 @@ window.PATHS = [];
     function x(y) { return left + (y - min) * px; }
     var h = '<div class="page"><span class="label">Timeline</span><h1>Who was alive when</h1>';
     h += '<p>Every thinker on one scale, 600 BCE to today. Dashed bars are lives whose dates are traditional or uncertain. Scroll sideways; tap a name to read.</p>';
-    h += '<p class="note">Two things jump out. First, the gap: almost nothing here between Augustine and Aquinas, which says more about which traditions got written down and translated than about who was thinking. Second, the crowd after 1800, when writing, printing and universities multiplied.</p></div>';
+    h += '<p class="note">Two things jump out. First, the thin stretch between Augustine and Aquinas, where only Boethius and Avicenna appear. That says more about which traditions got written down and translated into European languages than about who was thinking. Second, the crowd after 1800, when writing, printing and universities multiplied.</p></div>';
     h += '<div class="tl-wrap"><div class="tl" style="width:' + w + 'px;height:' + hgt + 'px"><div class="tl-axis">';
     for (var y = -500; y <= max; y += 250) {
       h += '<span class="tl-tick" style="left:' + x(y) + 'px">' + (y < 0 ? -y + ' BCE' : y === 0 ? '1 CE' : y) + '</span>';
