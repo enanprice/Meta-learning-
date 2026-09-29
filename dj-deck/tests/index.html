@@ -1,0 +1,23 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>DJ Deck tests</title>
+<style>body{font:13px/1.5 ui-monospace,monospace;background:#111;color:#ddd;padding:16px}.ok{color:#6d6}.bad{color:#f66}</style>
+<h1>DJ Deck engine tests</h1>
+<p>Open this file in a browser, or run <code>node tests/run.mjs</code>.</p>
+<pre id="out">running…</pre>
+<script src="../js/core.js"></script>
+<script src="../js/worklet.js"></script>
+<script src="../js/fx.js"></script>
+<script src="../js/analysis.js" onerror="void 0"></script>
+<script src="../js/engine.js"></script>
+<script src="harness.js"></script>
+<script src="stage1.js"></script>
+<script src="stage2.js" onerror="void 0"></script>
+<script>
+  window.addEventListener('load', async () => {
+    if (window.__noAuto) return;
+    const res = await T.run(new URLSearchParams(location.search).get('only'));
+    window.__results = res;
+    document.getElementById('out').innerHTML = res.map(r => `<span class="${r.ok ? 'ok' : 'bad'}">${r.ok ? 'PASS' : 'FAIL'}</span> ${r.name} <small>(${r.ms} ms)</small>\n     ${r.note}`).join('\n');
+  });
+</script>

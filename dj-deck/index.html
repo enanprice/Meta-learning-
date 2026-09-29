@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deckhand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar" id="topbar">
+    <div class="brand">Deck<b>h</b><i>and</i></div>
+    <div class="top-status" id="top-status">Starting audio…</div>
+  </header>
+  <main id="main" class="app-main"></main>
+</div>
+
+<!-- Load order matters: core first, app last. No build step, no modules,
+     so the whole thing runs by double-clicking index.html. -->
+<script src="js/core.js"></script>
+<script src="js/worklet.js"></script>
+<script src="js/analysis.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/controls.js"></script>
+<script src="js/waveform.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/keyboard.js"></script>
+<script src="js/midi.js"></script>
+<script src="js/io.js"></script>
+<script src="js/library.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
