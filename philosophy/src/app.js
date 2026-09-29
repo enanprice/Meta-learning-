@@ -41,6 +41,26 @@
   });
   document.getElementById('random-top').addEventListener('click', goRandom);
 
+  // Full screen, where the browser allows it (desktop browsers and Android; not iPhone Safari).
+  var fsBtn = document.getElementById('fs-toggle');
+  var fsOn = function () { return document.fullscreenElement || document.webkitFullscreenElement; };
+  if (document.fullscreenEnabled || document.webkitFullscreenEnabled) fsBtn.hidden = false;
+  function toggleFullscreen() {
+    try {
+      var p = fsOn() ? (document.exitFullscreen || document.webkitExitFullscreen).call(document)
+        : (root.requestFullscreen || root.webkitRequestFullscreen).call(root);
+      if (p && p.catch) p.catch(function () { fsBtn.hidden = true; });
+    } catch (e) { fsBtn.hidden = true; }
+  }
+  fsBtn.addEventListener('click', toggleFullscreen);
+  function fsLabel() { fsBtn.textContent = fsOn() ? 'Exit full screen' : 'Full screen'; }
+  document.addEventListener('fullscreenchange', fsLabel);
+  document.addEventListener('webkitfullscreenchange', fsLabel);
+  document.addEventListener('keydown', function (e) {
+    var tag = (e.target.tagName || '').toLowerCase();
+    if (e.key === 'f' && !e.metaKey && !e.ctrlKey && !e.altKey && tag !== 'input' && tag !== 'textarea' && !fsBtn.hidden) toggleFullscreen();
+  });
+
   function goRandom() {
     var pool = T.filter(function (t) { return !read[t.id]; });
     if (!pool.length) pool = T;
