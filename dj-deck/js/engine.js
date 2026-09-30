@@ -27,7 +27,7 @@
       this.track = null;
       this.pitch = 0; this.range = 0.08; this.bend = 0; this.keylock = false;
       this.syncOn = false; this.quantize = true;
-      this.playing = false; this.previewing = false; this.loading = false;
+      this.playing = false; this.previewing = false; this.loading = false; this.loadToken = 0;
       this.cuePoint = 0;
       this.hotcues = new Array(8).fill(null);
       this.loop = { on: false, in: null, out: null, beats: null };
@@ -105,27 +105,29 @@
 
     // ------------------------------------------------------------------- load
     async load(file, opts = {}) {
-      if (this.loading) { DJ.toast('Deck ' + this.id + ' is still loading the last track.'); return false; }
+      if (this.loading && this.loading !== 'demo') { DJ.toast('Deck ' + this.id + ' is still loading the last track.'); return false; }
       if (!file) return false;
+      const token = ++this.loadToken; // a newer load cancels an older one (e.g. the demo)
       if (file.size > MAX_FILE) { this.emit('error', `${file.name} is ${DJ.fmtBytes(file.size)}. Files over 1 GB are refused to avoid running out of memory.`); return false; }
       this.loading = true;
       this.emit('loading', { name: file.name, stage: 'Reading' });
       try {
         const decoded = await this.engine.decode(file, (stage) => this.emit('loading', { name: file.name, stage }));
         if (decoded.duration > WARN_SECONDS) DJ.toast(`${file.name} is ${Math.round(decoded.duration / 60)} minutes long. It will use about ${DJ.fmtBytes(decoded.length * 8)} of memory.`, { kind: 'warn', ms: 7000 });
-        await this.loadDecoded(decoded, Object.assign({ id: DJ.trackId(file), name: file.name, size: file.size }, opts.meta || {}));
+        if (token !== this.loadToken) return false;
+        await this.loadDecoded(decoded, Object.assign({ id: DJ.trackId(file), name: file.name, size: file.size }, opts.meta || {}), token);
+        if (token !== this.loadToken) return false;
         this.engine.emit('fileLoaded', this, file);
         return true;
       } catch (err) {
         this.emit('error', err.message || String(err));
         return false;
       } finally {
-        this.loading = false;
-        this.emit('loading', null);
+        if (token === this.loadToken) { this.loading = false; this.emit('loading', null); }
       }
     }
 
-    async loadDecoded(buf, meta) {
+    async loadDecoded(buf, meta, token) {
       // Fade this deck out before swapping buffers so the swap itself is silent.
       if (this.playing) { this.post({ type: 'pause' }); this.playing = false; await new Promise((r) => setTimeout(r, 25)); }
       const L = new Float32Array(buf.length); buf.copyFromChannel(L, 0);
@@ -138,6 +140,7 @@
         info = res.info; // L/R come back from the worker (transferred there and back)
         this._L = res.L; this._R = res.R;
       } else { this._L = L; this._R = R; }
+      if (token !== undefined && token !== this.loadToken) return; // superseded while analysing
       const saved = DJ.trackData.get(meta.id);
       const names = DJ.parseName(meta.name || 'Untitled');
       this.track = {
@@ -168,7 +171,7 @@
 
     // -------------------------------------------------------------- transport
     play() {
-      if (!this.track) return;
+      if (!this.track) { DJ.toast(this.loading ? `Deck ${this.id} is still loading.` : `Deck ${this.id} is empty. Load a track first.`); return; }
       this.engine.resume();
       if (this.syncOn) this.alignPhase();
       this.post({ type: 'play' });

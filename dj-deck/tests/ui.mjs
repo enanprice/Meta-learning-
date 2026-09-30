@@ -39,6 +39,16 @@ await check('start-audio prompt appears and clears on click', async () => {
   return shown ? 'prompt shown, audio running' : 'audio already running';
 });
 
+await check('demo tracks load on both decks and deck A plays with one click', async () => {
+  await until(() => DJ.engine.decks.A.track && DJ.engine.decks.B.track && !DJ.engine.decks.B.loading, null, 20000);
+  await page.click('[data-ctl="A.play"]');
+  await page.waitForTimeout(600);
+  const r = await page.evaluate(() => ({ a: DJ.engine.decks.A.track.title, b: DJ.engine.decks.B.track.title, bpm: DJ.engine.decks.A.track.bpm, key: DJ.engine.decks.A.track.key && DJ.engine.decks.A.track.key.camelot, level: DJ.engine.decks.A.level(), master: Math.max(...DJ.engine.masterLevels()) }));
+  await page.click('[data-ctl="A.play"]');
+  if (!(r.level > 0.05) || !(r.master > 0.05) || r.bpm !== 124) throw new Error(JSON.stringify(r));
+  return `${r.a} / ${r.b}, detected ${r.bpm} BPM ${r.key}, master peak ${r.master.toFixed(2)}`;
+});
+
 await check('load a WAV onto deck A with the file picker', async () => {
   await page.setInputFiles('#fileA', fx('Test Artist - Night Shift 124.wav'));
   await until(() => DJ.engine.decks.A.track && !DJ.engine.decks.A.loading, null, 20000);
@@ -53,7 +63,7 @@ await check('broken file shows a readable error and leaves deck B empty', async 
   await until(() => [...document.querySelectorAll('.toast.error')].some((t) => /Couldn.t decode/.test(t.textContent)));
   const txt = await page.locator('.toast.error').last().textContent();
   const s = await deckState('B');
-  if (s.track) throw new Error('deck B has a track');
+  if (s.track !== 'First Light (demo)') throw new Error('deck B lost its demo: ' + s.track);
   return txt.slice(0, 80) + '…';
 });
 

@@ -182,9 +182,10 @@ await check('after reload: library, hot cues and MIDI mapping are still there', 
   await boot();
   await until(() => DJ.library.tracks.size === 5, null, 10000);
   await page.dblclick('.lib-table tbody tr[data-id^="Test Artist - Night Shift"] td.t');
-  await until(() => DJ.engine.decks.A.track && !DJ.engine.decks.A.loading);
-  const r = await ev(() => ({ cues: DJ.engine.decks.A.hotcues.filter((x) => x != null).length, maps: Object.keys(DJ.midi.maps['Mock DJ Controller'] || {}).length, rows: document.querySelectorAll('.lib-table tbody tr').length }));
-  if (r.cues !== 2 || r.maps !== 3 || r.rows !== 5) throw new Error(JSON.stringify(r));
+  await until(() => DJ.engine.decks.A.track && DJ.engine.decks.A.track.title === 'Night Shift 124' && !DJ.engine.decks.A.loading);
+  await page.waitForTimeout(1500); // the demo must not replace it afterwards
+  const r = await ev(() => ({ title: DJ.engine.decks.A.track.title, cues: DJ.engine.decks.A.hotcues.filter((x) => x != null).length, maps: Object.keys(DJ.midi.maps['Mock DJ Controller'] || {}).length, rows: document.querySelectorAll('.lib-table tbody tr').length }));
+  if (r.title !== 'Night Shift 124' || r.cues !== 2 || r.maps !== 3 || r.rows !== 5) throw new Error(JSON.stringify(r));
   return `${r.rows} library rows, ${r.cues} hot cues restored for the track, ${r.maps} MIDI mappings`;
 });
 
