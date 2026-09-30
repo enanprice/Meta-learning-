@@ -302,29 +302,43 @@
 
   // ------------------------------------------------------------ main thread
   const workerSrc = 'const API = (' + core.toString() + ')();\n' +
-    'onmessage = (e) => { const m = e.data; let info = null, error = null;\n' +
+    'onmessage = (e) => { const m = e.data; if (m.ping) { postMessage({ pong: 1 }); return; } let info = null, error = null;\n' +
     '  try { info = API.analyze(m.L, m.R, m.sr, m.opts); } catch (err) { error = String(err && err.message || err); }\n' +
     '  const tr = [m.L.buffer]; if (m.R) tr.push(m.R.buffer);\n' +
     '  if (info && info.wave) tr.push(info.wave.amp.buffer, info.wave.low.buffer, info.wave.mid.buffer, info.wave.high.buffer);\n' +
     '  postMessage({ id: m.id, L: m.L, R: m.R, info, error }, tr); };';
 
   class Pool {
-    constructor() { this.w = null; this.jobs = new Map(); this.seq = 0; this.failed = false; }
+    constructor() { this.w = null; this.jobs = new Map(); this.seq = 0; this.failed = false; this.ready = null; }
+    // Resolves to a working worker, or null if workers are blocked here.
+    // Checked with a ping first, so audio is never handed to a dead worker.
     get() {
-      if (this.w || this.failed) return this.w;
-      try {
-        this.w = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' })));
-        this.w.onmessage = (e) => { const j = this.jobs.get(e.data.id); if (!j) return; this.jobs.delete(e.data.id); if (e.data.error) j.rej(new Error('Analysis failed: ' + e.data.error)); else j.res(e.data); };
-        this.w.onerror = (e) => { for (const j of this.jobs.values()) j.rej(new Error('Analysis worker crashed' + (e.message ? ': ' + e.message : ''))); this.jobs.clear(); this.w = null; };
-      } catch (e) { this.failed = true; this.w = null; }
-      return this.w;
+      if (this.failed) return Promise.resolve(null);
+      if (this.ready) return this.ready;
+      this.ready = new Promise((resolve) => {
+        let w;
+        const fail = () => { this.failed = true; this.ready = null; try { w && w.terminate(); } catch (e) {} resolve(null); };
+        try { w = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: 'text/javascript' }))); } catch (e) { fail(); return; }
+        const t = setTimeout(fail, 3000);
+        w.onerror = () => { clearTimeout(t); fail(); };
+        w.onmessage = (e) => {
+          if (e.data && e.data.pong) {
+            clearTimeout(t);
+            w.onmessage = (ev) => { const j = this.jobs.get(ev.data.id); if (!j) return; this.jobs.delete(ev.data.id); if (ev.data.error) j.rej(new Error('Analysis failed: ' + ev.data.error)); else j.res(ev.data); };
+            w.onerror = (ev) => { for (const j of this.jobs.values()) j.rej(new Error('Analysis worker crashed' + (ev.message ? ': ' + ev.message : ''))); this.jobs.clear(); this.ready = null; };
+            this.w = w; resolve(w);
+          }
+        };
+        w.postMessage({ ping: 1 });
+      });
+      return this.ready;
     }
-    run(L, R, sr, opts) {
-      const w = this.get();
+    async run(L, R, sr, opts) {
+      const w = await this.get();
       if (!w) {
         // No workers available: analyse on the main thread (UI pauses briefly).
         const info = api().analyze(L, R, sr, opts);
-        return Promise.resolve({ L, R, info });
+        return { L, R, info };
       }
       return new Promise((res, rej) => {
         const id = ++this.seq; this.jobs.set(id, { res, rej });

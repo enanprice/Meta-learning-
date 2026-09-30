@@ -1,11 +1,15 @@
-// AudioWorklet processors, stored as a function so we can load them from a
-// blob: URL (addModule() refuses file:// URLs). Everything inside this function
-// runs on the audio thread and cannot see window or DJ.
+// AudioWorklet processors. The page turns this function into a data:/blob:
+// URL (addModule() refuses file:// URLs); where those are blocked, this same
+// file is loaded directly as the worklet module and runs itself.
+// Everything inside runs on the audio thread and cannot see window or DJ.
 //
 //   deck-player  sample playback: varispeed, key lock (WSOLA), loops, scratch
 //   beat-roll    captures a tempo-synced slice and repeats it
 //   master-bus   look-ahead peak limiter + optional WAV capture tap
-DJ.workletSource = function () {
+(function (fn) {
+  if (typeof registerProcessor === 'function' && typeof window === 'undefined') fn();
+  else window.DJ.workletSource = fn;
+})(function () {
   const TAU = Math.PI * 2;
 
   // Cubic Hermite read at fractional index p (returns 0 outside the buffer).
@@ -298,4 +302,4 @@ DJ.workletSource = function () {
     }
   }
   registerProcessor('master-bus', MasterBus);
-};
+});

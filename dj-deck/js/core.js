@@ -65,7 +65,8 @@
     try {
       await ctx.audioWorklet.addModule('data:text/javascript;charset=utf-8,' + encodeURIComponent(src));
     } catch (e) {
-      await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+      try { await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([src], { type: 'text/javascript' }))); }
+      catch (e2) { await ctx.audioWorklet.addModule('js/worklet.js'); } // strict CSP: load the file itself
     }
   };
 
