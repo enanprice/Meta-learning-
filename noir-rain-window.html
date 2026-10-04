@@ -1,0 +1,1342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>3 A.M. Rain</title>
+<style>
+  :root{
+    /* The whole palette. Nothing else is drawn. */
+    --ink:#0a0d14; --neon:#d4262e; --amber:#d9a441; --frost:#dce3ec;
+
+    /* Sign-painter faces. Condensed caps for the hotel blade, a brush script for
+       the club. Each stack falls through to whatever condensed face the machine has. */
+    --font-hotel:"Bebas Neue","League Gothic","Oswald","Haettenschweiler","Impact","Arial Narrow","Roboto Condensed",sans-serif;
+    --font-jazz:"SignPainter","SignPainter-HouseScript","Brush Script MT","Bebas Neue","League Gothic","Oswald","Impact","Arial Narrow",sans-serif;
+    --font-panel:"Futura","Futura PT","Avenir Next","Gill Sans","Century Gothic","Helvetica Neue",Arial,sans-serif;
+  }
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--ink)}
+  canvas#glass{position:fixed;inset:0;width:100vw;height:100vh;display:block}
+  body.idle, body.idle *{cursor:none !important}
+
+  /* ---- period instrument panel ---- */
+  #panel{
+    position:fixed;right:24px;bottom:24px;z-index:2;box-sizing:border-box;
+    width:min(284px,calc(100vw - 32px));padding:16px 18px 14px;
+    background:rgba(10,13,20,.94);color:var(--amber);
+    border:1px solid rgba(217,164,65,.4);
+    box-shadow:inset 0 0 0 3px var(--ink),inset 0 0 0 4px rgba(217,164,65,.14);
+    font:300 11px/1.45 var(--font-panel);
+    font-variant:small-caps;text-transform:lowercase;letter-spacing:.24em;
+    user-select:none;-webkit-user-select:none;
+  }
+  #panel[hidden]{display:none}
+  #panel .hd{display:flex;justify-content:space-between;align-items:baseline;
+    padding-bottom:9px;margin-bottom:12px;border-bottom:1px solid rgba(217,164,65,.22)}
+  #panel .hd b{font-weight:400;letter-spacing:.32em}
+  #panel .hd span{opacity:.55}
+  #panel label{display:block;margin:0 0 11px}
+  #panel .row{display:flex;justify-content:space-between;align-items:baseline}
+  #panel output{font-variant-numeric:tabular-nums;letter-spacing:.12em;opacity:.8}
+  #panel .ft{margin-top:12px;padding-top:9px;border-top:1px solid rgba(217,164,65,.22);
+    display:flex;justify-content:space-between;opacity:.6;letter-spacing:.18em}
+
+  #panel input[type=range]{-webkit-appearance:none;appearance:none;display:block;width:100%;
+    height:16px;margin:3px 0 0;background:transparent;cursor:pointer}
+  #panel input[type=range]:focus{outline:none}
+  #panel input[type=range]:focus-visible{outline:1px dotted rgba(217,164,65,.55);outline-offset:3px}
+  /* track: a hairline with tick marks every tenth, like a dial scale */
+  #panel input[type=range]::-webkit-slider-runnable-track{height:9px;border:0;background:
+    linear-gradient(rgba(217,164,65,.6),rgba(217,164,65,.6)) 0 100%/100% 1px no-repeat,
+    repeating-linear-gradient(90deg,rgba(217,164,65,.42) 0 1px,transparent 1px 10%) 0 100%/100% 5px no-repeat}
+  #panel input[type=range]::-moz-range-track{height:9px;border:0;background:
+    linear-gradient(rgba(217,164,65,.6),rgba(217,164,65,.6)) 0 100%/100% 1px no-repeat,
+    repeating-linear-gradient(90deg,rgba(217,164,65,.42) 0 1px,transparent 1px 10%) 0 100%/100% 5px no-repeat}
+  /* thumb: a needle */
+  #panel input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:3px;height:14px;margin-top:-3px;border:0;border-radius:0;background:var(--amber);
+    box-shadow:0 0 6px rgba(217,164,65,.55)}
+  #panel input[type=range]::-moz-range-thumb{width:3px;height:14px;border:0;border-radius:0;
+    background:var(--amber);box-shadow:0 0 6px rgba(217,164,65,.55)}
+
+  #hint{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:1;
+    max-width:calc(100vw - 32px);text-align:center;white-space:nowrap;overflow:hidden;
+    color:rgba(217,164,65,.62);font:300 11px/1 var(--font-panel);font-variant:small-caps;
+    text-transform:lowercase;letter-spacing:.3em;pointer-events:none;opacity:0;transition:opacity 1.6s ease}
+  #hint.show{opacity:1;transition-duration:.6s}
+
+  @media (max-width:520px){
+    #panel{right:16px;bottom:16px}
+    #hint{bottom:18px;letter-spacing:.18em;white-space:normal;line-height:1.6}
+  }
+</style>
+</head>
+<body>
+<canvas id="glass" aria-label="Rain running down a window at night, neon signs blurred behind it"></canvas>
+
+<div id="panel" hidden role="group" aria-label="Window controls">
+  <div class="hd"><b>window controls</b><span>no. 7</span></div>
+  <div id="sliders"></div>
+  <div class="ft"><span>m sound</span><span>f full</span><span>h hide</span></div>
+</div>
+<div id="hint"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* =============================================================================
+   PALETTE (strict). Every pixel is one of these four, or an alpha blend of them.
+   ============================================================================= */
+const INK   = [10, 13, 20];    // #0a0d14 blue-black
+const RED   = [212, 38, 46];   // #d4262e neon red
+const AMBER = [217, 164, 65];  // #d9a441 amber
+const FROST = [220, 227, 236]; // cold grey-white for highlights
+
+const TAU = Math.PI * 2;
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const lerp  = (a, b, t) => a + (b - a) * t;
+const R     = Math.random;
+const rand  = (a, b) => a + R() * (b - a);
+const rgba  = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${clamp(a, 0, 1).toFixed(4)})`;
+const mixc  = (a, b, t) => `rgb(${Math.round(lerp(a[0], b[0], t))},${Math.round(lerp(a[1], b[1], t))},${Math.round(lerp(a[2], b[2], t))})`;
+const avg   = arr => arr.reduce((s, v) => s + v, 0) / arr.length;
+
+// Seeded PRNG so the skyline is the same city every time (and after resizes).
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// Off-DOM canvas. These are the "offscreen" layers.
+function mk(w, h) {
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.ceil(w)); c.height = Math.max(1, Math.ceil(h));
+  return c;
+}
+function cx2d(c, opaque) {
+  const g = c.getContext('2d', opaque ? { alpha: false } : undefined);
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+  return g;
+}
+
+const rootStyle  = getComputedStyle(document.documentElement);
+const FONT_HOTEL = rootStyle.getPropertyValue('--font-hotel').trim() || 'Impact, sans-serif';
+const FONT_JAZZ  = rootStyle.getPropertyValue('--font-jazz').trim()  || 'Impact, sans-serif';
+
+// Does this browser support ctx.filter? (Assigning to it proves nothing in Safari,
+// where it just becomes an expando, so we actually blur a pixel and look.)
+const HAS_FILTER = (() => {
+  try {
+    const c = mk(12, 12), g = c.getContext('2d');
+    g.filter = 'blur(2px)'; g.fillStyle = '#fff'; g.fillRect(5, 5, 2, 2);
+    return g.getImageData(1, 6, 1, 1).data[3] > 0;
+  } catch (e) { return false; }
+})();
+
+/* =============================================================================
+   SETTINGS
+   ============================================================================= */
+const DEF   = { rain: .5, fog: .65, neon: 1, grain: .5, size: 1 };
+const RANGE = { rain: [0, 1], fog: [0, 1], neon: [.2, 1.5], grain: [0, 1], size: [.5, 1.8] };
+const settings = { ...DEF };
+const STORE = 'noir-rain-window';
+try {
+  const s = JSON.parse(localStorage.getItem(STORE) || '{}');
+  for (const k in DEF) if (typeof s[k] === 'number' && isFinite(s[k])) settings[k] = clamp(s[k], RANGE[k][0], RANGE[k][1]);
+} catch (e) { /* private mode etc. */ }
+
+/* =============================================================================
+   CANVASES
+   W,H are in device pixels. S is the (capped) device pixel ratio, used to turn
+   CSS-pixel sizes into device-pixel sizes. hy is the street line (horizon).
+   ============================================================================= */
+const cv  = document.getElementById('glass');
+const ctx = cv.getContext('2d', { alpha: false });
+
+let W = 0, H = 0, S = 1, hy = 0, SH = 0;
+let baseC, baseX;     // sky, buildings, windows, street. Static except window toggles.
+let neonC, neonX;     // signs, lamps, door light, light spill. Redrawn on flicker.
+let reflO, reflOX, reflS, reflSX, ripC, ripX; // wet-road reflections (quarter res)
+let sceneC, sceneX;   // the sharp composite: base + reflections + neon + headlights
+let blurC, blurX;     // fogged-glass view of the scene (quarter res)
+let t1C, t1X, t2C, t2X; // scratch for the no-ctx.filter blur fallback
+let bloomC, bloomX;   // blurred neon for additive bloom (eighth res)
+let fogTex, vigC;     // fog mottling, vignette
+let fogM, fogX;       // FOG MASK: alpha = fog density (half res). See recoverFog().
+let fogComp, fcX;     // fogged glass cut to the mask (half res), rebuilt each frame
+let sdC, sdX;         // static droplets layer (full res, cached)
+
+let windows = [], winsBy = { far: [], mid: [], near: [] }, litRatio = .1;
+let geo = {};
+const neonLevels = { hotel: [1, 1, 1, 1, 1], jazz: [1, 1, 1, 1] };
+const flicks = [];
+const dirty = { neon: true, refl: true, scene: true, blur: true, statics: true };
+
+const statics = [];   // tiny condensation droplets {x,y,r}
+const runners = [];   // medium and large drops
+const cars = [];
+
+let simT = 0, frame = 0, lastStaticRender = -1;
+let nextWin = 2, nextFlicker = 4, nextCar = 2.5, nextMed = 0, nextBig = 5;
+let staticAcc = 0, evapAcc = 0, fogAcc = 0;
+
+/* =============================================================================
+   DROP SPRITES: the shading that makes a drop read as a lens, not a hole.
+   A dark crescent on the lower-right rim (light bent away from your eye at the
+   steep edge of the bead) and a small cold catchlight on the upper-left.
+   Pre-rendered at a few sizes so tiny drops don't alias.
+   ============================================================================= */
+const MAG = 1.25;  // lens magnification of the refracted image
+const SP  = 1.18;  // sprite is this much bigger than the lens radius
+function makeShade(n, rim) {
+  const c = mk(n, n), g = c.getContext('2d'), m = n / 2, r = n / 2 / SP;
+  g.save();
+  g.beginPath(); g.arc(m, m, r, 0, TAU); g.clip();
+  let gr = g.createRadialGradient(m - r * .28, m - r * .32, r * .2, m - r * .12, m - r * .14, r * 1.2);
+  gr.addColorStop(0, rgba(INK, 0));
+  gr.addColorStop(.62, rgba(INK, .05));
+  gr.addColorStop(.86, rgba(INK, .3 * rim));
+  gr.addColorStop(1, rgba(INK, rim));
+  g.fillStyle = gr; g.fillRect(0, 0, n, n);
+  g.restore();
+  // meniscus outline, faint all round
+  g.beginPath(); g.arc(m, m, r * .97, 0, TAU);
+  g.lineWidth = Math.max(.6, r * .07); g.strokeStyle = rgba(INK, .3 * rim); g.stroke();
+  // faint focused light pooling along the bottom inside edge
+  g.save(); g.beginPath(); g.arc(m, m, r, 0, TAU); g.clip();
+  gr = g.createRadialGradient(m - r * .1, m + r * 1.25, r * .55, m - r * .1, m + r * 1.25, r * .95);
+  gr.addColorStop(0, rgba(FROST, 0)); gr.addColorStop(.6, rgba(FROST, .16)); gr.addColorStop(1, rgba(FROST, 0));
+  g.fillStyle = gr; g.fillRect(0, 0, n, n);
+  g.restore();
+  // catchlight
+  const hx = m - r * .4, hy2 = m - r * .42, hr = Math.max(r * .26, 1);
+  gr = g.createRadialGradient(hx, hy2, 0, hx, hy2, hr);
+  gr.addColorStop(0, rgba(FROST, .95)); gr.addColorStop(.4, rgba(FROST, .42)); gr.addColorStop(1, rgba(FROST, 0));
+  g.fillStyle = gr; g.fillRect(hx - hr, hy2 - hr, hr * 2, hr * 2);
+  return c;
+}
+const SHADES = [[16, .3], [32, .42], [64, .55], [128, .6]].map(([n, rim]) => [n, makeShade(n, rim)]);
+function shade(g, x, y, rx, ry) {
+  const d = 2 * rx * SP;
+  let spr = SHADES[SHADES.length - 1][1];
+  for (const [n, c] of SHADES) if (d <= n) { spr = c; break; }
+  g.drawImage(spr, x - rx * SP, y - ry * SP, 2 * rx * SP, 2 * ry * SP);
+}
+
+/* =============================================================================
+   DROP REFRACTION
+
+   A water droplet on glass is a tiny plano-convex lens. Light from the street
+   comes through the pane, then through the curved bead, which bends it toward
+   the drop's centre. Seen from beyond its focal length, a converging lens makes
+   a real, INVERTED image of what's behind it. That upside-down street inside
+   every bead is what the eye reads as "water".
+
+   We fake it with one drawImage per drop:
+     1. Take a patch of the SHARP (unblurred) scene centred on the drop. The
+        patch is smaller than the drop (2r / MAG), so stretching it to fill the
+        drop magnifies it slightly.
+     2. Flip it vertically about the drop's own centre line.
+        setTransform(1, 0, 0, -1, 0, 2y) maps every point (px, py) to
+        (px, 2y - py): a mirror across the horizontal line through the drop.
+        The destination rectangle is symmetric about y, so it lands exactly
+        where it started, just upside down.
+     3. The CALLER limits it to the drop outline: a clip() for moving drops,
+        or one batched 'destination-in' pass for the static droplets.
+   The glass around the drop shows the blurred, fogged scene, so every drop is
+   a tiny window of clarity, which is why they read as lenses.
+   ============================================================================= */
+function refract(g, x, y, rx, ry) {
+  const sw = 2 * rx / MAG, sh = 2 * ry / MAG;
+  // Keep the source rect inside the scene canvas (edge drops just reuse the border).
+  const sx = clamp(x - sw / 2, 0, W - sw);
+  const sy = clamp(y - sh / 2, 0, H - sh);
+  g.setTransform(1, 0, 0, -1, 0, 2 * y);              // mirror about this drop's centre
+  g.drawImage(sceneC, sx, sy, sw, sh, x - rx, y - ry, 2 * rx, 2 * ry);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+// Moving drops: clip to an ellipse (sliding drops sag into an egg shape).
+function drawRunner(g, d) {
+  const rx = d.r, ry = d.r * d.stretch;
+  if (d.y + ry < 0 || d.y - ry > H) return;
+  g.save();
+  g.beginPath(); g.ellipse(d.x, d.y, rx, ry, 0, 0, TAU); g.clip();
+  refract(g, d.x, d.y, rx, ry);
+  g.restore();
+  shade(g, d.x, d.y, rx, ry);
+}
+
+// Static droplets live in a cached layer. A full rebuild is batched:
+// draw every refracted square, cut them all to circles in one fill, then shade.
+function renderStatics() {
+  const g = sdX;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.globalCompositeOperation = 'source-over';
+  g.clearRect(0, 0, W, H);
+  for (const s of statics) refract(g, s.x, s.y, s.r, s.r);
+  // 'destination-in' keeps what's already there only where the new shape is.
+  // One path with every circle in it trims all the squares at once.
+  g.globalCompositeOperation = 'destination-in';
+  g.beginPath();
+  for (const s of statics) { g.moveTo(s.x + s.r, s.y); g.arc(s.x, s.y, s.r, 0, TAU); }
+  g.fill();
+  g.globalCompositeOperation = 'source-over';
+  for (const s of statics) shade(g, s.x, s.y, s.r, s.r);
+  dirty.statics = false;
+  lastStaticRender = simT;
+}
+// Incremental add, between full rebuilds.
+function drawStaticLens(s) {
+  const g = sdX;
+  g.save(); g.beginPath(); g.arc(s.x, s.y, s.r, 0, TAU); g.clip();
+  refract(g, s.x, s.y, s.r, s.r);
+  g.restore();
+  shade(g, s.x, s.y, s.r, s.r);
+}
+function eraseStatic(s) {
+  sdX.globalCompositeOperation = 'destination-out';
+  sdX.beginPath(); sdX.arc(s.x, s.y, s.r * SP + S, 0, TAU); sdX.fill();
+  sdX.globalCompositeOperation = 'source-over';
+}
+
+/* =============================================================================
+   FOG MASK AND FOG RECOVERY
+
+   fogM is a half-resolution canvas whose ALPHA channel is fog density:
+   1 = fully fogged, 0 = wiped clear. Its colour is irrelevant.
+
+   Each frame the glass is composed as:
+       sharp scene                             (everything, in focus)
+     + blurred scene, alpha = fog mask         (fogComp: blurC 'source-in' fogM)
+   so wherever the mask is clear you see the sharp street through the glass.
+
+   CLEARING. A drop wipes fog off the glass. We stroke its path into the mask
+   with 'destination-out', which erases alpha: the trail goes to fog 0.
+
+   RECOVERY. Condensation re-forms at a roughly constant rate, so we refill the
+   mask LINEARLY: every so often we fill the whole mask with a tiny alpha using
+   'lighter' compositing. 'lighter' adds source to destination (alpha included)
+   and clamps at 1, so fog climbs back by a fixed step and stops exactly at
+   fully fogged.
+
+   Why not the usual "draw a translucent rect over it every frame"? That
+   multiplies the remaining clarity by (1 - a). On an 8-bit canvas, once
+   clarity is small the per-frame change rounds to zero and stalls, leaving
+   permanent ghost trails, so the glass would slowly end up streaked forever.
+   Additive refill has no such floor.
+
+   The smallest step a canvas can store is 1/255. To get slow recovery we
+   accumulate fractional progress and only paint when one or more whole steps
+   have built up (fogAcc below). Thin medium trails have soft edges, so their
+   edges reach full fog first and the trail visibly narrows as it fades. The
+   wide trails of large drops take longest to disappear. Because new drops keep
+   clearing paths while the fog keeps returning, the glass never settles fully
+   clear or fully fogged.
+   ============================================================================= */
+function recoverSeconds() { return lerp(32, 13, settings.fog); } // clear -> fully fogged
+function recoverFog(dt) {
+  fogAcc += dt * 255 / recoverSeconds();
+  const steps = Math.floor(fogAcc);
+  if (steps < 1) return;
+  fogAcc -= steps;
+  fogX.globalCompositeOperation = 'lighter';
+  // +0.25 keeps the 8-bit conversion from rounding a 1/255 step down to zero.
+  fogX.fillStyle = `rgba(0,0,0,${((steps + .25) / 255).toFixed(5)})`;
+  fogX.fillRect(0, 0, fogM.width, fogM.height);
+  fogX.globalCompositeOperation = 'source-over';
+}
+// Wipe a stroke of glass clear behind a drop. Mask is half res, hence * .5.
+// 'destination-out' with alpha a leaves fog * (1 - a). Overlapping strokes would
+// compound that, so the caller only stamps a new segment once the drop has moved
+// a few pixels past the last stamp, and the segments use flat (butt) ends so
+// neighbours meet instead of overlapping. A medium drop's a < 1 leaves a thin
+// film of water in its trail, so it is clearer than fog but not perfectly clear.
+const TRAIL_STEP = 3;   // device px between trail stamps
+function wipeTrail(d, w, a) {
+  const dx = d.x - d.tx, dy = d.y - d.ty;
+  if (dx * dx + dy * dy < TRAIL_STEP * TRAIL_STEP) return;
+  fogX.globalCompositeOperation = 'destination-out';
+  fogX.strokeStyle = `rgba(0,0,0,${a})`;
+  fogX.lineCap = 'butt';
+  fogX.lineWidth = Math.max(.9, w * .5);
+  fogX.beginPath(); fogX.moveTo(d.tx * .5, d.ty * .5); fogX.lineTo(d.x * .5, d.y * .5); fogX.stroke();
+  fogX.globalCompositeOperation = 'source-over';
+  d.tx = d.x; d.ty = d.y;
+}
+// Gradually clear a round patch (a gathering drop draws the fog into itself).
+function wipeSpot(x, y, r, a) {
+  fogX.globalCompositeOperation = 'destination-out';
+  fogX.fillStyle = `rgba(0,0,0,${a.toFixed(4)})`;
+  fogX.beginPath(); fogX.arc(x * .5, y * .5, r * .5, 0, TAU); fogX.fill();
+  fogX.globalCompositeOperation = 'source-over';
+}
+
+/* =============================================================================
+   THE CITY (drawn once per resize into baseC)
+   ============================================================================= */
+const LAYERS = {
+  far:  { col: mixc(INK, AMBER, .07),  off: mixc(INK, AMBER, .085), ww: 1.4, wh: 2,   gx: 2.6, gy: 3.2, p: .01, bright: .55 },
+  mid:  { col: mixc(INK, AMBER, .035), off: mixc(INK, AMBER, .05),  ww: 2.6, wh: 3.6, gx: 3.6, gy: 4.8, p: .035,  bright: .8 },
+  near: { col: mixc(INK, INK, 0),      off: mixc(INK, FROST, .035), ww: 6.5, wh: 10,  gx: 8,   gy: 11,  p: .1,  bright: 1 },
+};
+
+function paintWindow(g, s) {
+  g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  g.fillStyle = s.off; g.fillRect(s.x, s.y, s.w, s.h);
+  if (!s.on) return;
+  if (s.warm) { // warm white: cold white warmed with amber
+    g.fillStyle = rgba(FROST, .6 * s.a); g.fillRect(s.x, s.y, s.w, s.h);
+    g.fillStyle = rgba(AMBER, .42 * s.a); g.fillRect(s.x, s.y, s.w, s.h);
+  } else {
+    g.fillStyle = rgba(AMBER, .6 * s.a); g.fillRect(s.x, s.y, s.w, s.h);
+  }
+  if (s.shade && s.h > 3) { // a half-drawn blind
+    g.fillStyle = rgba(INK, .55); g.fillRect(s.x, s.y, s.w, Math.round(s.h * s.shade));
+  }
+}
+
+function buildCity() {
+  const rnd = mulberry32(0x1953), rr = (a, b) => a + rnd() * (b - a);
+  const g = baseX;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  windows = []; winsBy = { far: [], mid: [], near: [] };
+  geo = { lamps: [] };
+
+  // ---- sky: blue-black overhead, warm haze from the city near the horizon
+  let gr = g.createLinearGradient(0, 0, 0, hy);
+  gr.addColorStop(0, mixc(INK, FROST, .015));
+  gr.addColorStop(.45, mixc(INK, AMBER, .05));
+  gr.addColorStop(.8, mixc(INK, AMBER, .12));
+  gr.addColorStop(1, mixc(INK, AMBER, .24));
+  g.fillStyle = gr; g.fillRect(0, 0, W, hy + 1);
+  // low cloud lit from beneath
+  for (let i = 0; i < 11; i++) {
+    const cx = rr(-.1, 1.1) * W, cy = rr(.04, .42) * H, rx = rr(.14, .4) * W, ry = rr(.01, .035) * H;
+    g.save(); g.translate(cx, cy); g.scale(1, ry / rx);
+    const cg = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+    cg.addColorStop(0, rgba(AMBER, rr(.015, .04) * (.4 + cy / H)));
+    cg.addColorStop(1, rgba(AMBER, 0));
+    g.fillStyle = cg; g.beginPath(); g.arc(0, 0, rx, 0, TAU); g.fill(); g.restore();
+  }
+
+  function addWindows(x, top, w, bottom, spec, layer, excl) {
+    const ww = spec.ww * S, wh = spec.wh * S, gx = spec.gx * S, gy = spec.gy * S;
+    const cols = Math.floor((w - gx) / (ww + gx)); if (cols < 1) return;
+    const x0 = x + (w - (cols * (ww + gx) - gx)) / 2;
+    for (let y = top + gy; y + wh < bottom - gy * .5; y += wh + gy) {
+      const busy = rnd() < .16 ? 3.4 : (rnd() < .35 ? 0 : 1); // busy floors, dark floors
+      for (let c = 0; c < cols; c++) {
+        const wx = Math.round(x0 + c * (ww + gx)), wy = Math.round(y);
+        const sw = Math.max(1, Math.round(ww)), sh = Math.max(1, Math.round(wh));
+        if (excl && excl.some(e => wx + sw > e.x && wx < e.x + e.w && wy + sh > e.y && wy < e.y + e.h)) continue;
+        const s = { x: wx, y: wy, w: sw, h: sh, off: spec.off, on: rnd() < spec.p * busy, warm: rnd() < .4,
+          a: rr(.5, 1) * spec.bright, shade: rnd() < .3 ? rr(.25, .6) : 0, layer };
+        windows.push(s); winsBy[layer].push(s); paintWindow(g, s);
+      }
+    }
+    g.fillStyle = spec.col;
+  }
+  function waterTower(x, top, sc, col) {
+    const tw = rr(9, 14) * S * sc, th = tw * 1.05, legs = tw * .55, yb = top - legs;
+    g.fillStyle = col; g.strokeStyle = col; g.lineWidth = Math.max(1, .6 * S * sc);
+    const lw = Math.max(1, .9 * S * sc);
+    g.fillRect(x + tw * .1, yb, lw, legs + 1); g.fillRect(x + tw * .85, yb, lw, legs + 1); g.fillRect(x + tw * .47, yb, lw, legs + 1);
+    g.beginPath(); g.moveTo(x + tw * .1, yb); g.lineTo(x + tw * .9, top); g.moveTo(x + tw * .9, yb); g.lineTo(x + tw * .1, top); g.stroke();
+    g.fillRect(x, yb - th, tw, th + 1);
+    g.beginPath(); g.moveTo(x - tw * .06, yb - th); g.lineTo(x + tw / 2, yb - th - tw * .45); g.lineTo(x + tw * 1.06, yb - th); g.closePath(); g.fill();
+  }
+  function tower(x, w, top, layer, opt = {}) {
+    const spec = LAYERS[layer];
+    x = Math.round(x); w = Math.round(w); top = Math.round(top);
+    g.fillStyle = spec.col; g.fillRect(x, top, w, hy - top + 1);
+    addWindows(x, top, w, hy - (layer === 'near' ? 0 : 2 * S), spec, layer, opt.excl);
+    if (opt.crown === false) return;
+    const roll = rnd(), cx = x + w / 2;
+    if (roll < .32) { // wedding-cake setbacks, maybe a spire
+      let tw = w, tt = top; const n = 1 + Math.floor(rnd() * 3);
+      for (let i = 0; i < n; i++) {
+        tw *= rr(.62, .82); const th = rr(.018, .045) * H; tt -= th;
+        g.fillStyle = spec.col; g.fillRect(Math.round(cx - tw / 2), Math.round(tt), Math.round(tw), Math.round(th) + 1);
+        addWindows(cx - tw / 2, tt, tw, tt + th, spec, layer);
+      }
+      if (rnd() < .45) {
+        g.fillStyle = spec.col; g.beginPath(); g.moveTo(cx - tw * .18, tt); g.lineTo(cx, tt - rr(.03, .075) * H); g.lineTo(cx + tw * .18, tt); g.closePath(); g.fill();
+      }
+    } else if (roll < .6 && layer !== 'far') {
+      waterTower(x + rr(.12, .6) * w, top, layer === 'near' ? 1.6 : 1, spec.col);
+    } else if (roll < .78) { // parapet and a stair bulkhead
+      g.fillStyle = spec.col;
+      g.fillRect(x - S, top - 2 * S, w + 2 * S, 2 * S);
+      const bh = rr(4, 10) * S; g.fillRect(Math.round(x + rr(.1, .5) * w), Math.round(top - bh), Math.round(w * rr(.18, .38)), Math.round(bh) + 1);
+    }
+  }
+
+  // ---- far layer: a midtown cluster with one deco landmark
+  const swell = u => .7 + .6 * Math.exp(-Math.pow((u - .4) / .2, 2)) + .25 * Math.exp(-Math.pow((u - .82) / .1, 2));
+  {
+    const spec = LAYERS.far, cx = .38 * W, bw = Math.max(.05 * W, 40 * S), h = .56 * H;
+    let w = bw, y = hy;
+    for (const f of [.56, .17, .1, .06]) {
+      const th = h * f; y -= th;
+      g.fillStyle = spec.col; g.fillRect(Math.round(cx - w / 2), Math.round(y), Math.round(w), Math.round(th) + 1);
+      addWindows(cx - w / 2, y, w, y + th, spec, 'far');
+      w *= .72;
+    }
+    g.fillStyle = spec.col;
+    g.fillRect(Math.round(cx - w * .2), Math.round(y - h * .05), Math.round(w * .4), Math.round(h * .05) + 1);
+    g.fillRect(Math.round(cx - .7 * S), Math.round(y - h * .16), Math.max(1, Math.round(1.4 * S)), Math.round(h * .12));
+  }
+  for (let x = -rr(0, 30) * S; x < W;) {
+    const w = rr(26, 64) * S, h = rr(.1, .3) * H * swell(x / W);
+    tower(x, w, hy - h, 'far');
+    x += w * rr(.7, 1.05);
+  }
+  // atmospheric haze over the far layer
+  gr = g.createLinearGradient(0, hy - .45 * H, 0, hy);
+  gr.addColorStop(0, rgba(AMBER, 0)); gr.addColorStop(1, rgba(AMBER, .07));
+  g.fillStyle = gr; g.fillRect(0, hy - .45 * H, W, .45 * H);
+
+  // ---- mid layer
+  for (let x = -rr(10, 50) * S; x < W;) {
+    const w = rr(60, 130) * S, h = rr(.08, .3) * H * (.8 + .3 * swell(x / W));
+    tower(x, w, hy - h, 'mid');
+    x += w + rr(-.15, .5) * w;
+  }
+
+  // ---- near buildings framing the street
+  const lbW = clamp(.14 * W, 80 * S, 300 * S), lbTop = .26 * H;
+  const rbW = clamp(.17 * W, 90 * S, 320 * S), rbX = W - rbW;
+  geo.jazz = { w: lbW * .84, h: Math.max(.055 * H, 32 * S) };
+  geo.jazz.x = lbW * .08; geo.jazz.y = hy - .17 * H;
+  geo.door = { w: Math.max(lbW * .22, 24 * S), h: Math.max(.075 * H, 44 * S) };
+  geo.door.x = lbW * .36; geo.door.y = hy - geo.door.h;
+  const pad = 6 * S;
+  const excl = [
+    { x: geo.jazz.x - pad, y: geo.jazz.y - pad, w: geo.jazz.w + 2 * pad, h: hy - geo.jazz.y + pad },
+  ];
+  tower(0, lbW, lbTop, 'near', { excl, crown: false });
+  g.fillStyle = LAYERS.near.col; g.fillRect(0, Math.round(lbTop - 4 * S), Math.round(lbW + 4 * S), Math.round(4 * S)); // cornice
+  waterTower(lbW * .45, lbTop - 4 * S, 1.8, LAYERS.near.col);
+  tower(rbX, rbW + 2, -.05 * H, 'near', { crown: false });
+
+  geo.hotel = { w: Math.max(.036 * W, 38 * S), h: .36 * H, y: .17 * H };
+  geo.hotel.x = rbX - geo.hotel.w - 10 * S;
+  geo.wall = rbX;
+  geo.escape = { x: rbX + rbW * .1, w: rbW * .5, top: .22 * H, bottom: hy - .1 * H, step: (LAYERS.near.wh + LAYERS.near.gy) * 3 * S };
+  for (const u of [.3, .63]) geo.lamps.push({ x: u * W, top: hy - .15 * H, dir: u < .5 ? 1 : -1 });
+
+  // ---- street: far sidewalk, curb, wet asphalt, near curb
+  const sw = .014 * H;
+  geo.sidewalk = sw;
+  g.fillStyle = mixc(INK, FROST, .04); g.fillRect(0, hy, W, sw);
+  g.fillStyle = mixc(INK, FROST, .1); g.fillRect(0, Math.round(hy + sw), W, Math.max(1, Math.round(S)));
+  gr = g.createLinearGradient(0, hy + sw, 0, H);
+  gr.addColorStop(0, mixc(INK, FROST, .065)); gr.addColorStop(.3, mixc(INK, FROST, .025)); gr.addColorStop(1, mixc(INK, FROST, 0));
+  g.fillStyle = gr; g.fillRect(0, Math.round(hy + sw) + Math.max(1, Math.round(S)), W, H);
+  const nc = Math.round(H * .965);
+  g.fillStyle = mixc(INK, FROST, .07); g.fillRect(0, nc, W, Math.max(1, Math.round(S)));
+  g.fillStyle = mixc(INK, FROST, .02); g.fillRect(0, nc + Math.max(1, Math.round(S)), W, H);
+
+  const lit = windows.filter(s => s.on).length;
+  litRatio = clamp(lit / Math.max(1, windows.length), .02, .5);
+  geo.litCount = lit;
+}
+
+/* =============================================================================
+   NEON (redrawn only when a letter flickers or the brightness slider moves)
+   ============================================================================= */
+// One letter of glass tube. Unlit tube is always faintly visible; lit tube gets
+// two glow passes and a hot pale core.
+function tube(g, ch, x, y, size, family, col, level, sx) {
+  g.save();
+  g.font = `${size}px ${family}`;
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.translate(x, y); g.scale(sx, 1);
+  g.lineJoin = 'round'; g.lineCap = 'round';
+  const lw = Math.max(1.2 * S, size * .06);
+  g.lineWidth = lw;
+  g.strokeStyle = rgba(col, .17); g.strokeText(ch, 0, 0);
+  if (level > .01) {
+    const a = Math.min(1, level);
+    g.shadowColor = rgba(col, a); g.shadowBlur = size * .5;
+    g.strokeStyle = rgba(col, .92 * a); g.strokeText(ch, 0, 0);
+    g.shadowBlur = size * .16; g.strokeText(ch, 0, 0);
+    if (level > 1) { g.shadowBlur = size * .8; g.globalAlpha = level - 1; g.strokeText(ch, 0, 0); g.globalAlpha = 1; }
+    g.shadowBlur = 0;
+    g.lineWidth = lw * .38; g.strokeStyle = rgba(FROST, .58 * a); g.strokeText(ch, 0, 0);
+  }
+  g.restore();
+}
+function tubePath(g, pts, col, level) {
+  const draw = () => { g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (const p of pts.slice(1)) g.lineTo(p[0], p[1]); g.stroke(); };
+  g.save(); g.lineJoin = 'round'; g.lineCap = 'round';
+  g.lineWidth = Math.max(1.2 * S, 2.2 * S);
+  g.strokeStyle = rgba(col, .17); draw();
+  const a = Math.min(1, level);
+  g.shadowColor = rgba(col, a); g.shadowBlur = 12 * S; g.strokeStyle = rgba(col, .9 * a); draw();
+  g.shadowBlur = 0; g.lineWidth = .8 * S; g.strokeStyle = rgba(FROST, .5 * a); draw();
+  g.restore();
+}
+function spill(g, x, y, r, col, a) {
+  const gr = g.createRadialGradient(x, y, 0, x, y, r);
+  gr.addColorStop(0, rgba(col, a)); gr.addColorStop(.45, rgba(col, a * .35)); gr.addColorStop(1, rgba(col, 0));
+  g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r);
+}
+
+function drawNeon() {
+  const g = neonX, nb = settings.neon;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  g.clearRect(0, 0, W, H);
+  const h = geo.hotel, j = geo.jazz, d = geo.door, sw = geo.sidewalk;
+  const hA = avg(neonLevels.hotel) * nb, jA = avg(neonLevels.jazz) * nb;
+
+  // light thrown onto the walls around each sign
+  spill(g, h.x + h.w / 2, h.y + h.h / 2, Math.max(.2 * W, 160 * S), RED, .13 * hA);
+  spill(g, j.x + j.w / 2, j.y + j.h / 2, Math.max(.12 * W, 100 * S), AMBER, .12 * jA);
+
+  // fire escape on the hotel wall, its rails catching red from the sign
+  {
+    const e = geo.escape, metal = mixc(INK, FROST, .09);
+    g.lineWidth = Math.max(1, S);
+    let prev = null;
+    for (let y = e.top; y < e.bottom; y += e.step) {
+      g.strokeStyle = metal;
+      g.beginPath(); g.moveTo(e.x, y); g.lineTo(e.x + e.w, y); g.stroke();                  // platform
+      g.beginPath(); g.moveTo(e.x, y - 9 * S); g.lineTo(e.x + e.w, y - 9 * S); g.stroke();  // rail
+      for (let k = 0; k <= 6; k++) { const px = e.x + e.w * k / 6; g.beginPath(); g.moveTo(px, y); g.lineTo(px, y - 9 * S); g.stroke(); }
+      if (prev !== null) { g.beginPath(); g.moveTo(e.x + e.w * .15, y); g.lineTo(e.x + e.w * .8, prev); g.stroke(); } // stair
+      g.strokeStyle = rgba(RED, .32 * hA);
+      g.beginPath(); g.moveTo(e.x, y - 9 * S - S); g.lineTo(e.x + e.w * .6, y - 9 * S - S); g.stroke();
+      prev = y;
+    }
+  }
+
+  // street lamps (amber, not neon: they don't follow the neon slider)
+  for (const L of geo.lamps) {
+    const post = mixc(INK, FROST, .06), base = hy + sw * .5, arm = 20 * S * L.dir;
+    g.fillStyle = post; g.fillRect(L.x - 1.3 * S, L.top, 2.6 * S, base - L.top);
+    g.fillRect(L.x - 3 * S, base - 10 * S, 6 * S, 10 * S);
+    g.strokeStyle = post; g.lineWidth = 2 * S;
+    g.beginPath(); g.moveTo(L.x, L.top + 2 * S); g.quadraticCurveTo(L.x, L.top - 10 * S, L.x + arm, L.top - 7 * S); g.stroke();
+    const lx = L.x + arm, ly = L.top - 3 * S;
+    // light cone down onto the wet sidewalk
+    const cg = g.createLinearGradient(0, ly, 0, base);
+    cg.addColorStop(0, rgba(AMBER, .1)); cg.addColorStop(1, rgba(AMBER, 0));
+    g.fillStyle = cg; g.beginPath(); g.moveTo(lx - 3 * S, ly); g.lineTo(lx - 34 * S, base); g.lineTo(lx + 34 * S, base); g.lineTo(lx + 3 * S, ly); g.closePath(); g.fill();
+    spill(g, lx, ly, 60 * S, AMBER, .26);
+    spill(g, lx, ly, 7 * S, FROST, .85);
+    spill(g, lx, base, 48 * S, AMBER, .12);
+  }
+
+  // the club door: warm light leaking from inside, an awning, light on the pavement
+  {
+    let gg = g.createLinearGradient(0, d.y, 0, d.y + d.h);
+    gg.addColorStop(0, rgba(AMBER, .7)); gg.addColorStop(1, rgba(AMBER, .38));
+    g.fillStyle = gg; g.fillRect(d.x, d.y, d.w, d.h);
+    g.fillStyle = rgba(INK, .9);
+    g.fillRect(d.x + d.w * .48, d.y, Math.max(1, 1.6 * S), d.h); // split doors
+    g.fillRect(d.x + d.w * .12, d.y + d.h * .12, d.w * .28, d.h * .3);
+    g.fillRect(d.x + d.w * .6, d.y + d.h * .12, d.w * .28, d.h * .3);
+    g.fillStyle = mixc(INK, FROST, .03);
+    g.beginPath(); g.moveTo(d.x - 10 * S, d.y - 3 * S); g.lineTo(d.x + d.w + 10 * S, d.y - 3 * S);
+    g.lineTo(d.x + d.w + 4 * S, d.y - 14 * S); g.lineTo(d.x - 4 * S, d.y - 14 * S); g.closePath(); g.fill();
+    g.fillStyle = rgba(AMBER, .25); g.fillRect(d.x - 10 * S, d.y - 3 * S, d.w + 20 * S, Math.max(1, S));
+    g.save(); g.translate(d.x + d.w / 2, hy + sw * .55); g.scale(1, .22);
+    spill(g, 0, 0, d.w * 1.8, AMBER, .32); g.restore();
+  }
+
+  // HOTEL: vertical blade sign hanging off the right-hand building
+  {
+    g.fillStyle = mixc(INK, FROST, .03); g.fillRect(h.x, h.y, h.w, h.h);
+    g.strokeStyle = rgba(FROST, .07); g.lineWidth = S; g.strokeRect(h.x + .5, h.y + .5, h.w - 1, h.h - 1);
+    g.strokeStyle = mixc(INK, FROST, .09); g.lineWidth = 1.5 * S;
+    for (const f of [.04, .96]) { g.beginPath(); g.moveTo(h.x + h.w, h.y + h.h * f); g.lineTo(geo.wall, h.y + h.h * f - 6 * S); g.stroke(); }
+    const ins = 4 * S;
+    tubePath(g, [[h.x + ins, h.y + ins], [h.x + h.w - ins, h.y + ins], [h.x + h.w - ins, h.y + h.h - ins], [h.x + ins, h.y + h.h - ins], [h.x + ins, h.y + ins]], RED, .85 * nb);
+    const size = Math.min(h.h / 5 * .84, h.w * 1.35);
+    g.font = `${size}px ${FONT_HOTEL}`;
+    const maxW = h.w * .66;
+    'HOTEL'.split('').forEach((ch, i) => {
+      const m = g.measureText(ch).width || size * .5;
+      tube(g, ch, h.x + h.w / 2, h.y + h.h * (i + .52) / 5, size, FONT_HOTEL, RED, neonLevels.hotel[i] * nb, Math.min(1, maxW / m));
+    });
+  }
+
+  // JAZZ: smaller amber sign over the club door, with an arrow pointing in
+  {
+    g.fillStyle = mixc(INK, FROST, .025); g.fillRect(j.x, j.y, j.w, j.h);
+    g.strokeStyle = rgba(FROST, .06); g.lineWidth = S; g.strokeRect(j.x + .5, j.y + .5, j.w - 1, j.h - 1);
+    const size = j.h * .78;
+    g.font = `${size}px ${FONT_JAZZ}`;
+    const ws = 'JAZZ'.split('').map(ch => g.measureText(ch).width || size * .5);
+    const total = ws.reduce((a, b) => a + b, 0);
+    const sc = Math.min(1, j.w * .84 / total);
+    let x = j.x + j.w / 2 - total * sc / 2;
+    'JAZZ'.split('').forEach((ch, i) => {
+      tube(g, ch, x + ws[i] * sc / 2, j.y + j.h * .54, size, FONT_JAZZ, AMBER, neonLevels.jazz[i] * nb, sc);
+      x += ws[i] * sc;
+    });
+    const ax = d.x + d.w + 9 * S, ay0 = j.y + j.h + 6 * S, ay1 = d.y - 18 * S;
+    if (ay1 > ay0 + 6 * S) {
+      tubePath(g, [[ax, ay0], [ax, ay1]], AMBER, .8 * nb);
+      tubePath(g, [[ax - 5 * S, ay1 - 6 * S], [ax, ay1], [ax + 5 * S, ay1 - 6 * S]], AMBER, .8 * nb);
+    }
+  }
+}
+
+/* =============================================================================
+   WET ROAD REFLECTIONS (quarter res; rebuilt when neon or windows change)
+   Light sources become long vertical streaks; a soft mirror of the skyline
+   adds sheen; everything is smeared vertically and broken into ripple bands.
+   ============================================================================= */
+function buildRipple() {
+  const rnd = mulberry32(77), w = ripC.width, h = ripC.height, g = ripX;
+  g.clearRect(0, 0, w, h);
+  for (let y = 0; y < h; y++) {
+    const u = y / h;
+    const a = (.12 + .55 * Math.pow(.5 + .5 * Math.sin(y * .8 + Math.sin(y * .13) * 4), 3)) * (.35 + .65 * u);
+    g.fillStyle = `rgba(0,0,0,${a.toFixed(3)})`; g.fillRect(0, y, w, 1);
+  }
+  for (let i = 0; i < w * h / 55; i++) {
+    g.fillStyle = `rgba(0,0,0,${(rnd() * .5).toFixed(3)})`;
+    g.fillRect(rnd() * w, rnd() * h, 3 + rnd() * 26, 1);
+  }
+}
+function buildReflection() {
+  const q = .25, rw = reflO.width, rh = reflO.height, g = reflOX, nb = settings.neon;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
+  g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, rw, rh);
+  // soft mirror: a point k*d above the street line shows up d below it
+  const K = 1.4;
+  g.setTransform(q, 0, 0, -q * K, 0, hy * q * K);
+  g.globalAlpha = .3; g.drawImage(baseC, 0, 0); g.drawImage(neonC, 0, 0);
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
+  // explicit streaks under every light source
+  g.globalCompositeOperation = 'lighter';
+  const streak = (x, w, col, a, len) => {
+    if (a <= .002) return;
+    const L = rh * len, gr = g.createLinearGradient(0, 0, 0, L);
+    gr.addColorStop(0, rgba(col, a)); gr.addColorStop(.35, rgba(col, a * .55)); gr.addColorStop(1, rgba(col, 0));
+    g.fillStyle = gr; g.fillRect((x - w / 2) * q, 0, Math.max(1, w * q), L);
+  };
+  const h = geo.hotel, j = geo.jazz, d = geo.door;
+  streak(h.x + h.w / 2, h.w * .9, RED, .5 * avg(neonLevels.hotel) * nb, 1);
+  streak(h.x + h.w / 2, h.w * 2.2, RED, .12 * avg(neonLevels.hotel) * nb, .8);
+  streak(j.x + j.w / 2, j.w * .7, AMBER, .32 * avg(neonLevels.jazz) * nb, .9);
+  streak(d.x + d.w / 2, d.w * 1.2, AMBER, .3, .75);
+  for (const L of geo.lamps) streak(L.x + 20 * S * L.dir, 14 * S, AMBER, .35, .95);
+  const band = .3 * H;
+  for (const s of windows) {
+    if (!s.on || s.layer === 'far' || s.y < hy - band) continue;
+    streak(s.x + s.w / 2, s.w * 1.4, s.warm ? FROST : AMBER, .07 * s.a, .4 + (s.y - (hy - band)) / band * .45);
+  }
+  // vertical smear: squash to a few rows and stretch back
+  reflSX.globalCompositeOperation = 'copy';
+  reflSX.drawImage(reflO, 0, 0, reflS.width, reflS.height);
+  g.globalCompositeOperation = 'copy';
+  g.drawImage(reflS, 0, 0, rw, rh);
+  // ripples break the streaks into bands
+  g.globalCompositeOperation = 'destination-out';
+  g.drawImage(ripC, 0, 0);
+  g.globalCompositeOperation = 'source-over';
+}
+
+/* =============================================================================
+   HEADLIGHTS
+   ============================================================================= */
+function bokeh(g, x, y, r, a, warm) {
+  const gr = g.createRadialGradient(x, y, 0, x, y, r);
+  gr.addColorStop(0, rgba(warm ? FROST : RED, a));
+  gr.addColorStop(.3, rgba(warm ? AMBER : RED, a * .65));
+  gr.addColorStop(1, rgba(warm ? AMBER : RED, 0));
+  g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+}
+function drawCar(g, c) {
+  const r = 19 * S * c.sc;
+  const lights = [[c.x, c.y], [c.x - c.dir * c.sep, c.y + 1.5 * S * c.sc]];
+  for (const [x, y] of lights) { // reflection smeared down the wet road
+    const gr = g.createLinearGradient(0, y, 0, H);
+    gr.addColorStop(0, rgba(AMBER, .3)); gr.addColorStop(.4, rgba(AMBER, .1)); gr.addColorStop(1, rgba(AMBER, 0));
+    g.fillStyle = gr; g.fillRect(x - r * .45, y + r * .4, r * .9, H - y);
+  }
+  g.save(); g.translate(c.x + c.dir * r * 4, c.y + r * .9); g.scale(1, .16);
+  spill(g, 0, 0, r * 7, AMBER, .14); g.restore();
+  bokeh(g, c.x - c.dir * (c.sep + 74 * S * c.sc), c.y + S, r * .55, .32, false); // tail light
+  for (const [x, y] of lights) for (let k = 0; k < 4; k++) {
+    bokeh(g, x - c.dir * k * r * .35, y, r * (1 - k * .08), .55 * (1 - k * .22), true);
+  }
+}
+function spawnCar() {
+  const dir = R() < .5 ? 1 : -1, farLane = dir < 0, sc = farLane ? .72 : 1;
+  const speed = W / rand(11, 16);
+  cars.push({ x: dir > 0 ? -.12 * W : 1.12 * W, y: hy + SH * (farLane ? .17 : .33), dir, sc, speed, sep: 20 * S * sc });
+  carSound(dir, 1.24 * W / speed);
+}
+
+/* =============================================================================
+   SCENE COMPOSITE, BLUR, BLOOM
+   ============================================================================= */
+function composeScene() {
+  const g = sceneX;
+  g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  g.drawImage(baseC, 0, 0);
+  g.globalCompositeOperation = 'lighter';
+  g.globalAlpha = .9; g.drawImage(reflO, 0, hy, W, SH); g.globalAlpha = 1;
+  g.globalCompositeOperation = 'source-over';
+  g.drawImage(neonC, 0, 0);
+  if (cars.length) {
+    g.globalCompositeOperation = 'lighter';
+    for (const c of cars) drawCar(g, c);
+    g.globalCompositeOperation = 'source-over';
+  }
+}
+
+// Fogged glass = heavily blurred scene + a cold veil (water scatters light,
+// lifting blacks) + condensation that's thicker toward the bottom of the pane.
+function buildBlur() {
+  const g = blurX, bw = blurC.width, bh = blurC.height, fog = settings.fog;
+  g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  g.fillStyle = rgba(INK, 1); g.fillRect(0, 0, bw, bh);
+  const rad = (2.5 + fog * 9) * S * .25;  // css px -> quarter-res device px
+  if (HAS_FILTER) {
+    g.filter = `blur(${rad.toFixed(2)}px)`;
+    g.drawImage(sceneC, 0, 0, bw, bh);
+    g.filter = 'none';
+  } else { // downscale twice and stretch back: a filter-free blur
+    t1X.drawImage(sceneC, 0, 0, t1C.width, t1C.height);
+    t2X.drawImage(t1C, 0, 0, t2C.width, t2C.height);
+    g.drawImage(t2C, 0, 0, bw, bh);
+  }
+  g.fillStyle = rgba(FROST, .015 + .045 * fog); g.fillRect(0, 0, bw, bh);
+  const gr = g.createLinearGradient(0, bh * .35, 0, bh);
+  gr.addColorStop(0, rgba(FROST, 0)); gr.addColorStop(1, rgba(FROST, .04 * fog));
+  g.fillStyle = gr; g.fillRect(0, 0, bw, bh);
+  g.globalAlpha = .3 + .5 * fog; g.drawImage(fogTex, 0, 0, bw, bh); g.globalAlpha = 1;
+}
+function buildBloom() {
+  const g = bloomX, bw = bloomC.width, bh = bloomC.height;
+  g.globalCompositeOperation = 'copy';
+  if (HAS_FILTER) { g.filter = 'blur(3px)'; g.drawImage(neonC, 0, 0, bw, bh); g.filter = 'none'; }
+  else { t2X.clearRect(0, 0, t2C.width, t2C.height); t2X.drawImage(neonC, 0, 0, t2C.width, t2C.height); g.drawImage(t2C, 0, 0, bw, bh); }
+  g.globalCompositeOperation = 'source-over';
+}
+function buildFogTex() {
+  const rnd = mulberry32(5), w = fogTex.width, h = fogTex.height, g = fogTex.getContext('2d');
+  g.clearRect(0, 0, w, h);
+  for (let i = 0; i < 70; i++) {
+    const x = rnd() * w, y = rnd() * h, r = (.04 + rnd() * .16) * Math.max(w, h);
+    spill(g, x, y, r, FROST, rnd() * .045 * (.5 + y / h));
+  }
+}
+function buildVignette() {
+  const w = vigC.width, h = vigC.height, g = vigC.getContext('2d');
+  g.clearRect(0, 0, w, h);
+  const gr = g.createRadialGradient(w / 2, h * .48, Math.min(w, h) * .22, w / 2, h * .5, Math.hypot(w, h) * .62);
+  gr.addColorStop(0, rgba(INK, 0)); gr.addColorStop(.55, rgba(INK, .22)); gr.addColorStop(1, rgba(INK, .8));
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+}
+
+// Film grain: a few noise tiles, swapped and re-offset every 3rd frame.
+const grainPats = [];
+for (let k = 0; k < 4; k++) {
+  const n = 256, c = mk(n, n), g = c.getContext('2d'), id = g.createImageData(n, n), p = id.data;
+  for (let i = 0; i < p.length; i += 4) {
+    const v = R(), col = v < .5 ? INK : FROST;
+    p[i] = col[0]; p[i + 1] = col[1]; p[i + 2] = col[2]; p[i + 3] = Math.abs(v - .5) * 2 * 255;
+  }
+  g.putImageData(id, 0, 0);
+  grainPats.push(ctx.createPattern(c, 'repeat'));
+}
+let grainIdx = 0, gox = 0, goy = 0;
+
+/* =============================================================================
+   DROP SIMULATION
+   Sizes are CSS pixels * S (device px) * drop-size slider.
+   ============================================================================= */
+const unit = () => S * settings.size;
+const cssArea = () => (W / S) * (H / S);
+const staticTarget = () => Math.round(cssArea() / 1400 * (.2 + 1.2 * settings.rain));
+const maxMed = () => Math.round((5 + 26 * settings.rain) * clamp(cssArea() / (1920 * 1080), .3, 1.6));
+
+function addStatic(x, y, r, warm) {
+  const s = { x, y, r: r ?? (.45 + Math.pow(R(), 2.8) * 1.55) * unit() };
+  statics.push(s);
+  if (!warm) drawStaticLens(s);
+  return s;
+}
+function removeStaticAt(i, warm) {
+  const s = statics[i];
+  if (!warm) eraseStatic(s);
+  statics[i] = statics[statics.length - 1]; statics.pop();
+}
+// A drop swallows the small droplets it touches; volume adds, so r grows by root-sum-square.
+function absorbStatics(d, warm) {
+  const reach = d.r * (d.stretch || 1) + 3 * S;
+  for (let i = statics.length - 1; i >= 0; i--) {
+    const s = statics[i], dx = s.x - d.x;
+    if (dx > reach || dx < -reach) continue;
+    const dy = (s.y - d.y) / (d.stretch || 1), rr = d.r + s.r * .8;
+    if (dx * dx + dy * dy < rr * rr) {
+      d.r = Math.sqrt(d.r * d.r + s.r * s.r * .7);
+      removeStaticAt(i, warm);
+    }
+  }
+}
+function absorbRunners(d) {
+  for (const o of runners) {
+    if (o === d || o.dead || (o.big && o.r > d.r)) continue;
+    const dx = o.x - d.x, dy = (o.y - d.y) / d.stretch, rr = d.r + o.r * .8;
+    if (dx * dx + dy * dy < rr * rr) { d.r = Math.sqrt(d.r * d.r + o.r * o.r); o.dead = true; }
+  }
+}
+
+function spawnMedium() {
+  const k = unit();
+  runners.push({ big: false, x: R() * W, y: rand(-.02, .72) * H, r: 1.2 * k, rT: rand(3.2, 6.2) * k,
+    grow: rand(.25, .65) * k, state: 0, hold: 0, vx: 0, vy: 0, stretch: 1, lx: 0, ly: 0, tx: 0, ty: 0 });
+  const d = runners[runners.length - 1]; d.tx = d.x; d.ty = d.y;
+}
+function initBig(d) {
+  const k = unit();
+  d.big = true; d.vy = d.vy || 0; d.vx = 0; d.ph = R() * TAU; d.w = rand(.6, 1.4); d.drift = 0;
+  d.shed = rand(20, 70) * S; d.rT = Math.max(d.r, rand(7.5, 10.5) * k); d.stretch = d.stretch || 1.1;
+  d.tx = d.x; d.ty = d.y;
+}
+function spawnBig() {
+  const k = unit();
+  const cands = runners.filter(d => !d.big && !d.dead && d.state !== 2 && d.y < H * .6 && d.r > 2.5 * k);
+  if (cands.length && R() < .6) { // an existing drop gets hit and lets go
+    const d = cands[(R() * cands.length) | 0]; d.vy = 20 * S; initBig(d); return;
+  }
+  const d = { x: R() * W, y: -12 * k, r: rand(5, 7) * k, vy: 60 * S, stretch: 1.1, lx: 0, ly: 0 };
+  initBig(d); runners.push(d);
+}
+
+function updMedium(d, dt, warm) {
+  const k = unit();
+  d.lx = d.x; d.ly = d.y;
+  if (d.state === 0) {            // GATHER: condensation collects into a bead
+    d.r += d.grow * dt;
+    wipeSpot(d.x, d.y, d.r * 1.05, 1 - Math.exp(-dt * 1.4));
+    absorbStatics(d, warm);
+    if (d.r >= d.rT) { d.state = 1; d.hold = rand(.5, 3); }
+  } else if (d.state === 1) {     // HOLD: surface tension wins for a moment
+    d.hold -= dt;
+    d.stretch += (1 - d.stretch) * Math.min(1, dt * 6);
+    if (d.hold <= 0) {
+      d.state = 2; d.tx = d.x; d.ty = d.y;
+      d.vy = rand(80, 160) * S * (.7 + .6 * Math.min(1.5, d.r / (5 * k)));
+      d.vx = rand(-1, 1) * d.vy * .14;
+    }
+  } else {                        // SLIDE: a jerk that friction quickly kills
+    d.vy *= Math.exp(-2.1 * dt); d.vx *= Math.exp(-3 * dt);
+    d.x += d.vx * dt; d.y += d.vy * dt;
+    const dist = Math.hypot(d.x - d.lx, d.y - d.ly);
+    d.r -= dist * .0035;          // leaves water behind
+    d.stretch = 1 + Math.min(.4, d.vy / (260 * S));
+    wipeTrail(d, d.r * .7, .82);   // thin trail, a film of water left in it
+    absorbStatics(d, warm);
+    if (d.vy < 9 * S) { d.state = 1; d.hold = rand(.25, 1.6) * clamp(5 * k / d.r, .35, 1.4); }
+  }
+  if (d.y - d.r > H) d.dead = true;
+  else if (d.state === 2 && d.r < 1.7 * k) { d.dead = true; addStatic(d.x, d.y, d.r, warm); }
+  else if (d.r > 7.8 * k) initBig(d);
+}
+function updBig(d, dt, warm) {
+  const k = unit();
+  d.lx = d.x; d.ly = d.y;
+  if (d.r < d.rT) d.r = Math.min(d.rT, d.r + 5 * k * dt);
+  const vT = (95 + 11 * d.r / k) * S;      // heavier runs faster; still seconds to cross
+  d.vy += (vT - d.vy) * Math.min(1, dt * 1.3);
+  d.drift = clamp(d.drift + (R() - .5) * 60 * S * dt, -14 * S, 14 * S);
+  d.x += (Math.sin(simT * d.w + d.ph) * 10 * S + d.drift) * dt;
+  d.y += d.vy * dt;
+  d.stretch = 1.12 + Math.min(.25, d.vy / (900 * S));
+  const dist = Math.hypot(d.x - d.lx, d.y - d.ly);
+  d.r -= dist * .0011;
+  wipeTrail(d, d.r * 1.3, .96);  // wide, nearly clear trail
+  absorbStatics(d, warm);
+  absorbRunners(d);
+  d.r = Math.min(d.r, 14 * k);
+  d.shed -= dist;
+  if (d.shed <= 0) { // beads left behind in the trail
+    d.shed = rand(25, 90) * S;
+    addStatic(d.x + rand(-.5, .5) * d.r, d.y - d.r * rand(1.4, 2.4), rand(.5, 1.3) * k, warm);
+  }
+  if (d.y - d.r * 2 > H) d.dead = true;
+}
+
+function updateDrops(dt, warm) {
+  const rain = settings.rain, target = staticTarget();
+  if (statics.length < target) {
+    staticAcc += dt * (4 + 40 * rain);
+    while (staticAcc >= 1 && statics.length < target) { staticAcc -= 1; addStatic(R() * W, R() * H, null, warm); }
+  } else staticAcc = 0;
+  if (statics.length > target * 1.05) {
+    evapAcc += dt * 14;
+    while (evapAcc >= 1 && statics.length) { evapAcc -= 1; removeStaticAt((R() * statics.length) | 0, warm); }
+  } else evapAcc = 0;
+
+  nextMed -= dt;
+  if (nextMed <= 0) {
+    nextMed = rand(.6, 1.8) / (.25 + rain);
+    if (runners.filter(d => !d.big).length < maxMed()) spawnMedium();
+  }
+  nextBig -= dt;
+  if (nextBig <= 0) {
+    nextBig = rand(5, 12) / (.35 + rain * 1.3);
+    if (runners.filter(d => d.big).length < 3) spawnBig();
+  }
+  for (const d of runners) { if (!d.dead) (d.big ? updBig : updMedium)(d, dt, warm); }
+  for (let i = runners.length - 1; i >= 0; i--) if (runners[i].dead) runners.splice(i, 1);
+}
+
+/* =============================================================================
+   SCENE EVENTS: windows, neon flicker, cars
+   ============================================================================= */
+function toggleWindow() {
+  const r = R(), pool = r < .5 ? winsBy.near : r < .85 ? winsBy.mid : winsBy.far;
+  if (!pool.length) return;
+  const s = pool[(R() * pool.length) | 0];
+  // Turning off any lit window, but on only with odds litRatio/(1-litRatio),
+  // keeps the lit fraction stable over time.
+  if (s.on) s.on = false;
+  else if (R() < litRatio / (1 - litRatio)) s.on = true;
+  else return;
+  paintWindow(baseX, s);
+  dirty.refl = dirty.scene = true;
+}
+function startFlicker() {
+  const sign = R() < .62 ? 'hotel' : 'jazz', arr = neonLevels[sign], i = (R() * arr.length) | 0;
+  if (flicks.some(f => f.arr === arr && f.i === i)) return;
+  const seq = [], dim = rand(.05, .25);
+  if (R() < .5) seq.push([dim, rand(.12, .4)]);          // drops out
+  else {                                                 // buzzes
+    const n = 2 + ((R() * 2) | 0);
+    for (let k = 0; k < n; k++) seq.push([dim, rand(.04, .09)], [rand(.6, 1), rand(.04, .1)]);
+    seq.push([dim, rand(.1, .25)]);
+  }
+  seq.push([1, 0]);
+  arr[i] = seq[0][0]; dirty.neon = true;
+  flicks.push({ arr, i, seq, k: 0, t: 0 });
+}
+function updFlickers(dt) {
+  for (let j = flicks.length - 1; j >= 0; j--) {
+    const f = flicks[j]; f.t += dt;
+    while (f.t >= f.seq[f.k][1]) {
+      f.t -= f.seq[f.k][1]; f.k++;
+      f.arr[f.i] = f.seq[f.k][0]; dirty.neon = true;
+      if (f.k === f.seq.length - 1) { flicks.splice(j, 1); break; }
+    }
+  }
+}
+function updateEvents(dt) {
+  nextWin -= dt; if (nextWin <= 0) { nextWin = rand(1.2, 4); toggleWindow(); }
+  nextFlicker -= dt; if (nextFlicker <= 0) { nextFlicker = rand(3.5, 10); startFlicker(); }
+  updFlickers(dt);
+  nextCar -= dt; if (nextCar <= 0) { nextCar = rand(6, 15); if (cars.length < 2) spawnCar(); }
+  for (let i = cars.length - 1; i >= 0; i--) {
+    const c = cars[i]; c.x += c.dir * c.speed * dt;
+    if ((c.dir > 0 && c.x > 1.2 * W) || (c.dir < 0 && c.x < -.2 * W)) { cars.splice(i, 1); dirty.scene = true; }
+  }
+  if (cars.length) dirty.scene = true;
+}
+
+/* =============================================================================
+   FRAME
+   ============================================================================= */
+function render() {
+  const fw = fogComp.width, fh = fogComp.height;
+  // fogged glass, cut to the fog mask: copy the mask, then paint blur only where it has alpha
+  fcX.globalCompositeOperation = 'copy';      fcX.drawImage(fogM, 0, 0, fw, fh);
+  fcX.globalCompositeOperation = 'source-in'; fcX.drawImage(blurC, 0, 0, fw, fh);
+  fcX.globalCompositeOperation = 'source-over';
+
+  const g = ctx;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  g.drawImage(sceneC, 0, 0);                                    // sharp street (shows through trails)
+  g.drawImage(fogComp, 0, 0, W, H);                             // fog on the glass
+  g.drawImage(sdC, 0, 0);                                       // tiny static droplets
+  for (const d of runners) if (!d.big) drawRunner(g, d);        // medium drops
+  for (const d of runners) if (d.big) drawRunner(g, d);         // large drops on top
+  g.globalCompositeOperation = 'lighter';                        // neon bloom
+  g.globalAlpha = clamp(.42 * settings.neon, 0, .7);
+  g.drawImage(bloomC, 0, 0, W, H);
+  g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  g.drawImage(vigC, 0, 0, W, H);                                // vignette
+  if (settings.grain > 0) {                                      // grain
+    if (frame % 3 === 0) { grainIdx = (grainIdx + 1) % grainPats.length; gox = (R() * 256) | 0; goy = (R() * 256) | 0; }
+    g.globalAlpha = settings.grain * .075;
+    g.fillStyle = grainPats[grainIdx];
+    g.setTransform(1, 0, 0, 1, -gox, -goy);
+    g.fillRect(gox, goy, W, H);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalAlpha = 1;
+  }
+}
+
+let raf = 0, last = 0;
+function loop(now) {
+  raf = requestAnimationFrame(loop);
+  let dt = (now - last) / 1000; last = now;
+  if (!(dt > 0)) dt = 1 / 60;
+  dt = Math.min(dt, .05);
+  simT += dt; frame++;
+
+  updateEvents(dt);
+  updateDrops(dt, false);
+  recoverFog(dt);
+
+  // The scene layer is only rebuilt when something in it changed.
+  if (dirty.neon)  { drawNeon(); buildBloom(); dirty.neon = false; dirty.refl = true; }
+  if (dirty.refl)  { buildReflection(); dirty.refl = false; dirty.scene = true; }
+  if (dirty.scene) { composeScene(); dirty.scene = false; dirty.blur = true; dirty.statics = true; }
+  if (dirty.blur)  { buildBlur(); dirty.blur = false; }
+  // While a car passes the scene changes every frame; refreshing ~1300 tiny
+  // lenses 8x a second is plenty for something 2px wide.
+  if (dirty.statics && simT - lastStaticRender >= (cars.length ? .12 : 0)) renderStatics();
+
+  render();
+}
+
+/* =============================================================================
+   RESIZE
+   ============================================================================= */
+function alloc() {
+  baseC = mk(W, H);   baseX = cx2d(baseC, true);
+  neonC = mk(W, H);   neonX = cx2d(neonC);
+  sceneC = mk(W, H);  sceneX = cx2d(sceneC, true);
+  sdC = mk(W, H);     sdX = cx2d(sdC);
+  const qw = Math.ceil(W / 4), qh = Math.ceil(H / 4), sq = Math.ceil(SH / 4);
+  blurC = mk(qw, qh); blurX = cx2d(blurC, true);
+  t1C = mk(W / 8, H / 8);   t1X = cx2d(t1C);
+  t2C = mk(W / 24, H / 24); t2X = cx2d(t2C);
+  bloomC = mk(W / 8, H / 8); bloomX = cx2d(bloomC);
+  fogTex = mk(W / 8, H / 8);
+  vigC = mk(qw, qh);
+  reflO = mk(qw, sq); reflOX = cx2d(reflO);
+  reflS = mk(qw, Math.max(2, sq / 6)); reflSX = cx2d(reflS);
+  ripC = mk(qw, sq); ripX = cx2d(ripC);
+  fogComp = mk(W / 2, H / 2); fcX = cx2d(fogComp);
+}
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  const nW = Math.max(2, Math.round(innerWidth * dpr)), nH = Math.max(2, Math.round(innerHeight * dpr));
+  if (nW === W && nH === H && dpr === S) return false;
+  const oW = W, oH = H, oS = S, oFog = fogM;
+  W = nW; H = nH; S = dpr; hy = Math.round(H * .74); SH = H - hy;
+  cv.width = W; cv.height = H;
+  alloc();
+  // Carry the old fog mask over, so entering fullscreen doesn't wipe the glass.
+  fogM = mk(W / 2, H / 2); fogX = cx2d(fogM);
+  fogX.fillStyle = '#000'; fogX.fillRect(0, 0, fogM.width, fogM.height);
+  if (oFog) { fogX.globalCompositeOperation = 'copy'; fogX.drawImage(oFog, 0, 0, fogM.width, fogM.height); fogX.globalCompositeOperation = 'source-over'; }
+  if (oW) {
+    const sx = W / oW, sy = H / oH, sr = S / oS;
+    for (const s of statics) { s.x *= sx; s.y *= sy; s.r *= sr; }
+    for (const d of runners) {
+      d.x *= sx; d.y *= sy; d.lx = d.tx = d.x; d.ly = d.ty = d.y;
+      for (const k of ['r', 'rT', 'vx', 'vy', 'grow', 'drift', 'shed']) if (typeof d[k] === 'number') d[k] *= sr;
+    }
+    cars.length = 0;
+  }
+  buildCity(); buildRipple(); buildFogTex(); buildVignette();
+  dirty.neon = dirty.refl = dirty.scene = dirty.blur = dirty.statics = true;
+  return true;
+}
+let resizeT = 0;
+addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(resize, 120); });
+
+/* =============================================================================
+   AUDIO (off by default; M toggles). All synthesized, no files.
+   ============================================================================= */
+const audio = { ac: null, on: false };
+function noiseBuffer(ac, sec, brown) {
+  const len = Math.floor(ac.sampleRate * sec), b = ac.createBuffer(2, len, ac.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = b.getChannelData(ch);
+    let last = 0;
+    for (let i = 0; i < len; i++) {
+      const w = Math.random() * 2 - 1;
+      if (brown) { last = (last + .02 * w) / 1.02; d[i] = last * 3.5; } else d[i] = w;
+    }
+    if (brown) { const drift = d[len - 1] - d[0]; for (let i = 0; i < len; i++) d[i] -= drift * i / (len - 1); } // seamless loop
+  }
+  return b;
+}
+function initAudio() {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return false;
+  const ac = new AC(); audio.ac = ac;
+  const gain = v => { const g = ac.createGain(); g.gain.value = v; return g; };
+  const biquad = (type, f, q) => { const b = ac.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q; return b; };
+  const loopSrc = buf => { const s = ac.createBufferSource(); s.buffer = buf; s.loop = true; return s; };
+
+  const master = gain(0), glass = biquad('lowpass', 6500, .5); // heard through a closed window
+  master.connect(glass); glass.connect(ac.destination);
+  audio.master = master;
+  audio.white = noiseBuffer(ac, 5.3, false);
+  const white2 = noiseBuffer(ac, 4.1, false), brown = noiseBuffer(ac, 7.7, true);
+
+  const rainBus = gain(.3 + .9 * settings.rain); rainBus.connect(master); audio.rainBus = rainBus;
+  // body of the rain
+  const s1 = loopSrc(audio.white), b1 = biquad('bandpass', 1400, .55), g1 = gain(.42);
+  s1.connect(b1); b1.connect(g1); g1.connect(rainBus);
+  // fine patter on the glass
+  const s2 = loopSrc(white2), b2 = biquad('bandpass', 5200, .9), g2 = gain(.13);
+  s2.connect(b2); b2.connect(g2); g2.connect(rainBus);
+  // slow swell so it never sounds like a loop
+  const lfo = ac.createOscillator(), lg = gain(.1); lfo.frequency.value = .06; lfo.connect(lg); lg.connect(g1.gain);
+  // the city's low rumble
+  const s3 = loopSrc(brown), lp = biquad('lowpass', 110, .7), g3 = gain(.8);
+  s3.connect(lp); lp.connect(g3); g3.connect(master);
+  for (const s of [s1, s2, s3, lfo]) s.start();
+  return true;
+}
+function envelope(param, t, dur, peak) {
+  param.setValueAtTime(.0001, t);
+  param.exponentialRampToValueAtTime(peak, t + dur * .5);
+  param.exponentialRampToValueAtTime(.0001, t + dur);
+}
+// A distant car hissing past on wet tarmac, panned with the headlights.
+function carSound(dir, dur) {
+  if (!audio.on || !audio.ac) return;
+  const ac = audio.ac, t = ac.currentTime + .05;
+  const s = ac.createBufferSource(); s.buffer = audio.white; s.loop = true;
+  const hiss = ac.createBiquadFilter(); hiss.type = 'bandpass'; hiss.Q.value = .7;
+  hiss.frequency.setValueAtTime(900, t);                                  // pitch rises on approach,
+  hiss.frequency.linearRampToValueAtTime(1300, t + dur * .48);            // falls as it passes
+  hiss.frequency.linearRampToValueAtTime(650, t + dur);
+  const eng = ac.createBiquadFilter(); eng.type = 'lowpass'; eng.frequency.value = 220;
+  const gh = ac.createGain(), ge = ac.createGain();
+  envelope(gh.gain, t, dur, .09); envelope(ge.gain, t, dur, .16);
+  let out = audio.master;
+  if (ac.createStereoPanner) {
+    const p = ac.createStereoPanner();
+    p.pan.setValueAtTime(-.8 * dir, t); p.pan.linearRampToValueAtTime(.8 * dir, t + dur);
+    p.connect(audio.master); out = p;
+  }
+  s.connect(hiss); hiss.connect(gh); gh.connect(out);
+  s.connect(eng); eng.connect(ge); ge.connect(out);
+  s.start(t); s.stop(t + dur + .1);
+}
+function toggleAudio() {
+  if (!audio.ac && !initAudio()) { toast('no audio in this browser'); return; }
+  const ac = audio.ac, now = ac.currentTime;
+  audio.on = !audio.on;
+  clearTimeout(audio.sus);
+  audio.master.gain.cancelScheduledValues(now);
+  audio.master.gain.setValueAtTime(audio.master.gain.value, now);
+  if (audio.on) { ac.resume(); audio.master.gain.setTargetAtTime(.55, now, .8); }
+  else { audio.master.gain.setTargetAtTime(0, now, .35); audio.sus = setTimeout(() => { if (!audio.on) ac.suspend(); }, 2500); }
+  toast(audio.on ? 'rain sound on' : 'rain sound off');
+}
+function setRainAudio() {
+  if (audio.rainBus) audio.rainBus.gain.setTargetAtTime(.3 + .9 * settings.rain, audio.ac.currentTime, .5);
+}
+
+/* =============================================================================
+   UI: panel, hint, keys, cursor, fullscreen, visibility
+   ============================================================================= */
+const panel = document.getElementById('panel'), hint = document.getElementById('hint');
+let hintT = 0;
+function toast(msg, ms = 1800) {
+  hint.textContent = msg; hint.classList.add('show');
+  clearTimeout(hintT); hintT = setTimeout(() => hint.classList.remove('show'), ms);
+}
+
+const SLIDERS = [['rain', 'rain intensity'], ['fog', 'fog'], ['neon', 'neon'], ['grain', 'grain'], ['size', 'drop size']];
+const fmt = (k, v) => k === 'neon' || k === 'size' ? v.toFixed(2) : String(Math.round(v * 100)).padStart(3, '0');
+let saveT = 0;
+for (const [k, label] of SLIDERS) {
+  const lab = document.createElement('label');
+  const row = document.createElement('div'); row.className = 'row';
+  const name = document.createElement('span'); name.textContent = label;
+  const out = document.createElement('output'); out.textContent = fmt(k, settings[k]);
+  const inp = document.createElement('input');
+  Object.assign(inp, { type: 'range', min: RANGE[k][0], max: RANGE[k][1], step: .01, value: settings[k] });
+  inp.setAttribute('aria-label', label);
+  inp.addEventListener('input', () => {
+    const old = settings[k], v = clamp(+inp.value, RANGE[k][0], RANGE[k][1]);
+    settings[k] = v; out.textContent = fmt(k, v);
+    if (k === 'fog') dirty.blur = true;
+    if (k === 'neon') dirty.neon = true;
+    if (k === 'rain') setRainAudio();
+    if (k === 'size' && old > 0) { // rescale the drops already on the glass
+      const f = v / old;
+      for (const s of statics) s.r *= f;
+      for (const d of runners) { d.r *= f; d.rT *= f; if (d.grow) d.grow *= f; }
+      dirty.statics = true; lastStaticRender = -1;
+    }
+    clearTimeout(saveT);
+    saveT = setTimeout(() => { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch (e) {} }, 300);
+  });
+  row.append(name, out); lab.append(row, inp);
+  document.getElementById('sliders').append(lab);
+}
+
+function toggleFullscreen() {
+  const d = document, el = d.documentElement;
+  if (!(d.fullscreenElement || d.webkitFullscreenElement)) {
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req) { const p = req.call(el); if (p && p.catch) p.catch(() => {}); }
+  } else {
+    const ex = d.exitFullscreen || d.webkitExitFullscreen;
+    if (ex) { const p = ex.call(d); if (p && p.catch) p.catch(() => {}); }
+  }
+}
+addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+  const k = e.key.toLowerCase();
+  if (k === 'm') toggleAudio();
+  else if (k === 'f') toggleFullscreen();
+  else if (k === 'h') {
+    panel.hidden = !panel.hidden;
+    if (panel.hidden && panel.contains(document.activeElement)) document.activeElement.blur();
+  }
+});
+
+// Hide the cursor after 3 s of stillness. Mouse movement does nothing else.
+let idleT = 0;
+function wake() {
+  document.body.classList.remove('idle');
+  clearTimeout(idleT); idleT = setTimeout(() => document.body.classList.add('idle'), 3000);
+}
+addEventListener('mousemove', wake, { passive: true });
+wake();
+
+// Pause rendering while the tab is hidden. (Rain sound, if on, keeps going.)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { cancelAnimationFrame(raf); raf = 0; }
+  else if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); }
+});
+
+/* =============================================================================
+   START
+   ============================================================================= */
+resize();
+// Pre-fill condensation, then run 25 s of rain off-screen so the glass starts
+// lived-in rather than pristine.
+while (statics.length < staticTarget()) addStatic(R() * W, R() * H, null, true);
+for (let t = 0; t < 25; t += 1 / 20) { simT += 1 / 20; updateDrops(1 / 20, true); recoverFog(1 / 20); }
+drawNeon(); buildBloom(); buildReflection(); composeScene(); buildBlur(); renderStatics();
+dirty.neon = dirty.refl = dirty.scene = dirty.blur = dirty.statics = false;
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { dirty.neon = true; });
+toast('h controls · m sound · f fullscreen', 5500);
+last = performance.now();
+if (!document.hidden) raf = requestAnimationFrame(loop);
+
+// Exposed for debugging in the console. Not used by the page.
+window.__rain = { settings, statics, runners, cars, windows: () => windows, geo: () => geo, fog: () => fogM, HAS_FILTER };
+})();
+</script>
+</body>
+</html>
