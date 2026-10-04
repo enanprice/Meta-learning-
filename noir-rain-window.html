@@ -40,7 +40,16 @@
   #panel .row{display:flex;justify-content:space-between;align-items:baseline}
   #panel output{font-variant-numeric:tabular-nums;letter-spacing:.12em;opacity:.8}
   #panel .ft{margin-top:12px;padding-top:9px;border-top:1px solid rgba(217,164,65,.22);
-    display:flex;justify-content:space-between;opacity:.6;letter-spacing:.18em}
+    display:flex;justify-content:space-between;gap:8px}
+  #panel .ft button, #dock{font:inherit;font-variant:small-caps;text-transform:lowercase;color:var(--amber);
+    background:transparent;border:0;padding:4px 0;letter-spacing:.18em;opacity:.65;cursor:pointer}
+  #panel .ft button:hover, #dock:hover{opacity:1}
+  #panel .ft button:focus-visible, #dock:focus-visible{outline:1px dotted rgba(217,164,65,.6);outline-offset:3px}
+  /* a quiet way in for touch screens and for viewers who haven't clicked the page yet */
+  #dock{position:fixed;left:20px;bottom:calc(18px + env(safe-area-inset-bottom, 0px));z-index:2;
+    font:300 11px/1 var(--font-panel);letter-spacing:.3em;padding:8px 10px;
+    background:rgba(10,13,20,.7);border:1px solid rgba(217,164,65,.3);transition:opacity .8s ease}
+  body.idle #dock{opacity:0;pointer-events:none}
 
   #panel input[type=range]{-webkit-appearance:none;appearance:none;display:block;width:100%;
     height:16px;margin:3px 0 0;background:transparent;cursor:pointer}
@@ -78,8 +87,13 @@
 <div id="panel" hidden role="group" aria-label="Window controls">
   <div class="hd"><b>window controls</b><span>no. 7</span></div>
   <div id="sliders"></div>
-  <div class="ft"><span>m sound</span><span>f full</span><span>h hide</span></div>
+  <div class="ft">
+    <button type="button" id="btn-sound">m sound</button>
+    <button type="button" id="btn-full">f full</button>
+    <button type="button" id="btn-hide">h hide</button>
+  </div>
 </div>
+<button type="button" id="dock" aria-controls="panel">controls</button>
 <div id="hint"></div>
 
 <script>
@@ -1293,16 +1307,22 @@ function toggleFullscreen() {
     if (ex) { const p = ex.call(d); if (p && p.catch) p.catch(() => {}); }
   }
 }
+function togglePanel() {
+  panel.hidden = !panel.hidden;
+  if (panel.hidden && panel.contains(document.activeElement)) document.activeElement.blur();
+}
 addEventListener('keydown', e => {
   if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
   const k = e.key.toLowerCase();
   if (k === 'm') toggleAudio();
   else if (k === 'f') toggleFullscreen();
-  else if (k === 'h') {
-    panel.hidden = !panel.hidden;
-    if (panel.hidden && panel.contains(document.activeElement)) document.activeElement.blur();
-  }
+  else if (k === 'h') togglePanel();
 });
+// Buttons for touch screens. These only operate the panel and audio, never the scene.
+document.getElementById('dock').addEventListener('click', togglePanel);
+document.getElementById('btn-hide').addEventListener('click', togglePanel);
+document.getElementById('btn-sound').addEventListener('click', toggleAudio);
+document.getElementById('btn-full').addEventListener('click', toggleFullscreen);
 
 // Hide the cursor after 3 s of stillness. Mouse movement does nothing else.
 let idleT = 0;
@@ -1311,6 +1331,7 @@ function wake() {
   clearTimeout(idleT); idleT = setTimeout(() => document.body.classList.add('idle'), 3000);
 }
 addEventListener('mousemove', wake, { passive: true });
+addEventListener('pointerdown', wake, { passive: true });
 wake();
 
 // Pause rendering while the tab is hidden. (Rain sound, if on, keeps going.)
