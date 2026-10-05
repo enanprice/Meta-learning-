@@ -276,7 +276,7 @@ function mapPlane(g, tex, X, z0, z1, top, ppm, flip) {
    ============================================================================= */
 const cv = document.getElementById('glass');
 const ctx = cv.getContext('2d', { alpha: false });
-let backC, backX;     // sky, road, pavements, pools of light on the ground
+let backC, backX, farC, farX;     // sky, road, pavements, pools of light on the ground
 let frontC, frontX;   // buildings, storefronts, parked cars, ironwork (all static)
 let emissC, emissX;   // only the light from the static scene (lit windows, shop fronts)
 let signsC, signsX;   // neon and lit signs, lamps, signals (redrawn when one flickers)
@@ -311,16 +311,16 @@ function planStreet() {
       windows: [], roof: [], seed: (rnd() * 1e9) | 0 };
   };
   const L = [mkB(-1, 5, 11.8, 5, 'brick', 'bar'), mkB(-1, 11.8, 18.2, 4, 'brown', 'club'), mkB(-1, 18.2, 24.4, 6, 'brick', 'club'),
-             mkB(-1, 24.4, 29.5, 5, 'brick', 'restaurant'), mkB(-1, 29.5, 34.6, 5, 'brown', 'club'), mkB(-1, 34.6, 42, 8, 'stone', 'hotel'),
+             mkB(-1, 24.4, 29.5, 5, 'brick', 'restaurant'), mkB(-1, 29.5, 34.6, 5, 'brown', 'club'), mkB(-1, 34.6, 42, 15, 'stone', 'hotel'),
              mkB(-1, 42, 49.5, 5, 'brick', 'liquor'), mkB(-1, 49.5, CROSS.z0, 6, 'brick', 'bar')];
   const Rt = [mkB(1, 5, 10.8, 5, 'brick', 'liquor'), mkB(1, 10.8, 16.4, 4, 'brown', 'club'), mkB(1, 16.4, 21.6, 5, 'brick', 'bar'),
-              mkB(1, 21.6, 27, 6, 'brick', 'club'), mkB(1, 27, 32.4, 5, 'brown', 'club'), mkB(1, 32.4, 38.6, 5, 'brick', 'restaurant'),
-              mkB(1, 38.6, 46, 7, 'stone', 'shop'), mkB(1, 46, CROSS.z0, 5, 'brick', 'diner')];
+              mkB(1, 21.6, 27, 9, 'brick', 'club'), mkB(1, 27, 32.4, 5, 'brown', 'club'), mkB(1, 32.4, 38.6, 5, 'brick', 'restaurant'),
+              mkB(1, 38.6, 46, 13, 'stone', 'shop'), mkB(1, 46, CROSS.z0, 5, 'brick', 'diner')];
   for (const arr of [L, Rt]) {
     let z = CROSS.z1; const side = arr[0].side;
     while (z < ZFAR) {
       const w = rr(6, 12) * (1 + z / 220), mat = ['brick', 'brick', 'brown', 'stone'][(rnd() * 4) | 0];
-      arr.push(mkB(side, z, Math.min(ZFAR, z + w), 4 + ((rnd() * 5) | 0), mat, pick2(rnd, ['bar', 'shop', 'closed', 'restaurant', 'club', 'closed'])));
+      arr.push(mkB(side, z, Math.min(ZFAR, z + w), 5 + Math.floor(rnd() * rnd() * 20), mat, pick2(rnd, ['bar', 'shop', 'closed', 'restaurant', 'club', 'closed'])));
       z += w;
     }
   }
@@ -377,7 +377,8 @@ function planStreet() {
       for (const w of b.windows) if (w.za < b.fez1 && w.zb > b.fez0) w.locked = true;
     }
     const back = b.side < 0 ? -1 : 1, X0 = b.side < 0 ? XL : XR;
-    if (b.mat !== 'stone' && rnd() < .4) b.roof.push({ t: 'tower', X: X0 + back * rr(2.5, 6), Z: rr(b.z0 + 1, b.z1 - 1), s: rr(.85, 1.15) });
+    if (b.st >= 11) for (let i = 0, n = 1 + ((rnd() * 2) | 0); i < n; i++) b.roof.push({ t: 'tier', X: X0 + back * (3 + i * 3 + rr(5, 9)), Z: b.z0 + rr(0, 2), w: (b.z1 - b.z0) * rr(.5, .8), h: rr(5, 12) * (1 + i), d: rr(8, 12) });
+    if (b.mat !== 'stone' && b.st < 11 && rnd() < .65) b.roof.push({ t: 'tower', X: X0 + back * rr(2.5, 6), Z: rr(b.z0 + 1, b.z1 - 1), s: rr(.85, 1.15) });
     for (let i = 0, n = (rnd() * 3) | 0; i < n; i++) b.roof.push({ t: 'chimney', X: X0 + back * rr(.6, 4), Z: rr(b.z0 + .4, b.z1 - .6), h: rr(.8, 2.2), w: rr(.5, 1.1) });
   }
   // signs mounted in front of windows hide them; they can't switch on and off
@@ -391,7 +392,7 @@ function planStreet() {
     while (z < 120) {
       if (z > CROSS.z0 - 6 && z < CROSS.z1 + 2) { z = CROSS.z1 + 2.5; continue; }
       const len = rr(5.0, 5.4);
-      if (rnd() < .86) CARS.push({ x: side * (CURB - 1.08), z, len, side, col: pick2(rnd, colours), seed: (rnd() * 1e9) | 0 });
+      if (rnd() < .86) { const col = pick2(rnd, colours); CARS.push({ x: side * (CURB - 1.08), z, len, side, col, cab: col[0] === 200, seed: (rnd() * 1e9) | 0 }); }
       z += len + rr(.7, 2.2);
     }
   }
@@ -656,6 +657,13 @@ function drawRoof(g, b) {
       g.stroke();
       g.fillRect(x - tw / 2, yb - legs - th, tw, th);
       g.beginPath(); g.moveTo(x - tw * .56, yb - legs - th); g.lineTo(x, yb - legs - th - tw * .42); g.lineTo(x + tw * .56, yb - legs - th); g.closePath(); g.fill();
+    } else if (o.t === 'tier') {
+      const xa = Math.min(o.X, o.X + (b.side < 0 ? -o.d : o.d)), xb = Math.max(o.X, o.X + (b.side < 0 ? -o.d : o.d));
+      box(g, xa, xb, b.top, b.top + o.h, Z, Z + o.w, col, hz([16, 18, 24], Z), col);
+      const rr0 = mulberry32((o.Z * 1000) | 0);
+      for (let y = b.top + 1.5; y < b.top + o.h - 1; y += 3.2) for (let x = xa + 1; x < xb - 1; x += 2.6) if (rr0() < .14) {
+        const r = frontRect(x, x + 1.1, y, y + 1.5, Z); g.fillStyle = rgba(AMBER, .35 * (1 - hazeAt(Z) * .6)); g.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0); g.fillStyle = col;
+      }
     } else box(g, o.X - o.w / 2, o.X + o.w / 2, b.top, b.top + o.h, Z, Z + o.w, col, col, col);
   }
 }
@@ -756,6 +764,10 @@ function paintCarSide(c, ppm) {
   g.strokeStyle = rgba(mixa(hl, FROST, .4), .45); g.lineWidth = Math.max(.6, .018 * ppm);
   g.beginPath(); g.moveTo(U(.25), V(.9)); g.bezierCurveTo(U(.65), V(1.05), U(1.3), V(1.05), U(1.6), V(.82)); g.stroke();
   g.beginPath(); g.moveTo(U(3.4), V(1.07)); g.bezierCurveTo(U(4.0), V(1.08), U(4.7), V(1.0), U(5.0), V(.82)); g.stroke();
+  if (c.cab) { // the checker band of a New York cab
+    const sq = .09;
+    for (let u = .4, i = 0; u < 4.9; u += sq, i++) for (let r = 0; r < 2; r++) { g.fillStyle = (i + r) % 2 ? rgba(INK, .85) : rgba([230, 222, 200], .55); g.fillRect(U(u), V(1.0 - r * sq), sq * s * ppm + .5, sq * ppm + .5); }
+  }
   // windows
   g.beginPath();
   g.moveTo(U(1.62), V(1.19)); g.lineTo(U(1.98), V(1.47)); g.quadraticCurveTo(U(2.4), V(1.57), U(3.0), V(1.55));
@@ -907,14 +919,21 @@ function drawGround(g) {
 function buildStatic() {
   const b0 = backX, f = frontX, e = emissX;
   for (const g of [b0, f, e]) { g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; }
-  f.clearRect(0, 0, W, H); e.clearRect(0, 0, W, H);
+  f.clearRect(0, 0, W, H); e.clearRect(0, 0, W, H); farX.setTransform(1, 0, 0, 1, 0, 0); farX.clearRect(0, 0, W, H);
+  // Things beyond the cross street go on their own layer so the El train can run between them and us.
+  const layerAt = z => z >= CROSS.z1 - .01 ? farX : frontX;
   // sky: nearly black, a low warm glow over the far end of the street
   let gr = b0.createLinearGradient(0, 0, 0, VPy + 10 * S);
   gr.addColorStop(0, rgba([6, 8, 13], 1)); gr.addColorStop(.6, rgba([12, 14, 22], 1)); gr.addColorStop(1, rgba([34, 28, 30], 1));
   b0.fillStyle = gr; b0.fillRect(0, 0, W, H);
+  // the city lights up the low cloud over Midtown
+  const cg = b0.createRadialGradient(VPx, VPy, 0, VPx, VPy, Math.max(W, H) * .6);
+  cg.addColorStop(0, rgba([90, 60, 50], .5)); cg.addColorStop(.5, rgba([50, 34, 36], .25)); cg.addColorStop(1, rgba([20, 18, 26], 0));
+  b0.fillStyle = cg; b0.fillRect(0, 0, W, VPy);
+  drawSkyline(b0);
   drawGround(b0);
   // far end, lost in the dark
-  face(f, [[XL - 40, 0, ZFAR], [XR + 40, 0, ZFAR], [XR + 40, 24, ZFAR], [XL - 40, 24, ZFAR]], rgba(HAZE, 1));
+  face(b0, [[XL - 40, 0, ZFAR], [XR + 40, 0, ZFAR], [XR + 40, 24, ZFAR], [XL - 40, 24, ZFAR]], rgba(HAZE, 1));
 
   // across the cross street: the next block's corner faces us
   const rnd = mulberry32(5);
@@ -922,14 +941,16 @@ function buildStatic() {
     const cf = paintCrossFront(side, rnd), Z = CROSS.z1;
     const xa = side < 0 ? XL - cf.wM : XR, xb = side < 0 ? XL : XR + cf.wM;
     const r = frontRect(xa, xb, 0, cf.hM, Z);
-    f.drawImage(cf.wall, r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
-    f.fillStyle = rgba(HAZE, hazeAt(Z) * .85); f.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
-    for (const g of [f, e]) { g.globalAlpha = 1 - hazeAt(Z) * .4; g.drawImage(cf.lit, r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0); g.globalAlpha = 1; }
+    b0.drawImage(cf.wall, r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+    b0.fillStyle = rgba(HAZE, hazeAt(Z) * .85); b0.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+    for (const g of [b0, e]) { g.globalAlpha = 1 - hazeAt(Z) * .4; g.drawImage(cf.lit, r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0); g.globalAlpha = 1; }
   }
 
   // buildings far to near, both sides interleaved
   const order = [...BLD].sort((a, b) => b.z0 - a.z0);
+  let adDone = false, roofDone = false;
   for (const b of order) {
+    const f = layerAt(b.z0);
     b.ppm = clamp(Math.min(F / b.z0, 3600 / b.top, 3600 / (b.z1 - b.z0)), 3, 160);
     drawRoof(f, b);
     const X = b.side < 0 ? XL : XR;
@@ -937,7 +958,9 @@ function buildStatic() {
     if (nearer && nearer.top < b.top) {
       const back = b.side < 0 ? -18 : 18;
       face(f, [[X, nearer.top, b.z0], [X + back, nearer.top, b.z0], [X + back, b.top, b.z0], [X, b.top, b.z0]], hz(scl(b.col, .7), b.z0));
+      if (!adDone && b.z0 > 25 && b.z0 < 110 && b.top - nearer.top > 7) { adDone = true; paintedAd(f, X + (b.side < 0 ? -1 : 1), back * .85, nearer.top + 1, b.top - 1.2, b.z0 - .01); }
     }
+    if (!roofDone && b.side > 0 && b.z0 > 85 && b.z0 < 170 && b.st >= 9) { roofDone = true; roofSign(f, e, b); }
     if (Math.abs(b.z1 - CROSS.z0) < .01) { // the corner: its side wall along the cross street faces away; nothing to draw
     }
     const t = paintFacade(b);
@@ -951,19 +974,23 @@ function buildStatic() {
     for (let i = 0; i <= 6; i++) { const t2 = i / 6, sx = lerp(sa, sb, t2), Z = F * (X - CAM.x) / (sx - VPx || 1e-3); gh.addColorStop(t2, rgba(HAZE, hazeAt(Z) * .92)); }
     f.fillStyle = gh; f.fillRect(Math.min(sa, sb) - 1, 0, Math.abs(sb - sa) + 2, H);
     f.restore();
-    for (const w of b.windows) { w.q = winQuad(w); paintWindow(f, e, w); }
+    for (const w of b.windows) { w.q = winQuad(w); w.cv = f; paintWindow(f, e, w); }
   }
   // everything that stands in front of the walls, far to near
   const items = [];
   for (const b of BLD) {
-    if (b.z0 < 150) items.push([b.z1, () => cornice(f, b)]);
-    if (b.fe && b.z0 < 160) items.push([(b.fez0 + b.fez1) / 2, () => fireEscape(f, b)]);
+    if (b.z0 < 150) items.push([b.z1, g => cornice(g, b)]);
+    if (b.fe && b.z0 < 160) items.push([(b.fez0 + b.fez1) / 2, g => fireEscape(g, b)]);
   }
-  for (const s of SIGNS) items.push([s.z + .01, () => signHousing(f, s)]);
-  for (const L of LAMPS) items.push([L.Z, () => lampPost(f, L)]);
-  for (const s of SIGNALS) items.push([s.Z, () => signalPost(f, s)]);
+  for (const s of SIGNS) items.push([s.z + .01, g => signHousing(g, s)]);
+  for (const L of LAMPS) items.push([L.Z, g => lampPost(g, L)]);
+  items.push([EL.z0, g => elStructure(g)]);
+  items.push([SUBWAY.z0, g => subwayRails(g)]);
+  items.push([STACK.Z, g => steamStack(g)]);
+  items.push([CROSS.z0 - .7, g => cornerSign(g)]);
+  for (const s of SIGNALS) items.push([s.Z, g => signalPost(g, s)]);
   items.sort((a, b) => b[0] - a[0]);
-  for (const it of items) it[1]();
+  for (const it of items) it[1](layerAt(it[0]));
   // Parked cars are rendered once into their own little canvases, then sorted
   // with the people and moving cars every frame so nearer things cover farther ones.
   for (const c of CARS) {
@@ -987,10 +1014,215 @@ function buildStatic() {
   for (let i = 0; i < 6 && cands.length; i++) {
     const w = cands.splice((r2() * cands.length) | 0, 1)[0];
     w.anim = { type: i % 3 === 2 ? 'curtain' : 'person', u: r2(), target: r2(), wait: r2() * 6, ph: r2() * TAU };
-    w.shade = 0; paintWindow(f, e, w); ANIMWIN.push(w);
+    w.shade = 0; paintWindow(w.cv, e, w); ANIMWIN.push(w);
   }
 }
 
+/* =============================================================================
+   NEW YORK: the skyline over the street, the El, the subway, the steam
+   ============================================================================= */
+// Far towers stand in the slot of sky above the street. At a kilometre away
+// perspective barely changes across their width, so each is drawn as flat
+// shapes at one depth. Shapes nod to the Empire State and Chrysler buildings.
+const TOWERS = [
+  { t: 'slab', X: -150, Z: 950, w: 70, h: 150 }, { t: 'slab', X: 160, Z: 850, w: 60, h: 135 },
+  { t: 'setback', X: -45, Z: 720, w: 46, h: 185 }, { t: 'setback', X: 60, Z: 680, w: 40, h: 160 },
+  { t: 'setback', X: 15, Z: 980, w: 50, h: 230 }, { t: 'slab', X: -95, Z: 620, w: 34, h: 120 },
+  { t: 'empire', X: -70, Z: 1150, w: 58, h: 381 }, { t: 'chrysler', X: 95, Z: 1450, w: 40, h: 319 },
+  { t: 'setback', X: 120, Z: 1100, w: 44, h: 200 }, { t: 'slab', X: 30, Z: 560, w: 30, h: 105 },
+];
+function drawSkyline(g) {
+  const rnd = mulberry32(1931);
+  const sorted = [...TOWERS].sort((a, b) => b.Z - a.Z);
+  for (const T of sorted) {
+    const Z = T.Z, k = kAt(Z), a = clamp(1 - Z / 2200, .25, .8);
+    const body = rgba(mixa([10, 12, 19], [30, 30, 40], 1 - a), 1);
+    const block = (cx, w, y0, y1, lit = .22) => {
+      const x0 = px(cx - w / 2, Z), x1 = px(cx + w / 2, Z), ya = py(y1, Z), yb = py(y0, Z);
+      g.fillStyle = body; g.fillRect(x0, ya, x1 - x0, yb - ya);
+      const fh = 3.8 * k, cw = 3.2 * k;
+      if (fh < 1.2) return;
+      for (let y = yb - fh; y > ya + fh * .5; y -= fh) for (let x = x0 + cw * .5; x < x1 - cw * .5; x += cw) {
+        if (rnd() < lit) { g.fillStyle = rgba(rnd() < .7 ? AMBER : [240, 228, 200], rr2(rnd, .25, .7) * a); g.fillRect(x, y, Math.max(.8, cw * .45), Math.max(.8, fh * .4)); }
+      }
+    };
+    if (T.t === 'slab') block(T.X, T.w, 0, T.h, .2);
+    else if (T.t === 'setback') { block(T.X, T.w, 0, T.h * .6); block(T.X, T.w * .75, T.h * .6, T.h * .85); block(T.X, T.w * .5, T.h * .85, T.h, .3); }
+    else if (T.t === 'empire') {
+      block(T.X, T.w * 1.5, 0, 85); block(T.X, T.w, 85, 200, .25); block(T.X, T.w * .7, 200, 320, .25); block(T.X, T.w * .42, 320, 340, .1);
+      // floodlit top, mast, and a steady red beacon
+      const x = px(T.X, Z), y0 = py(320, Z), y1 = py(381, Z);
+      glow(g, x, py(330, Z), 30 * k, [255, 236, 200], .35 * a);
+      g.fillStyle = rgba([235, 225, 205], .8 * a); g.fillRect(px(T.X - T.w * .21, Z), py(345, Z), T.w * .42 * k, 25 * k);
+      g.fillStyle = rgba([200, 196, 186], .7 * a); g.fillRect(x - 2.2 * k, y1, 4.4 * k, y0 - y1 - 25 * k);
+      glow(g, x, y1, 9 * k, RED, .6 * a); glow(g, x, y1, 2 * k, [255, 120, 110], 1);
+    } else if (T.t === 'chrysler') {
+      block(T.X, T.w * 1.4, 0, 60); block(T.X, T.w, 60, 240, .25);
+      // the crown: stacked arches lit from inside, then the needle
+      const x = px(T.X, Z);
+      for (let i = 0; i < 6; i++) {
+        const w = T.w * (1 - i * .15) * k / 2, yb = py(240 + i * 9, Z);
+        g.fillStyle = body; g.beginPath(); g.ellipse(x, yb, w, w * .9, 0, Math.PI, TAU); g.fill();
+        g.strokeStyle = rgba([245, 238, 220], .65 * a); g.lineWidth = Math.max(.6, .9 * k); g.stroke();
+        for (let j = -2; j <= 2; j++) { const ang = Math.PI * 1.5 + j * .45, tx = x + Math.cos(ang) * w * .7, ty = yb + Math.sin(ang) * w * .63;
+          g.fillStyle = rgba([255, 244, 220], .75 * a); g.beginPath(); g.moveTo(tx, ty - 1.2 * k); g.lineTo(tx - .8 * k, ty + .6 * k); g.lineTo(tx + .8 * k, ty + .6 * k); g.closePath(); g.fill(); }
+      }
+      glow(g, x, py(265, Z), 26 * k, [245, 236, 220], .25 * a);
+      g.fillStyle = rgba([210, 206, 196], .8 * a); g.beginPath(); g.moveTo(x - 1.5 * k, py(292, Z)); g.lineTo(x, py(T.h, Z)); g.lineTo(x + 1.5 * k, py(292, Z)); g.closePath(); g.fill();
+    }
+  }
+}
+// The elevated railway runs along the cross street, over our street.
+const EL = { z0: 61.2, z1: 66.4, y0: 5.6, y1: 6.9 };
+// Only the stretch inside the opening of the intersection is visible: nearer
+// buildings stand in front of the rest.
+function elClip(g) { g.beginPath(); const x0 = px(XL, CROSS.z0), x1 = px(XR, CROSS.z0); g.rect(x0, 0, x1 - x0, H); g.clip(); }
+function elStructure(g) {
+  g.save(); elClip(g);
+  const iron = hz([14, 18, 17], EL.z0), dark = hz([10, 13, 13], EL.z0), k = kAt(EL.z0);
+  // underside of the deck, then columns, then the riveted girder that faces us
+  face(g, [[-70, EL.y0, EL.z0], [70, EL.y0, EL.z0], [70, EL.y0, EL.z1], [-70, EL.y0, EL.z1]], dark);
+  g.strokeStyle = rgba([40, 46, 44], .6); g.lineWidth = Math.max(.6, .05 * k); g.beginPath();
+  for (let x = -70; x <= 70; x += 1.6) line3(g, [x, EL.y0, EL.z0], [x, EL.y0, EL.z1]);
+  g.stroke();
+  for (const X of [-CURB - .7, CURB + .7, -24, 24, -45, 45]) for (const z of [EL.z0 + .3, EL.z1 - .3]) box(g, X - .25, X + .25, 0, EL.y0, z - .25, z + .25, iron, iron, iron);
+  const r = frontRect(-70, 70, EL.y0, EL.y1, EL.z0);
+  g.fillStyle = iron; g.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+  g.strokeStyle = rgba(INK, .8); g.lineWidth = Math.max(.6, .06 * k);
+  g.beginPath();
+  const step = 1.3 * k;
+  for (let x = r.x0, i = 0; x < r.x1; x += step, i++) { g.moveTo(x, r.y0 + 2); g.lineTo(x + step, r.y1 - 2); g.moveTo(x + step, r.y0 + 2); g.lineTo(x, r.y1 - 2); }
+  g.stroke();
+  g.fillStyle = rgba([60, 66, 62], .5); g.fillRect(r.x0, r.y0, r.x1 - r.x0, Math.max(1, .1 * k)); g.fillRect(r.x0, r.y1 - Math.max(1, .1 * k), r.x1 - r.x0, Math.max(1, .1 * k));
+  g.fillStyle = rgba([240, 220, 160], .25); g.fillRect(r.x0, r.y0, r.x1 - r.x0, Math.max(.6, .03 * k)); // rail catching light
+  g.restore();
+}
+const el = { trains: [], next: 14 };
+function spawnTrain() {
+  const dir = R() < .5 ? 1 : -1, spd = rand(8, 11), n = 4 + ((R() * 2) | 0);
+  el.trains.push({ x: dir > 0 ? -95 : 95, dir, spd, n });
+  trainSound(dir, 190 / spd);
+}
+function updateTrains(dt) {
+  el.next -= dt;
+  if (el.next <= 0) { el.next = rand(40, 85); spawnTrain(); }
+  for (let i = el.trains.length - 1; i >= 0; i--) { const t = el.trains[i]; t.x += t.dir * t.spd * dt; if (Math.abs(t.x) > 95 + t.n * 15) el.trains.splice(i, 1); }
+}
+function drawTrains(g) {
+  const Z = EL.z0 + .9, k = kAt(Z);
+  g.save(); elClip(g);
+  for (const t of el.trains) for (let i = 0; i < t.n; i++) {
+    const cx = t.x - t.dir * i * 15.2, r = frontRect(cx - 7.3, cx + 7.3, EL.y1, EL.y1 + 3.3, Z);
+    if (r.x1 < 0 || r.x0 > W) continue;
+    g.fillStyle = hz([30, 40, 36], Z); g.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+    g.fillStyle = hz([18, 22, 22], Z); g.fillRect(r.x0, r.y0, r.x1 - r.x0, .35 * k);
+    for (let w = 0; w < 7; w++) {
+      const wx = r.x0 + (1.0 + w * 1.9) * k, wy = r.y0 + 1.0 * k;
+      g.fillStyle = rgba([250, 226, 160], .8); g.fillRect(wx, wy, 1.1 * k, .9 * k);
+      if ((w + i) % 3 === 0) { g.fillStyle = rgba([60, 40, 30], .8); g.fillRect(wx + .35 * k, wy + .35 * k, .35 * k, .55 * k); } // a passenger
+    }
+    g.save(); g.globalCompositeOperation = 'lighter'; glow(g, (r.x0 + r.x1) / 2, r.y0 + 1.4 * k, 8 * k, AMBER, .12); g.restore();
+  }
+  g.restore();
+}
+// A subway entrance on the right-hand pavement: railings and two green globes.
+const SUBWAY = { x0: CURB + .8, x1: CURB + 2.3, z0: 22.6, z1: 25.6 };
+function subwayRails(g) {
+  const s = SUBWAY, Z = s.z0, iron = ironCol(Z), k = kAt(Z);
+  face(g, [[s.x0, .02, s.z0], [s.x1, .02, s.z0], [s.x1, .02, s.z1], [s.x0, .02, s.z1]], rgba(INK, .95)); // the stairwell
+  g.strokeStyle = iron; g.lineWidth = Math.max(.8, .05 * k); g.beginPath();
+  for (const y of [.5, 1.0]) { line3(g, [s.x0, y, s.z0], [s.x1, y, s.z0]); line3(g, [s.x0, y, s.z0], [s.x0, y, s.z1]); line3(g, [s.x1, y, s.z0], [s.x1, y, s.z1]); }
+  for (let x = s.x0; x <= s.x1 + .01; x += .25) line3(g, [x, 0, s.z0], [x, 1.0, s.z0]);
+  for (const x of [s.x0, s.x1]) line3(g, [x, 0, s.z0], [x, 2.2, s.z0]);
+  g.stroke();
+  const r = frontRect(s.x0 + .25, s.x1 - .25, 1.08, 1.35, s.z0);
+  g.fillStyle = rgba([24, 26, 30], 1); g.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+  ctxText(g, 'SUBWAY', (r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2, (r.y1 - r.y0) * .7, FONT_SIGN, FROST, .75);
+}
+function subwayGlobes(g) {
+  const s = SUBWAY, Z = s.z0, k = kAt(Z), out = [];
+  for (const x of [s.x0, s.x1]) {
+    const gx = px(x, Z), gy = py(2.35, Z);
+    glow(g, gx, gy, 1.6 * k, NEON.green, .22); glow(g, gx, gy, .35 * k, [140, 255, 180], .7);
+    g.fillStyle = rgba([170, 255, 200], .95); g.beginPath(); g.arc(gx, gy, .15 * k, 0, TAU); g.fill();
+    out.push({ x0: gx - .4 * k, x1: gx + .4 * k, y0: gy - .4 * k, y1: gy + .4 * k });
+  }
+  SUBWAY.rs = out;
+}
+// The orange-and-white Con Ed style steam chimney, mid-street.
+const STACK = { X: -1.3, Z: 31, h: 2.3, r: .32 };
+function steamStack(g) {
+  const Z = STACK.Z, k = kAt(Z), x = px(STACK.X, Z), w = STACK.r * k;
+  for (let i = 0; i < 6; i++) {
+    const y0 = py(STACK.h * i / 6, Z), y1 = py(STACK.h * (i + 1) / 6, Z);
+    const gr = g.createLinearGradient(x - w, 0, x + w, 0), c = i % 2 ? [200, 196, 186] : [210, 92, 30];
+    gr.addColorStop(0, rgba(scl(c, .25), 1)); gr.addColorStop(.35, rgba(scl(c, .6), 1)); gr.addColorStop(1, rgba(scl(c, .2), 1));
+    g.fillStyle = gr; g.fillRect(x - w, y1, 2 * w, y0 - y1);
+  }
+  g.fillStyle = rgba(INK, .9); g.beginPath(); g.ellipse(x, py(STACK.h, Z), w, w * .25, 0, 0, TAU); g.fill();
+}
+// The street sign at the corner: the cross street's name faces us.
+function cornerSign(g) {
+  const Z = CROSS.z0 - .6, X = CURB + .35, r = frontRect(X - .55, X + .55, 2.75, 2.98, Z);
+  g.fillStyle = rgba([24, 54, 36], 1); g.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+  ctxText(g, 'W 52 ST', (r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2, (r.y1 - r.y0) * .8, FONT_SIGN, FROST, .85);
+  const r2 = frontRect(-CURB - .9, -CURB + .2, 2.75, 2.98, Z);
+  g.fillStyle = rgba([24, 54, 36], 1); g.fillRect(r2.x0, r2.y0, r2.x1 - r2.x0, r2.y1 - r2.y0);
+  ctxText(g, 'ONE WAY →', (r2.x0 + r2.x1) / 2, (r2.y0 + r2.y1) / 2, (r2.y1 - r2.y0) * .75, FONT_SIGN, FROST, .8);
+}
+// Painted advertisement on an exposed brick party wall, the kind Midtown was full of.
+function paintedAd(g, X, back, y0, y1, Z) {
+  const r = frontRect(Math.min(X, X + back), Math.max(X, X + back), y0, y1, Z), w = r.x1 - r.x0, h = r.y1 - r.y0;
+  if (w < 10 || h < 10) return;
+  g.save(); g.beginPath(); g.rect(r.x0, r.y0, w, h); g.clip();
+  g.fillStyle = rgba([60, 28, 26], .55); g.fillRect(r.x0 + w * .06, r.y0 + h * .08, w * .88, h * .84);
+  g.fillStyle = rgba([150, 120, 80], .35); g.fillRect(r.x0 + w * .06, r.y0 + h * .55, w * .88, h * .2);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  const line = (t, y, s, c, a) => { g.font = `${s}px ${FONT_SERIF}`; const tw = g.measureText(t).width, sc = Math.min(1, w * .8 / tw);
+    g.save(); g.translate((r.x0 + r.x1) / 2, y); g.scale(sc, 1); g.fillStyle = rgba(c, a); g.fillText(t, 0, 0); g.restore(); };
+  line('GOTHAM', r.y0 + h * .25, h * .2, [220, 200, 160], .5);
+  line('COFFEE', r.y0 + h * .44, h * .18, [220, 200, 160], .5);
+  line('THE MORNING CUP · 5¢', r.y0 + h * .65, h * .08, [40, 20, 18], .55);
+  for (let i = 0; i < 160; i++) { g.fillStyle = rgba(INK, Math.random() * .25); g.fillRect(r.x0 + Math.random() * w, r.y0 + Math.random() * h, Math.random() * w * .08, Math.random() * 3 + 1); }
+  g.restore();
+  // gooseneck lamps along the top
+  for (let i = 1; i < 4; i++) glow(g, r.x0 + w * i / 4, r.y0 + h * .04, w * .14, [250, 226, 180], .12);
+}
+// Rooftop neon on a tall far building, on an iron lattice.
+function roofSign(g, e, b) {
+  const X0 = b.side < 0 ? XL - 2 : XR + 2, X1 = b.side < 0 ? XL - 17 : XR + 17, Z = b.z0 + 3;
+  const r = frontRect(Math.min(X0, X1), Math.max(X0, X1), b.top + .8, b.top + 4.6, Z), w = r.x1 - r.x0, h = r.y1 - r.y0;
+  g.strokeStyle = hz([24, 24, 28], Z); g.lineWidth = Math.max(.6, .05 * kAt(Z)); g.beginPath();
+  for (let x = r.x0; x <= r.x1; x += w / 12) { g.moveTo(x, r.y0); g.lineTo(x, py(b.top, Z)); }
+  g.moveTo(r.x0, r.y1); g.lineTo(r.x1, r.y1); g.stroke();
+  for (const cx of [g, e]) {
+    cx.save(); cx.font = `${h * .8}px ${FONT_SIGN}`; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    const tw = cx.measureText('HOTEL WESTLAKE').width, sc = Math.min(1, w * .95 / tw);
+    cx.translate((r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2); cx.scale(sc, 1);
+    cx.shadowColor = rgba(RED, .9); cx.shadowBlur = h * .6; cx.lineWidth = Math.max(1, h * .07); cx.strokeStyle = rgba(NEON.red, .9);
+    cx.strokeText('HOTEL WESTLAKE', 0, 0); cx.shadowBlur = 0; cx.lineWidth *= .4; cx.strokeStyle = rgba([255, 200, 190], .8); cx.strokeText('HOTEL WESTLAKE', 0, 0);
+    cx.restore();
+  }
+}
+function ctxText(g, str, x, y, size, font, col, a) {
+  if (size < 3) return;
+  g.font = `${size}px ${font}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillStyle = rgba(col, a); g.fillText(str, x, y);
+}
+function trainSound(dir, dur) {
+  if (!audio.on || !audio.ac) return;
+  const ac = audio.ac, t = ac.currentTime + .05;
+  const s = ac.createBufferSource(); s.buffer = audio.white; s.loop = true;
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380;
+  const g = ac.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.16, t + dur * .45); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  const clack = ac.createGain(); clack.gain.value = .6;                        // wheels over rail joints
+  const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.type = 'square'; lfo.frequency.value = 3.2; lg.gain.value = .4;
+  lfo.connect(lg); lg.connect(clack.gain);
+  let out = audio.master;
+  if (ac.createStereoPanner) { const p = ac.createStereoPanner(); p.pan.setValueAtTime(-.8 * dir, t); p.pan.linearRampToValueAtTime(.8 * dir, t + dur); p.connect(audio.master); out = p; }
+  s.connect(lp); lp.connect(clack); clack.connect(g); g.connect(out);
+  s.start(t); s.stop(t + dur + .1); lfo.start(t); lfo.stop(t + dur + .1);
+}
 /* =============================================================================
    SIGNS, LAMPS AND SIGNALS (redrawn when a letter flickers or a signal changes)
    ============================================================================= */
@@ -1111,6 +1343,7 @@ function drawSigns() {
     g.fillStyle = rgba([255, 244, 220], .95 * fade); g.beginPath(); g.ellipse(x, y, .17 * k, .22 * k, 0, 0, TAU); g.fill();
     L.r = { x0: x - .5 * k, x1: x + .5 * k, y0: y - .5 * k, y1: y + .5 * k };
   }
+  subwayGlobes(g);
   // traffic signals at the corner
   const scol = [NEON.green, NEON.yellow, NEON.red][signal.state];
   for (const s of SIGNALS) {
@@ -1171,6 +1404,7 @@ function buildReflection() {
   for (const s of SIGNS) flipRect(s.r, s.z, signsC, Math.max(4, (s.r ? s.r.x1 - s.r.x0 : 0) * .3));
   for (const L of LAMPS) flipRect(L.r, L.Z, signsC, 4);
   for (const s of SIGNALS) flipRect(s.r, s.Z, signsC, 4);
+  for (const r of SUBWAY.rs || []) flipRect(r, SUBWAY.z0, signsC, 4);
   g.setTransform(1, 0, 0, 1, 0, 0);
   // 3. smear toward the viewer, keep a little of the sharp mirror for the puddles
   reflSX.globalCompositeOperation = 'copy';
@@ -1214,7 +1448,7 @@ function spawnPed(initial) {
     alpha: initial || dir > 0 ? 1 : 0, state: 'walk', decided: false });
 }
 function spawnCar(initial) {
-  const c = { x: rand(-.15, .15), z: initial ? rand(30, 90) : 1.6, len: rand(5.0, 5.4), spd: rand(4.5, 7), cab: R() < .3, seed: (R() * 1e9) | 0 };
+  const c = { x: rand(-.15, .15), z: initial ? rand(30, 90) : 1.6, len: rand(5.0, 5.4), spd: rand(4.5, 7), cab: R() < .45, seed: (R() * 1e9) | 0 };
   c.col = c.cab ? [200, 160, 46] : pick([[14, 15, 18], [44, 16, 18], [18, 30, 26], [150, 140, 118], [18, 22, 36]]);
   c.hl = pick([NEON.red, NEON.orange, NEON.yellow, NEON.pink]);
   cars.push(c);
@@ -1222,6 +1456,7 @@ function spawnCar(initial) {
 }
 const marquees = () => SIGNS.filter(s => s.kind === 'marquee');
 function updateLife(dt) {
+  updateTrains(dt);
   nextPed -= dt;
   if (nextPed <= 0) { nextPed = rand(2.5, 6); if (peds.length < 14) spawnPed(false); }
   for (let i = peds.length - 1; i >= 0; i--) {
@@ -1241,7 +1476,9 @@ function updateLife(dt) {
   if (nextCar <= 0) { nextCar = rand(9, 20); if (cars.length < 2) spawnCar(false); }
   for (let i = cars.length - 1; i >= 0; i--) { const c = cars[i]; c.z += c.spd * dt; if (c.z > 220) cars.splice(i, 1); }
   nextSteam -= dt;
-  while (nextSteam <= 0) { nextSteam += .3; steam.push({ x: -.6 + rand(-.3, .3), y: .05, z: 17.5 + rand(-.25, .25), r: rand(.25, .4), vy: rand(.3, .5), vx: rand(-.04, .14), life: rand(5, 8), age: 0 }); }
+  while (nextSteam <= 0) { nextSteam += .22;
+    if (R() < .45) steam.push({ x: -.6 + rand(-.3, .3), y: .05, z: 17.5 + rand(-.25, .25), r: rand(.25, .4), vy: rand(.3, .5), vx: rand(-.04, .14), life: rand(5, 8), age: 0 });
+    else steam.push({ x: STACK.X + rand(-.1, .1), y: STACK.h, z: STACK.Z, r: rand(.3, .45), vy: rand(.5, .8), vx: rand(-.02, .18), life: rand(6, 9), age: 0 }); }
   for (let i = steam.length - 1; i >= 0; i--) { const s = steam[i]; s.age += dt; s.y += s.vy * dt; s.x += s.vx * dt; s.r += .3 * dt; if (s.age > s.life) steam.splice(i, 1); }
   for (const p of GROUPS) { p.ph += dt; p.puff -= dt; if (p.puff < 0) p.puff = rand(6, 12); }
   for (const w of ANIMWIN) {
@@ -1293,11 +1530,12 @@ function rimFor(p) {
   for (const s of SIGNS) { const d = Math.abs(s.z - p.z) + (s.side === p.side ? 0 : 5); if (d < bd) { bd = d; best = s; } }
   return best && bd < 6 ? [best.col, .26 * (1 - bd / 6) + .06] : [COLD, .1];
 }
-function drawSteam(g) {
+function drawSteam(g, which) {
   g.globalCompositeOperation = 'lighter';
   for (const s of steam) {
+    if (!which(s)) continue;
     const k = kAt(s.z), x = px(s.x, s.z), y = py(s.y, s.z), r = s.r * k, t = s.age / s.life;
-    g.globalAlpha = Math.min(1, s.age / 1.2) * (1 - t) * .06; g.drawImage(puff, x - r, y - r, 2 * r, 2 * r);
+    g.globalAlpha = Math.min(1, s.age / 1.2) * (1 - t) * .1; g.drawImage(puff, x - r, y - r, 2 * r, 2 * r);
   }
   g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
 }
@@ -1376,6 +1614,8 @@ function composeScene(t) {
   g.drawImage(backC, 0, 0);
   g.globalCompositeOperation = 'lighter'; g.drawImage(reflC, 0, 0, W, H);
   g.globalCompositeOperation = 'source-over';
+  g.drawImage(farC, 0, 0);
+  drawTrains(g);
   g.drawImage(frontC, 0, 0);
   g.drawImage(signsC, 0, 0);
   drawAnimWindows(g, t);
@@ -1394,7 +1634,8 @@ function composeScene(t) {
     g.globalCompositeOperation = 'source-over';
     drawCar(g, c, { lit: true });
   }]);
-  items.push([17.5, () => drawSteam(g)]);
+  items.push([17.5, () => drawSteam(g, s => s.z < 24)]);
+  items.push([STACK.Z - .1, () => drawSteam(g, s => s.z >= 24)]);
   items.sort((a, b) => b[0] - a[0]);
   for (const it of items) it[1]();
   g.globalCompositeOperation = 'lighter';
@@ -1718,7 +1959,7 @@ function toggleWindow() {
   const w = pool[(R() * pool.length) | 0];
   if (w.on) { if (w.anim && R() < .7) return; w.on = false; }
   else { if (R() > .3) return; w.on = true; w.kind = (R() * 3) | 0; w.a = rand(.35, .9); }
-  paintWindow(frontX, emissX, w);
+  paintWindow(w.cv || frontX, emissX, w);
 }
 function startFlicker() {
   const pool = SIGNS.filter(s => s.flick && s.z < 80 && s.levels.length);
@@ -1827,6 +2068,7 @@ function loop(now) {
 function alloc() {
   backC = mk(W, H);   backX = cx2d(backC, true);
   frontC = mk(W, H);  frontX = cx2d(frontC);
+  farC = mk(W, H);    farX = cx2d(farC);
   emissC = mk(W, H);  emissX = cx2d(emissC);
   signsC = mk(W, H);  signsX = cx2d(signsC);
   allC = mk(W, H);    allX = cx2d(allC);
@@ -2217,6 +2459,7 @@ toast('h controls \u00b7 m music \u00b7 f fullscreen', 5500);
 last = performance.now();
 if (!document.hidden) raf = requestAnimationFrame(loop);
 
+window.__forceTrain = () => { el.trains.push({ x: -30, dir: 1, spd: 9, n: 5 }); };
 window.__street = { settings, peds, cars, runners, statics, SIGNS: () => SIGNS, CARS: () => CARS, HAS_FILTER, audio, mus };
 })();
 </script>
