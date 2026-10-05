@@ -14,6 +14,7 @@
 
     --font-sign:"Bebas Neue","League Gothic","Oswald","Haettenschweiler","Impact","Arial Narrow","Roboto Condensed",sans-serif;
     --font-script:"SignPainter","SignPainter-HouseScript","Brush Script MT","Snell Roundhand","Bebas Neue","Impact",cursive;
+    --font-serif:"Playfair Display","Didot","Bodoni 72",Georgia,"Times New Roman",serif;
     --font-deco:"Broadway","Futura","Gill Sans","Century Gothic","Avenir Next","Helvetica Neue",sans-serif;
     --font-panel:"Futura","Futura PT","Avenir Next","Gill Sans","Century Gothic","Helvetica Neue",Arial,sans-serif;
   }
@@ -83,7 +84,7 @@
 </head>
 <body>
 
-<canvas id="glass" aria-label="A rainy 1940s Manhattan street at night, seen from a second-floor window"></canvas>
+<canvas id="glass" aria-label="A rainy 1940s Manhattan street of jazz clubs at night, seen through a window"></canvas>
 
 <div id="panel" hidden role="group" aria-label="Window controls">
   <div class="hd"><b>window controls</b><span>no. 7</span></div>
@@ -103,17 +104,21 @@
 
 /* =============================================================================
    PALETTE
+   Low key: almost everything sits in blue-black, and colour lives only in the
+   lights, the way it does in night photographs of 52nd Street and Times Square.
    ============================================================================= */
-const INK    = [10, 13, 20];    // blue-black shadow
-const NIGHT  = [17, 21, 31];
-const COLD   = [124, 142, 168]; // streetlamp / sky blue-grey
-const FROST  = [214, 222, 232]; // cold highlight
-const AMBER  = [228, 162, 74];  // warm light
-const ORANGE = [240, 128, 46];  // hot doorway light
-const RED    = [212, 38, 46];   // the one neon red
-const HAZE   = [66, 58, 58];    // distance haze, a little warm
-const BRICK  = [40, 27, 27], BROWN = [35, 27, 25], STONE = [36, 36, 41];
-const CABY   = [150, 116, 36];  // a cab, dimmed by night
+const INK    = [8, 10, 16];
+const NIGHT  = [14, 17, 26];
+const COLD   = [120, 138, 165];
+const FROST  = [222, 228, 236];
+const AMBER  = [238, 172, 82];
+const ORANGE = [248, 130, 46];
+const RED    = [232, 38, 46];
+const HAZE   = [22, 24, 34];      // distance fades to dark navy, not grey
+const NEON = {
+  red: [238, 40, 48], pink: [252, 78, 116], orange: [252, 136, 48], yellow: [255, 206, 90],
+  green: [70, 226, 132], blue: [98, 170, 255], white: [248, 240, 216],
+};
 
 const TAU = Math.PI * 2;
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
@@ -124,6 +129,7 @@ const pick  = arr => arr[(R() * arr.length) | 0];
 const rgba  = (c, a) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${clamp(a, 0, 1).toFixed(4)})`;
 const mixa  = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 const mixc  = (a, b, t) => rgba(mixa(a, b, t), 1);
+const scl   = (c, k) => [c[0] * k, c[1] * k, c[2] * k];
 const avg   = arr => arr.reduce((s, v) => s + v, 0) / arr.length;
 function mulberry32(a) {
   return function () {
@@ -147,6 +153,7 @@ const css = getComputedStyle(document.documentElement);
 const FONT_SIGN   = css.getPropertyValue('--font-sign').trim()   || 'Impact, sans-serif';
 const FONT_SCRIPT = css.getPropertyValue('--font-script').trim() || 'cursive';
 const FONT_DECO   = css.getPropertyValue('--font-deco').trim()   || 'sans-serif';
+const FONT_SERIF  = css.getPropertyValue('--font-serif').trim()  || 'Georgia, serif';
 
 const HAS_FILTER = (() => {
   try {
@@ -159,10 +166,10 @@ const HAS_FILTER = (() => {
 /* =============================================================================
    SETTINGS
    ============================================================================= */
-const DEF   = { rain: .5, fog: .25, neon: 1, grain: .5, music: .7 };
+const DEF   = { rain: .5, fog: .2, neon: 1, grain: .55, music: .7 };
 const RANGE = { rain: [0, 1], fog: [0, 1], neon: [.2, 1.5], grain: [0, 1], music: [0, 1] };
 const settings = { ...DEF };
-const STORE = 'noir-street-window';
+const STORE = 'noir-swing-street';
 try {
   const s = JSON.parse(localStorage.getItem(STORE) || '{}');
   for (const k in DEF) if (typeof s[k] === 'number' && isFinite(s[k])) settings[k] = clamp(s[k], RANGE[k][0], RANGE[k][1]);
@@ -174,38 +181,42 @@ try {
    World units are metres.  X runs across the street (left negative, right
    positive), Y is height above the road, Z is distance down the street.
 
-   We are in a second-floor window: the camera sits at CAM = (1.5, 6.5, 0),
-   a little right of the street's centre line, looking straight down the street
-   (+Z).  A pinhole camera turns a world point into a screen point with
+   We look out of a ground-floor window at about eye level: the camera sits at
+   CAM = (0.6, 2.1, 0), just right of the street's centre line, looking
+   straight down the street (+Z).  A pinhole camera turns a world point into
+   a screen point with
 
        sx = VPx + F * (X - CAM.x) / Z
        sy = VPy + F * (CAM.y - Y) / Z
 
-   Divide-by-Z is the whole of perspective: every line parallel to the street
-   (constant X and Y, Z growing) heads toward (VPx, VPy) as Z grows, so that is
-   the single vanishing point of a one-point view.  We put it slightly right of
-   centre.  F is the focal length in pixels: larger F means a narrower lens.
-   Anything h metres tall at depth Z is F*h/Z pixels tall on screen.
+   Dividing by Z is all of perspective.  Every line parallel to the street
+   (constant X and Y, growing Z) runs toward (VPx, VPy), the single vanishing
+   point of a one-point view, placed slightly right of centre.  F is the focal
+   length in pixels; anything h metres tall at depth Z is F*h/Z pixels tall.
 
-   Facades are vertical planes (X = constant).  Along such a plane every screen
-   column sees exactly ONE depth Z.  So each building is painted flat first, as
-   an architect's elevation (bricks, windows, signs), and then copied onto the
-   screen one pixel column at a time, each column scaled by F/Z.  That is an
-   exact perspective warp using nothing but drawImage.  The road is the same
-   idea turned sideways: each screen row below the horizon has one Z.
+   Building fronts and car flanks are vertical planes (X = constant).  On such
+   a plane each screen column sees exactly ONE depth Z.  So each one is painted
+   flat first, like an architect's elevation, then copied to the screen one
+   pixel column at a time with each column scaled by F/Z (mapPlane).  That is
+   an exact perspective warp done with nothing but drawImage.  The road uses
+   the same trick sideways: each screen row below the horizon has one Z.
+
+   Reflections fall out of the same algebra: a point (X, Y, Z) mirrored in the
+   wet road sits at (X, -Y, Z), so on screen it lands at 2*py(0, Z) - sy.  In
+   other words each column is flipped about its own ground line.
    ============================================================================= */
-const CAM = { x: 1.5, y: 6.5 };
-const XL = -8.5, XR = 8.5;   // building fronts
-const ROAD = 5;              // kerbs at X = +/-5, pavements outside that
-const ZNEAR = 8, ZFAR = 420;
-const CLUB = { door0: 26.3, door1: 27.9 };  // the jazz club doorway, left side
+const CAM = { x: .6, y: 2.1 };
+const XL = -7.4, XR = 7.4;     // building fronts
+const CURB = 4.3;              // kerbs at X = +/-4.3
+const ZNEAR = 6, ZFAR = 300;
+const CROSS = { z0: 58, z1: 70 }; // a cross street cuts the block here
 let W = 0, H = 0, S = 1, F = 1, VPx = 0, VPy = 0;
 const px = (X, Z) => VPx + F * (X - CAM.x) / Z;
 const py = (Y, Z) => VPy + F * (CAM.y - Y) / Z;
-const kAt = Z => F / Z;                                    // pixels per metre at depth Z
-const hazeAt = Z => clamp(1 - Math.exp(-(Z - 14) / 125), 0, .86);
-const darkAt = Z => clamp(.42 * (1 - (Z - 8) / 30), 0, .42);
+const kAt = Z => F / Z;
+const hazeAt = Z => clamp(1 - Math.exp(-(Z - 10) / 85), 0, .93);
 const hz = (col, Z, extra = 1) => mixc(col, HAZE, hazeAt(Z) * extra);
+const hza = (col, Z, extra = 1) => mixa(col, HAZE, hazeAt(Z) * extra);
 
 function poly(g, pts) {
   g.beginPath();
@@ -216,7 +227,6 @@ function poly(g, pts) {
   g.closePath();
 }
 function face(g, pts, fill) { if (!fill) return; poly(g, pts); g.fillStyle = fill; g.fill(); }
-// A box in world space: draws only the faces the camera can see, back to front.
 function box(g, x0, x1, y0, y1, z0, z1, front, side, top) {
   if (CAM.x > x1) face(g, [[x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]], side);
   else if (CAM.x < x0) face(g, [[x0, y0, z0], [x0, y1, z0], [x0, y1, z1], [x0, y0, z1]], side);
@@ -225,26 +235,40 @@ function box(g, x0, x1, y0, y1, z0, z1, front, side, top) {
   face(g, [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0]], front);
 }
 function line3(g, a, b) { g.moveTo(px(a[0], a[2]), py(a[1], a[2])); g.lineTo(px(b[0], b[2]), py(b[1], b[2])); }
-function sbox(x0, x1, y0, y1, z0, z1) { // screen bbox of a world box
-  const xs = [], ys = [];
-  for (const X of [x0, x1]) for (const Y of [y0, y1]) for (const Z of [z0, z1]) { xs.push(px(X, Z)); ys.push(py(Y, Z)); }
-  return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
-}
-// A soft pool of light lying on the ground, foreshortened correctly.
+function frontRect(x0, x1, y0, y1, z) { return { x0: px(x0, z), x1: px(x1, z), y0: py(y1, z), y1: py(y0, z) }; }
 function groundGlow(g, X, Z, rx, rz, col, a) {
   if (Z < 1) return;
   const k = kAt(Z), x = px(X, Z), y = py(0, Z);
   const r = rx * k, ry = Math.max(1, rz * k * CAM.y / Z);
   g.save(); g.translate(x, y); g.scale(1, ry / r);
   const gr = g.createRadialGradient(0, 0, 0, 0, 0, r);
-  gr.addColorStop(0, rgba(col, a)); gr.addColorStop(.4, rgba(col, a * .45)); gr.addColorStop(1, rgba(col, 0));
+  gr.addColorStop(0, rgba(col, a)); gr.addColorStop(.4, rgba(col, a * .4)); gr.addColorStop(1, rgba(col, 0));
   g.fillStyle = gr; g.fillRect(-r, -r, 2 * r, 2 * r); g.restore();
 }
 function glow(g, x, y, r, col, a) {
-  if (r < .5) return;
+  if (r < .5 || a <= 0) return;
   const gr = g.createRadialGradient(x, y, 0, x, y, r);
-  gr.addColorStop(0, rgba(col, a)); gr.addColorStop(.35, rgba(col, a * .4)); gr.addColorStop(1, rgba(col, 0));
+  gr.addColorStop(0, rgba(col, a)); gr.addColorStop(.3, rgba(col, a * .38)); gr.addColorStop(1, rgba(col, 0));
   g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r);
+}
+// Copy a flat elevation texture onto a vertical plane X = const, one screen column at a time.
+function mapPlane(g, tex, X, z0, z1, top, ppm, flip) {
+  const dx = X - CAM.x;
+  if (Math.abs(dx) < 1e-3) return;
+  const sa = px(X, z0), sb = px(X, z1);
+  const s0 = Math.max(0, Math.floor(Math.min(sa, sb))), s1 = Math.min(W, Math.ceil(Math.max(sa, sb)));
+  for (let sx = s0; sx < s1; sx++) {
+    const da = sx - VPx, db = sx + 1 - VPx;           // invert sx -> Z for this column
+    if (da === 0 || db === 0 || Math.sign(da) !== Math.sign(dx) || Math.sign(db) !== Math.sign(dx)) continue;
+    let za = F * dx / da, zb = F * dx / db;
+    if (za > zb) [za, zb] = [zb, za];
+    za = clamp(za, z0, z1); zb = clamp(zb, z0, z1);
+    if (zb <= za) continue;
+    const zm = (za + zb) / 2;
+    const ua = (flip ? z1 - zb : za - z0) * ppm, uw = Math.max(.35, (zb - za) * ppm);
+    const yt = py(top, zm), yb = py(0, zm);
+    g.drawImage(tex, clamp(ua, 0, tex.width - uw), 0, uw, tex.height, sx, yt, 1, yb - yt);
+  }
 }
 
 /* =============================================================================
@@ -252,65 +276,98 @@ function glow(g, x, y, r, col, a) {
    ============================================================================= */
 const cv = document.getElementById('glass');
 const ctx = cv.getContext('2d', { alpha: false });
-let staticC, staticX;   // everything that never moves (rendered once per resize)
-let lightC, lightX;     // neon, lamps, light pools (rendered when a sign flickers)
-let reflC, reflX, reflS, reflSX, ripC; // wet-road reflections (half res)
-let sceneC, sceneX;     // the live street: static + light + people, cars, rain
-let softC, softX;       // scene, lightly blurred (half res): water film on the glass
-let blurC, blurX;       // scene, heavily blurred + veil (quarter res): condensation
-let t2C, t2X;           // scratch for no-filter fallback
-let bloomC, bloomX;
-let fogM, fogX;         // "unwiped" mask, see recoverFog
-let fogT;               // where condensation lives (edges, bottom corners)
-let fogComp, fcX, wetComp, wcX;
-let sdC, sdX;           // static droplets
-let frameC, vigC;
+let backC, backX;     // sky, road, pavements, pools of light on the ground
+let frontC, frontX;   // buildings, storefronts, parked cars, ironwork (all static)
+let emissC, emissX;   // only the light from the static scene (lit windows, shop fronts)
+let signsC, signsX;   // neon and lit signs, lamps, signals (redrawn when one flickers)
+let allC, allX;       // emiss + signs: source for reflections, bloom and mist
+let reflC, reflX, reflS, reflSX, ripC;
+let sceneC, sceneX, softC, softX, blurC, blurX, t2C, t2X;
+let bloomC, bloomX, mistC, mistX, rainC, rainX;
+let fogM, fogX, fogT, fogComp, fcX, wetComp, wcX;
+let sdC, sdX, frameC, vigC;
 let roadTile, walkTile, puff;
 
 /* =============================================================================
-   STREET LAYOUT (seeded so it's the same street every time)
+   STREET LAYOUT (seeded, so it's the same block every time)
    ============================================================================= */
-let BLD = [], WINS = [], PROTS = [], LAMPS = [], ANIMWIN = [];
-const neon = { jazz: [1, 1, 1, 1], velvet: [1, 1, 1, 1, 1, 1], bar: [1, 1, 1], eats: [1, 1, 1, 1] };
+let BLD = [], WINS = [], SIGNS = [], CARS = [], LAMPS = [], SIGNALS = [], ANIMWIN = [], GROUPS = [];
+const signal = { state: 0, t: 0 };   // 0 green, 1 amber, 2 red
 
+function sideSpan(side, a, b) { return side < 0 ? [XL + a, XL + b] : [XR - b, XR - a]; }
+function addSign(o) {
+  const [x0, x1] = sideSpan(o.side, o.a, o.b);
+  o.x0 = x0; o.x1 = x1;
+  o.levels = (o.text || '').split('').map(() => 1);
+  SIGNS.push(o); return o;
+}
 function planStreet() {
-  const rnd = mulberry32(1947), rr = (a, b) => a + rnd() * (b - a);
-  const mkB = (side, z0, z1, st, mat, ground, fe) => {
-    const gH = mat === 'brown' ? 3.3 : 4.2, fh = rr(3.0, 3.25);
-    const top = gH + (st - 1) * fh + rr(.5, 1.1);
-    const base = mat === 'brick' ? BRICK : mat === 'brown' ? BROWN : STONE;
-    const col = base.map(v => v * rr(.82, 1.12));
-    return { side, z0, z1, st, mat, ground, gH, fh, top, col, fe: !!fe, windows: [], roof: [], seed: (rnd() * 1e9) | 0 };
+  const rnd = mulberry32(1949), rr = (a, b) => a + rnd() * (b - a);
+  const mkB = (side, z0, z1, st, mat, ground) => {
+    const gH = 4.2, fh = rr(3.0, 3.3);
+    const top = gH + (st - 1) * fh + rr(.4, 1.0);
+    const base = mat === 'brick' ? [30, 20, 20] : mat === 'brown' ? [26, 20, 19] : [27, 27, 31];
+    return { side, z0, z1, st, mat, ground, gH, fh, top, col: base.map(v => v * rr(.85, 1.15)), fe: rnd() < .5 && mat !== 'stone',
+      windows: [], roof: [], seed: (rnd() * 1e9) | 0 };
   };
-  const L = [mkB(-1, 8, 14.5, 6, 'brown', 'stoop'), mkB(-1, 14.5, 21.5, 5, 'brick', 'shutter', 1),
-             mkB(-1, 21.5, 30.5, 5, 'brick', 'club', 1), mkB(-1, 30.5, 37.5, 4, 'brown', 'stoop'),
-             mkB(-1, 37.5, 47, 6, 'brick', 'shop', 1)];
-  const Rt = [mkB(1, 8, 17, 5, 'brick', 'diner', 1), mkB(1, 17, 27, 7, 'stone', 'hotel'),
-              mkB(1, 27, 34, 5, 'brick', 'closed', 1), mkB(1, 34, 43, 4, 'brown', 'bar'),
-              mkB(1, 43, 51, 6, 'brick', 'shop', 1)];
+  const L = [mkB(-1, 5, 11.8, 5, 'brick', 'bar'), mkB(-1, 11.8, 18.2, 4, 'brown', 'club'), mkB(-1, 18.2, 24.4, 6, 'brick', 'club'),
+             mkB(-1, 24.4, 29.5, 5, 'brick', 'restaurant'), mkB(-1, 29.5, 34.6, 5, 'brown', 'club'), mkB(-1, 34.6, 42, 8, 'stone', 'hotel'),
+             mkB(-1, 42, 49.5, 5, 'brick', 'liquor'), mkB(-1, 49.5, CROSS.z0, 6, 'brick', 'bar')];
+  const Rt = [mkB(1, 5, 10.8, 5, 'brick', 'liquor'), mkB(1, 10.8, 16.4, 4, 'brown', 'club'), mkB(1, 16.4, 21.6, 5, 'brick', 'bar'),
+              mkB(1, 21.6, 27, 6, 'brick', 'club'), mkB(1, 27, 32.4, 5, 'brown', 'club'), mkB(1, 32.4, 38.6, 5, 'brick', 'restaurant'),
+              mkB(1, 38.6, 46, 7, 'stone', 'shop'), mkB(1, 46, CROSS.z0, 5, 'brick', 'diner')];
   for (const arr of [L, Rt]) {
-    let z = arr[arr.length - 1].z1;
-    const side = arr[0].side;
+    let z = CROSS.z1; const side = arr[0].side;
     while (z < ZFAR) {
-      const w = rr(6, 13) * (1 + z / 240), mat = ['brick', 'brick', 'brown', 'stone'][(rnd() * 4) | 0];
-      arr.push(mkB(side, z, Math.min(ZFAR, z + w), 4 + ((rnd() * 4) | 0), mat, rnd() < .5 ? 'shop' : 'closed', rnd() < .45));
+      const w = rr(6, 12) * (1 + z / 220), mat = ['brick', 'brick', 'brown', 'stone'][(rnd() * 4) | 0];
+      arr.push(mkB(side, z, Math.min(ZFAR, z + w), 4 + ((rnd() * 5) | 0), mat, pick2(rnd, ['bar', 'shop', 'closed', 'restaurant', 'club', 'closed'])));
       z += w;
     }
   }
   BLD = [...L, ...Rt];
+
+  // ---- signs. a/b are distances out from the wall (metres); y0/y1 heights.
+  SIGNS = [];
+  addSign({ side: -1, z: 9.0,  a: .2, b: .95, y0: 3.4, y1: 5.6, kind: 'blade', text: 'BAR', col: NEON.red, font: FONT_SIGN });
+  addSign({ side: -1, z: 13.6, a: 0, b: 3.0, y0: 3.7, y1: 5.3, kind: 'marquee', text: 'Corsair', col: NEON.orange, font: FONT_SCRIPT,
+            board: ['TONIGHT', 'LOU HARLAN QUARTET'], depth: 1.4 });
+  addSign({ side: -1, z: 19.6, a: .2, b: 1.15, y0: 4.3, y1: 10.6, kind: 'blade', text: 'SAMARA', top: 'CLUB', col: NEON.red, font: FONT_SIGN });
+  addSign({ side: -1, z: 25.6, a: .15, b: 2.5, y0: 3.5, y1: 4.35, kind: 'box', text: 'CHOP SUEY', col: NEON.red, panel: NEON.white, font: FONT_SIGN });
+  addSign({ side: -1, z: 30.6, a: .15, b: 2.7, y0: 4.4, y1: 5.25, kind: 'neonbox', text: 'Jade Room', col: NEON.green, font: FONT_SCRIPT });
+  addSign({ side: -1, z: 36.0, a: .2, b: 1.0, y0: 5.0, y1: 10.2, kind: 'blade', text: 'HOTEL', col: NEON.white, font: FONT_DECO, bulbs: true });
+  addSign({ side: -1, z: 44.5, a: .15, b: 2.2, y0: 3.4, y1: 4.0, kind: 'neonbox', text: 'LIQUORS', col: NEON.yellow, font: FONT_SIGN });
+  addSign({ side: -1, z: 51.5, a: .2, b: 1.0, y0: 3.8, y1: 7.6, kind: 'blade', text: 'GRILL', col: NEON.orange, font: FONT_SIGN });
+  addSign({ side: 1, z: 7.5,  a: .15, b: 2.3, y0: 3.4, y1: 4.05, kind: 'neonbox', text: 'LIQUORS', col: NEON.yellow, font: FONT_SIGN });
+  addSign({ side: 1, z: 12.4, a: 0, b: 3.0, y0: 3.7, y1: 5.3, kind: 'marquee', text: '3 ACES', col: NEON.red, font: FONT_SIGN,
+            board: ['EDDIE MARCH TRIO', 'RUBY LANE'], depth: 1.4 });
+  addSign({ side: 1, z: 17.6, a: .2, b: 1.1, y0: 4.4, y1: 10.0, kind: 'blade', text: "DOLAN'S", col: NEON.yellow, font: FONT_SIGN, under: 'BAR' });
+  addSign({ side: 1, z: 23.0, a: .15, b: 2.7, y0: 4.2, y1: 5.05, kind: 'neonbox', text: 'Pelican', col: NEON.pink, font: FONT_SCRIPT });
+  addSign({ side: 1, z: 28.4, a: .2, b: 1.0, y0: 4.6, y1: 10.4, kind: 'blade', text: 'DANCING', col: NEON.blue, font: FONT_SIGN });
+  addSign({ side: 1, z: 33.8, a: .15, b: 2.1, y0: 3.6, y1: 4.25, kind: 'box', text: 'STEAKS', col: NEON.red, panel: NEON.yellow, font: FONT_SIGN });
+  addSign({ side: 1, z: 40.0, a: .2, b: 1.0, y0: 4.2, y1: 8.6, kind: 'blade', text: 'CAFE', col: NEON.orange, font: FONT_SIGN, bulbs: true });
+  addSign({ side: 1, z: 49.0, a: .15, b: 2.3, y0: 3.5, y1: 4.15, kind: 'box', text: 'DINER', col: NEON.blue, panel: NEON.white, font: FONT_SIGN });
+  const farWords = ['BAR', 'GRILL', 'HOTEL', 'CLUB', 'CAFE', 'DANCING', 'BILLIARDS', 'BAR', 'RESTAURANT', 'COCKTAILS'];
+  const farCols = [NEON.red, NEON.orange, NEON.yellow, NEON.red, NEON.white, NEON.pink, NEON.green, NEON.blue];
+  for (let z = CROSS.z1 + 3; z < 170; z += rr(5, 11)) {
+    const side = rnd() < .5 ? -1 : 1, word = pick2(rnd, farWords), col = pick2(rnd, farCols);
+    if (rnd() < .55) addSign({ side, z, a: .2, b: 1.0, y0: rr(3.6, 4.6), y1: rr(7.5, 10.5), kind: 'blade', text: word.length > 7 ? word.slice(0, 6) : word, col, font: FONT_SIGN, bulbs: rnd() < .25 });
+    else addSign({ side, z, a: .15, b: rr(1.8, 2.8), y0: rr(3.4, 4.2), y1: 0, kind: rnd() < .5 ? 'neonbox' : 'box', text: word, col, panel: NEON.white, font: FONT_SIGN });
+  }
+  for (const s of SIGNS) if (!s.y1) s.y1 = s.y0 + .7;
+  for (const s of SIGNS) s.flick = s.kind !== 'box';
+
+  // ---- windows: few lit. Low key.
   WINS = [];
   for (const b of BLD) {
-    const depth = b.z1 - b.z0, nb = Math.max(2, Math.round(depth / rr(2.3, 2.9))), bw = depth / nb;
+    const depth = b.z1 - b.z0, nb = Math.max(2, Math.round(depth / rr(2.2, 2.8))), bw = depth / nb;
     b.nb = nb; b.bw = bw;
-    const sizeVar = rr(.85, 1.1), litP = rr(.1, .36);
+    const sizeVar = rr(.85, 1.1), litP = rr(.05, .2);
     for (let s = 1; s < b.st; s++) {
-      const y0 = b.gH + (s - 1) * b.fh + rr(.75, .95);
-      const hh = b.fh * rr(.48, .58) * sizeVar * (s === b.st - 1 ? .9 : 1);
+      const y0 = b.gH + (s - 1) * b.fh + rr(.75, .95), hh = b.fh * rr(.48, .58) * sizeVar;
       for (let i = 0; i < nb; i++) {
-        const cz = b.z0 + bw * (i + .5) + rr(-.08, .08) * bw, ww = bw * rr(.36, .48) * sizeVar, jy = rr(-.07, .07);
-        const t = rnd();
+        const cz = b.z0 + bw * (i + .5) + rr(-.08, .08) * bw, ww = bw * rr(.36, .48) * sizeVar, jy = rr(-.07, .07), t = rnd();
         const w = { b, side: b.side, X: b.side < 0 ? XL : XR, za: cz - ww / 2, zb: cz + ww / 2, ya: y0 + jy, yb: y0 + jy + hh,
-          on: rnd() < litP, kind: t < .45 ? 0 : t < .8 ? 1 : 2, a: rr(.4, 1), shade: rnd() < .25 ? rr(.2, .55) : 0, locked: false };
+          on: rnd() < litP, kind: t < .5 ? 0 : t < .85 ? 1 : 2, a: rr(.35, .9), shade: rnd() < .3 ? rr(.2, .6) : 0, locked: false };
         b.windows.push(w); WINS.push(w);
       }
     }
@@ -319,56 +376,70 @@ function planStreet() {
       b.fez0 = b.z0 + bw * i0 + .15; b.fez1 = b.z0 + bw * (i0 + 2) - .15;
       for (const w of b.windows) if (w.za < b.fez1 && w.zb > b.fez0) w.locked = true;
     }
-    // roof clutter: water towers, chimneys, stair bulkheads (set back from the front)
-    const back = b.side < 0 ? -1 : 1;
-    if (b.mat !== 'stone' && rnd() < .45) b.roof.push({ t: 'tower', X: b.side < 0 ? XL - rr(2.5, 6) : XR + rr(2.5, 6), Z: rr(b.z0 + 1, b.z1 - 1), s: rr(.85, 1.15) });
-    const nc = (rnd() * 3) | 0;
-    for (let i = 0; i < nc; i++) b.roof.push({ t: 'chimney', X: (b.side < 0 ? XL : XR) + back * rr(.6, 4), Z: rr(b.z0 + .4, b.z1 - .6), h: rr(.8, 2.2), w: rr(.5, 1.1) });
-    if (rnd() < .4) b.roof.push({ t: 'bulk', X: (b.side < 0 ? XL : XR) + back * rr(2, 5), Z: rr(b.z0 + .5, b.z1 - 2.5), h: rr(2, 2.8), w: rr(1.8, 3) });
+    const back = b.side < 0 ? -1 : 1, X0 = b.side < 0 ? XL : XR;
+    if (b.mat !== 'stone' && rnd() < .4) b.roof.push({ t: 'tower', X: X0 + back * rr(2.5, 6), Z: rr(b.z0 + 1, b.z1 - 1), s: rr(.85, 1.15) });
+    for (let i = 0, n = (rnd() * 3) | 0; i < n; i++) b.roof.push({ t: 'chimney', X: X0 + back * rr(.6, 4), Z: rr(b.z0 + .4, b.z1 - .6), h: rr(.8, 2.2), w: rr(.5, 1.1) });
   }
-  // the club's lit windows above the door should mostly be on
+  // signs mounted in front of windows hide them; they can't switch on and off
+  for (const s of SIGNS) for (const w of WINS) if (w.side === s.side && w.za < s.z + 1.5 && w.zb > s.z - .5 && w.yb > s.y0 - .5 && w.ya < s.y1 + .5) w.locked = true;
+
+  // ---- parked cars nose to tail along both kerbs (one-way street: all face away)
+  CARS = [];
+  const colours = [[14, 15, 18], [14, 15, 18], [14, 15, 18], [20, 18, 20], [44, 16, 18], [18, 30, 26], [18, 22, 36], [18, 22, 36], [62, 64, 68], [34, 28, 24], [44, 16, 18], [150, 140, 118], [200, 160, 46]];
+  for (const side of [-1, 1]) {
+    let z = side < 0 ? 6.4 : 7.6;
+    while (z < 120) {
+      if (z > CROSS.z0 - 6 && z < CROSS.z1 + 2) { z = CROSS.z1 + 2.5; continue; }
+      const len = rr(5.0, 5.4);
+      if (rnd() < .86) CARS.push({ x: side * (CURB - 1.08), z, len, side, col: pick2(rnd, colours), seed: (rnd() * 1e9) | 0 });
+      z += len + rr(.7, 2.2);
+    }
+  }
+  for (const c of CARS) {  // what each car's polish picks up: the nearest sign on its side
+    let best = null, bd = 1e9;
+    for (const s of SIGNS) { const d = Math.abs(s.z - c.z - 2) + (s.side === c.side ? 0 : 6); if (d < bd) { bd = d; best = s; } }
+    c.hl = best ? best.col : AMBER;
+  }
   LAMPS = [];
-  for (const z of [18, 44, 70, 96, 122, 150]) LAMPS.push({ X: -ROAD - .45, Z: z, arm: 1.05 });
-  for (const z of [31, 57, 83, 109, 136]) LAMPS.push({ X: ROAD + .45, Z: z, arm: -1.05 });
+  for (const [side, z] of [[-1, 16.4], [-1, 40.2], [-1, 77], [1, 27.6], [1, 54.6], [1, 92]]) LAMPS.push({ X: side * (CURB + .35), Z: z, side });
+  SIGNALS = [{ X: -(CURB + .35), Z: CROSS.z0 - .6 }, { X: CURB + .35, Z: CROSS.z0 - .6 }];
+  // people waiting under the marquees, and a doorman at each
+  GROUPS = [];
+  for (const s of SIGNS.filter(s => s.kind === 'marquee')) {
+    const [x0, x1] = sideSpan(s.side, .6, 2.8);
+    for (let i = 0; i < 3; i++) GROUPS.push({ x: lerp(x0, x1, rr(.1, .9)), z: s.z + rr(.3, 1.6), side: s.side, h: rr(1.62, 1.86), ph: rr(0, 6),
+      hat: rnd() < .8, skirt: rnd() < .35, umb: false, smoke: i === 1, col: s.col, puff: rr(2, 9) });
+  }
 }
+function pick2(rnd, arr) { return arr[(rnd() * arr.length) | 0]; }
 
 /* =============================================================================
    TEXTURES
    ============================================================================= */
-const TP = 64; // road texture pixels per metre
+const TP = 64;
 function makeTiles() {
   const rnd = mulberry32(42), rr = (a, b) => a + rnd() * (b - a);
-  // Cobbles, half paved over with worn asphalt
   roadTile = mk(256, 256);
   let g = roadTile.getContext('2d');
-  g.fillStyle = rgba(mixa(INK, NIGHT, .5), 1); g.fillRect(0, 0, 256, 256);
-  for (let y = 0; y < 256; y += 10) {
-    let x = (y / 10 % 2) * 8;
-    while (x < 256 + 20) {
-      const w = rr(13, 19), c = mixa(INK, [40, 42, 52], rr(.15, .6));
-      g.fillStyle = rgba(c, 1);
-      g.beginPath(); g.roundRect ? g.roundRect(x + 1, y + 1, w - 2, 8, 2.5) : g.rect(x + 1, y + 1, w - 2, 8); g.fill();
-      g.fillStyle = rgba(FROST, rr(.03, .08)); g.fillRect(x + 2, y + 1.5, w - 5, 1.2); // wet top glint
-      x += w;
-    }
+  g.fillStyle = 'rgb(11,12,17)'; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 40; i++) { // patched, worn asphalt
+    g.fillStyle = rgba(rnd() < .5 ? [7, 8, 12] : [18, 19, 25], rr(.4, .9));
+    g.beginPath(); g.ellipse(rr(0, 256), rr(0, 256), rr(14, 70), rr(8, 40), rr(0, 3), 0, TAU); g.fill();
   }
-  for (let i = 0; i < 26; i++) { // asphalt patches
-    g.fillStyle = rgba(mixa(INK, NIGHT, .7), rr(.6, .95));
-    g.beginPath(); g.ellipse(rr(0, 256), rr(0, 256), rr(20, 70), rr(14, 50), rr(0, 3), 0, TAU); g.fill();
+  for (let i = 0; i < 1600; i++) { g.fillStyle = rgba(rnd() < .55 ? INK : FROST, rr(.02, .07)); g.fillRect(rr(0, 256), rr(0, 256), rr(1, 3), rr(1, 2)); }
+  for (let i = 0; i < 8; i++) { // tar seams
+    g.strokeStyle = rgba(INK, .6); g.lineWidth = rr(1, 2.5); g.beginPath();
+    let x = rr(0, 256), y = rr(0, 256); g.moveTo(x, y);
+    for (let j = 0; j < 6; j++) { x += rr(-30, 30); y += rr(-30, 30); g.lineTo(x, y); } g.stroke();
   }
-  for (let i = 0; i < 900; i++) { g.fillStyle = rgba(rnd() < .5 ? INK : FROST, rr(.02, .07)); g.fillRect(rr(0, 256), rr(0, 256), rr(1, 3), rr(1, 2)); }
-
-  // Pavement flagstones
   walkTile = mk(256, 256);
   g = walkTile.getContext('2d');
-  g.fillStyle = 'rgb(28,29,35)'; g.fillRect(0, 0, 256, 256);
+  g.fillStyle = 'rgb(19,20,25)'; g.fillRect(0, 0, 256, 256);
   for (let y = 0; y < 256; y += 85.33) for (let x = 0; x < 256; x += 85.33) {
-    g.fillStyle = rgba(mixa([24, 25, 31], [40, 40, 46], rnd()), 1); g.fillRect(x + 1.5, y + 1.5, 82, 82);
-    g.strokeStyle = rgba(INK, .5); g.lineWidth = 1;
-    if (rnd() < .4) { g.beginPath(); g.moveTo(x + rr(5, 80), y + 2); g.lineTo(x + rr(5, 80), y + rr(30, 82)); g.stroke(); }
+    g.fillStyle = rgba(mixa([16, 17, 22], [28, 28, 34], rnd()), 1); g.fillRect(x + 1.5, y + 1.5, 82, 82);
+    if (rnd() < .4) { g.strokeStyle = rgba(INK, .5); g.lineWidth = 1; g.beginPath(); g.moveTo(x + rr(5, 80), y + 2); g.lineTo(x + rr(5, 80), y + rr(30, 82)); g.stroke(); }
   }
-  for (let i = 0; i < 700; i++) { g.fillStyle = rgba(rnd() < .5 ? INK : FROST, rr(.02, .06)); g.fillRect(rr(0, 256), rr(0, 256), rr(1, 4), rr(1, 3)); }
-
+  for (let i = 0; i < 900; i++) { g.fillStyle = rgba(rnd() < .5 ? INK : FROST, rr(.02, .06)); g.fillRect(rr(0, 256), rr(0, 256), rr(1, 4), rr(1, 3)); }
   puff = mk(64, 64);
   g = puff.getContext('2d');
   const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
@@ -376,750 +447,803 @@ function makeTiles() {
   g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
 }
 
-// Paint one building front as a flat elevation. u runs along the street, v down from the roof.
+/* ---------- a building front: the wall, and separately the light it gives off ---------- */
 function paintFacade(b) {
   const depth = b.z1 - b.z0, ppm = b.ppm;
   const tw = Math.max(2, Math.ceil(depth * ppm)), th = Math.max(2, Math.ceil(b.top * ppm));
-  const c = mk(tw, th), g = c.getContext('2d');
+  const wall = mk(tw, th), g = wall.getContext('2d');
+  const lit = mk(tw, th), e = lit.getContext('2d');
   const rnd = mulberry32(b.seed), rr = (a, x) => a + rnd() * (x - a);
-  // Right-hand facades are seen mirrored, so flip u for them and text still reads.
   const U = Z => (b.side < 0 ? Z - b.z0 : b.z1 - Z) * ppm, V = Y => (b.top - Y) * ppm;
   const RC = (za, zb, ya, yb) => { const u0 = U(za), u1 = U(zb); return [Math.min(u0, u1), V(yb), Math.abs(u1 - u0), (yb - ya) * ppm]; };
-  const fr = (col, a, za, zb, ya, yb) => { g.fillStyle = rgba(col, a); const r = RC(za, zb, ya, yb); g.fillRect(r[0], r[1], r[2], r[3]); };
-  const text = (str, Z, Y, size, font, col, a, maxW) => {
-    g.save(); g.font = `${size * ppm}px ${font}`; g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillStyle = rgba(col, a);
-    const w = g.measureText(str).width, sc = maxW ? Math.min(1, maxW * ppm / w) : 1;
-    g.translate(U(Z), V(Y)); g.scale(sc, 1); g.fillText(str, 0, 0); g.restore();
+  const fr = (cx, col, a, za, zb, ya, yb) => { cx.fillStyle = rgba(col, a); const r = RC(za, zb, ya, yb); cx.fillRect(r[0], r[1], r[2], r[3]); };
+  const grad = (cx, za, zb, ya, yb, stops) => {
+    const r = RC(za, zb, ya, yb), gr = cx.createLinearGradient(0, r[1], 0, r[1] + r[3]);
+    for (const [t, c, a] of stops) gr.addColorStop(t, rgba(c, a));
+    cx.fillStyle = gr; cx.fillRect(r[0], r[1], r[2], r[3]);
+  };
+  const text = (cx, str, Z, Y, size, font, col, a, maxW, glowA) => {
+    cx.save(); cx.font = `${size * ppm}px ${font}`; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    const w = cx.measureText(str).width, sc = maxW ? Math.min(1, maxW * ppm / w) : 1;
+    cx.translate(U(Z), V(Y)); cx.scale(sc, 1);
+    if (glowA) { cx.shadowColor = rgba(col, glowA); cx.shadowBlur = size * ppm * .5; }
+    cx.fillStyle = rgba(col, a); cx.fillText(str, 0, 0); cx.restore();
   };
 
-  // base colour, then noise at several scales so nothing is a flat fill
+  // --- the wall: dark masonry, noise at several scales, grime, ledges
   g.fillStyle = rgba(b.col, 1); g.fillRect(0, 0, tw, th);
-  const area = depth * b.top, nBl = Math.min(1100, area * 2.4);
-  for (let i = 0; i < nBl; i++) {
-    const s = rr(.12, 2.2) * (rnd() < .2 ? 2.2 : 1);
-    g.fillStyle = rnd() < .55 ? rgba(INK, rr(.05, .16)) : rgba(FROST, rr(.012, .035));
+  const area = depth * b.top;
+  for (let i = 0, n = Math.min(1200, area * 2.6); i < n; i++) {
+    const s = rr(.12, 2.4) * (rnd() < .2 ? 2.2 : 1);
+    g.fillStyle = rnd() < .6 ? rgba(INK, rr(.06, .2)) : rgba([70, 60, 56], rr(.02, .06));
     g.beginPath(); g.ellipse(rnd() * tw, rnd() * th, s * ppm * rr(.4, 1.3), s * ppm * rr(.3, .9), 0, 0, TAU); g.fill();
   }
   if (b.mat === 'brick') {
     const ch = .077 * ppm;
     if (ch >= 2) {
-      g.fillStyle = rgba(INK, .26);
+      g.fillStyle = rgba(INK, .32);
       for (let y = 0; y < th; y += ch) g.fillRect(0, y, tw, Math.max(.6, ch * .17));
-      if (ch >= 4) {
-        const bw = .225 * ppm; let row = 0;
-        for (let y = 0; y < th; y += ch, row++) {
-          for (let x = (row % 2) * bw / 2; x < tw; x += bw) {
-            g.fillStyle = rgba(INK, .2); g.fillRect(x, y, Math.max(.6, ch * .15), ch);
-            if (rnd() < .18) { g.fillStyle = rgba(rnd() < .6 ? INK : [120, 70, 60], rr(.05, .14)); g.fillRect(x, y, bw, ch); }
-          }
-        }
-      }
+      if (ch >= 4) { const bw = .225 * ppm; let row = 0;
+        for (let y = 0; y < th; y += ch, row++) for (let x = (row % 2) * bw / 2; x < tw; x += bw) {
+          g.fillStyle = rgba(INK, .22); g.fillRect(x, y, Math.max(.6, ch * .15), ch);
+          if (rnd() < .2) { g.fillStyle = rgba(rnd() < .6 ? INK : [90, 50, 44], rr(.05, .16)); g.fillRect(x, y, bw, ch); }
+        } }
     }
-  } else if (b.mat === 'brown') {
-    g.fillStyle = rgba(INK, .24);
-    for (let y = 0; y < th; y += .42 * ppm) g.fillRect(0, y, tw, Math.max(.6, .03 * ppm));
   } else {
-    g.fillStyle = rgba(INK, .2);
-    for (let y = 0; y < th; y += .6 * ppm) { g.fillRect(0, y, tw, Math.max(.6, .025 * ppm)); for (let x = (y / ppm * 1.7 % 1.2) * ppm; x < tw; x += 1.2 * ppm) g.fillRect(x, y, Math.max(.6, .025 * ppm), .6 * ppm); }
+    g.fillStyle = rgba(INK, .28);
+    const step = b.mat === 'brown' ? .42 : .6;
+    for (let y = 0; y < th; y += step * ppm) g.fillRect(0, y, tw, Math.max(.6, .03 * ppm));
   }
-  // storey bands
-  for (let s = 1; s < b.st; s++) {
-    const Y = b.gH + (s - 1) * b.fh;
-    fr(FROST, .045, b.z0, b.z1, Y - .07, Y + .07); fr(INK, .22, b.z0, b.z1, Y - .16, Y - .07);
-  }
-  // grime and rain staining
+  for (let s = 1; s < b.st; s++) { const Y = b.gH + (s - 1) * b.fh; fr(g, [80, 76, 74], .06, b.z0, b.z1, Y - .07, Y + .07); fr(g, INK, .3, b.z0, b.z1, Y - .17, Y - .07); }
   for (let i = 0; i < depth * 3; i++) {
-    const x = rnd() * tw, y0 = rnd() * th * .75, len = rr(1.5, 9) * ppm, w = rr(.04, .32) * ppm;
-    const gr = g.createLinearGradient(0, y0, 0, y0 + len);
-    gr.addColorStop(0, rgba(INK, rr(.1, .24))); gr.addColorStop(1, rgba(INK, 0));
+    const x = rnd() * tw, y0 = rnd() * th * .8, len = rr(1.5, 9) * ppm, w = rr(.04, .32) * ppm;
+    const gr = g.createLinearGradient(0, y0, 0, y0 + len); gr.addColorStop(0, rgba(INK, rr(.12, .3))); gr.addColorStop(1, rgba(INK, 0));
     g.fillStyle = gr; g.fillRect(x, y0, w, len);
   }
-  for (let i = 0; i < depth * 4; i++) { g.fillStyle = rgba(FROST, .028); g.fillRect(rnd() * tw, rnd() * th, Math.max(.6, .02 * ppm), rr(.8, 5) * ppm); }
-  // window surrounds: stone lintels, sills, deep recesses, grime under each sill
+  for (let i = 0; i < depth * 5; i++) { g.fillStyle = rgba(FROST, .02); g.fillRect(rnd() * tw, rnd() * th, Math.max(.6, .02 * ppm), rr(.8, 5) * ppm); }
   for (const w of b.windows) {
-    const [x, y, ww, hh] = RC(w.za, w.zb, w.ya, w.yb), e = .09 * ppm;
-    g.fillStyle = rgba(FROST, b.mat === 'brick' ? .075 : .04); g.fillRect(x - e, y - .22 * ppm, ww + 2 * e, .2 * ppm);
-    g.fillStyle = rgba(INK, .9); g.fillRect(x - .04 * ppm, y - .03 * ppm, ww + .08 * ppm, hh + .06 * ppm);
-    g.fillStyle = rgba(FROST, .07); g.fillRect(x - e, y + hh, ww + 2 * e, .09 * ppm);
-    const gr = g.createLinearGradient(0, y + hh, 0, y + hh + 1.1 * ppm);
-    gr.addColorStop(0, rgba(INK, .3)); gr.addColorStop(1, rgba(INK, 0));
-    g.fillStyle = gr; g.fillRect(x, y + hh + .09 * ppm, ww, 1.1 * ppm);
+    const [x, y, ww, hh] = RC(w.za, w.zb, w.ya, w.yb), ex = .09 * ppm;
+    g.fillStyle = rgba([90, 86, 84], b.mat === 'brick' ? .09 : .05); g.fillRect(x - ex, y - .22 * ppm, ww + 2 * ex, .2 * ppm);
+    g.fillStyle = rgba(INK, .92); g.fillRect(x - .04 * ppm, y - .03 * ppm, ww + .08 * ppm, hh + .06 * ppm);
+    g.fillStyle = rgba([90, 86, 84], .07); g.fillRect(x - ex, y + hh, ww + 2 * ex, .09 * ppm);
   }
-  // cornice band, dentils
-  fr(FROST, .05, b.z0, b.z1, b.top - .95, b.top - .55); fr(INK, .3, b.z0, b.z1, b.top - 1.1, b.top - .95);
-  if (ppm > 12) for (let z = b.z0; z < b.z1; z += .3) fr(INK, .35, z, z + .12, b.top - .9, b.top - .7);
+  fr(g, [80, 76, 74], .05, b.z0, b.z1, b.top - .95, b.top - .55); fr(g, INK, .35, b.z0, b.z1, b.top - 1.1, b.top - .95);
+  // upper floors fall into darkness: these walls are lit from the street, not the sky
+  const gd = g.createLinearGradient(0, 0, 0, V(5));
+  gd.addColorStop(0, rgba(INK, .62)); gd.addColorStop(1, rgba(INK, 0));
+  g.fillStyle = gd; g.fillRect(0, 0, tw, V(5));
 
-  // ground floor
-  const gh = b.gH, z0 = b.z0, z1 = b.z1;
-  const shopfront = (lit) => {
-    fr(INK, .55, z0 + .2, z1 - .2, 0, gh - .5);
-    const wz0 = z0 + .6, wz1 = z1 - 2.2;
-    fr(lit ? AMBER : NIGHT, lit ? .28 : .9, wz0, wz1, .7, gh - .9);
-    if (!lit) fr(COLD, .08, wz0, wz1, gh - 1.6, gh - .9);
-    for (let z = wz0; z < wz1; z += 1.3) fr(INK, .9, z, z + .08, .7, gh - .9);
-    fr(INK, .95, z1 - 1.8, z1 - .7, 0, 2.4); // door
-    fr(FROST, .05, z0 + .2, z1 - .2, gh - .55, gh - .3);
-  };
-  switch (b.ground) {
-    case 'club': {
-      fr(INK, .82, z0 + .25, z1 - .25, 0, gh - .35);                    // black lacquered frontage
-      for (const z of [z0 + .25, z1 - .55]) fr(FROST, .05, z, z + .3, 0, gh - .35);
-      const r = RC(CLUB.door0, CLUB.door1, 0, 2.6), gr = g.createLinearGradient(0, r[1], 0, r[1] + r[3]);
-      gr.addColorStop(0, rgba(AMBER, 1)); gr.addColorStop(.45, rgba(ORANGE, 1)); gr.addColorStop(1, rgba([200, 96, 34], 1));
-      g.fillStyle = gr; g.fillRect(r[0], r[1], r[2], r[3]);
-      fr(INK, .85, CLUB.door1 - .3, CLUB.door1, 0, 2.6);                // open door leaf
-      fr(INK, .5, CLUB.door0 + .5, CLUB.door0 + .78, .0, 1.75);          // someone inside, in the light
-      fr(INK, .5, CLUB.door0 + .55, CLUB.door0 + .73, 1.75, 1.95);
-      fr(AMBER, .9, CLUB.door0, CLUB.door1, 2.7, 3.05);                 // lit transom
-      for (const zc of [23.4, 29.7]) {                                   // porthole windows
-        const [cx0, cy0, cw] = RC(zc - .32, zc + .32, 1.1, 1.74);
-        g.fillStyle = rgba(ORANGE, .75); g.beginPath(); g.ellipse(cx0 + cw / 2, cy0 + cw * .0 + .32 * ppm, cw / 2, .32 * ppm, 0, 0, TAU); g.fill();
+  // --- ground floor: the wall part and the light part
+  const z0 = b.z0, z1 = b.z1, gh = b.gH, mid = (z0 + z1) / 2;
+  fr(g, INK, .55, z0 + .15, z1 - .15, 0, gh - .35);
+  fr(g, [70, 66, 64], .06, z0, z1, gh - .4, gh - .2);
+  const doorZ = b.side < 0 ? z1 - 1.7 : z0 + .5;
+  const shopWin = (za, zb, ya, yb, col, a, busy) => {
+    fr(g, INK, .95, za - .08, zb + .08, ya - .08, yb + .08);
+    grad(e, za, zb, ya, yb, [[0, col, a * .75], [.6, col, a], [1, mixa(col, ORANGE, .3), a * .9]]);
+    if (busy) { // people and things inside, against the light
+      for (let i = 0; i < busy; i++) {
+        const zc = rr(za + .3, zb - .3), hh = rr(.9, 1.5);
+        fr(e, scl(col, .25), .85, zc - .14, zc + .14, ya, ya + hh - .25);
+        const r = RC(zc - .11, zc + .11, ya + hh - .25, ya + hh); e.fillStyle = rgba(scl(col, .25), .85);
+        e.beginPath(); e.ellipse(r[0] + r[2] / 2, r[1] + r[3] / 2, r[2] / 2, r[3] / 2, 0, 0, TAU); e.fill();
       }
-      fr(FROST, .5, 28.45, 29.25, .95, 2.15);                           // poster
-      fr(INK, .55, 28.5, 29.2, 1.5, 2.05);
-      text('TONITE', 28.85, 1.25, .16, FONT_SIGN, INK, .8, .7);
-      fr(AMBER, .7, 28.5, 29.2, 1.55, 2.0);
-      fr(ORANGE, .85, 22.6, 24.3, .06, .5);                             // basement window, glowing
-      for (let z = 22.6; z < 24.3; z += .2) fr(INK, .9, z, z + .04, .06, .5);
-      break;
     }
-    case 'shutter': {
-      fr(INK, .6, z0 + .2, z1 - .2, 0, gh - .4);
-      const sz0 = z0 + .7, sz1 = z1 - .7;
-      fr([44, 46, 52], 1, sz0, sz1, 0, 2.95);
-      for (let y = 0; y < 2.95; y += .075) { fr(INK, .45, sz0, sz1, y, y + .022); fr(FROST, .05, sz0, sz1, y + .022, y + .034); }
-      fr(INK, .5, sz0, sz1, 2.95, 3.25);
-      fr([40, 38, 36], 1, z0 + .4, z1 - .4, 3.3, 3.95);
-      text('A. KESSLER  TAILORING', (z0 + z1) / 2, 3.62, .38, FONT_SIGN, FROST, .32, depth - 1.2);
+    for (let z = za + 1.1; z < zb - .1; z += 1.1) fr(e, INK, .9, z, z + .06, ya, yb);       // mullions
+    fr(e, [255, 255, 255], .05, za, zb, yb - .25, yb - .05);                                 // glass glint
+  };
+  const door = (col, a) => {
+    fr(g, INK, .95, doorZ - .1, doorZ + 1.3, 0, 2.6);
+    grad(e, doorZ, doorZ + 1.2, 0, 2.45, [[0, scl(col, .45), a * .7], [.5, col, a * .75], [1, mixa(col, ORANGE, .4), a * .9]]);
+    fr(e, scl(col, .2), a * .8, doorZ + .3, doorZ + .62, .0, 1.8);                         // a figure inside, against the light
+    fr(e, INK, .75, doorZ + .55, doorZ + .62, 0, 2.45);
+    fr(e, INK, .5, doorZ, doorZ + 1.2, 1.15, 1.2);
+    fr(e, col, a * .55, doorZ, doorZ + 1.2, 2.5, 2.85);                                    // transom
+  };
+  const gwin0 = b.side < 0 ? z0 + .5 : doorZ + 1.6, gwin1 = b.side < 0 ? doorZ - .4 : z1 - .5;
+  switch (b.ground) {
+    case 'club':
+      door(ORANGE, .8);
+      if (gwin1 - gwin0 > 1.2) {
+        // glass display cases with photographs of the band
+        for (let z = gwin0 + .2; z < gwin1 - .9; z += 1.3) {
+          fr(g, INK, .95, z - .05, z + .85, .9, 2.35);
+          grad(e, z, z + .8, .95, 2.3, [[0, [220, 190, 140], .32], [1, AMBER, .26]]);
+          // two photographs of the band and a bill underneath, lit from inside the case
+          for (const [a0, a1] of [[.08, .38], [.42, .72]]) {
+            fr(e, [40, 34, 30], .85, z + a0, z + a1, 1.55, 2.2);
+            const r = RC(z + a0 + .05, z + a1 - .05, 1.72, 2.1); e.fillStyle = rgba([150, 130, 110], .45);
+            e.beginPath(); e.ellipse(r[0] + r[2] / 2, r[1] + r[3] * .35, r[2] * .22, r[3] * .26, 0, 0, TAU); e.fill();
+            e.fillRect(r[0] + r[2] * .2, r[1] + r[3] * .62, r[2] * .6, r[3] * .38);
+          }
+          fr(e, [200, 60, 50], .35, z + .1, z + .7, 1.1, 1.45); fr(e, INK, .6, z + .14, z + .66, 1.18, 1.22);
+        }
+      }
       break;
-    }
-    case 'diner': {
-      fr(STONE, 1, z0, z1, 0, gh);
-      fr(INK, .4, z0, z1, 0, gh);
-      const r = RC(11.0, 16.2, .75, 2.85), gr = g.createLinearGradient(0, r[1], 0, r[1] + r[3]);
-      gr.addColorStop(0, rgba(mixa(FROST, AMBER, .55), .95)); gr.addColorStop(1, rgba(AMBER, .9));
-      g.fillStyle = gr; g.fillRect(r[0], r[1], r[2], r[3]);
-      fr(INK, .8, 11.0, 16.2, .75, 1.15);                                // counter
-      for (let z = 11.3; z < 16; z += .55) fr(INK, .9, z, z + .12, .75, 1.3); // stools
-      fr(INK, .75, 13.6, 14.05, 1.15, 2.05); fr(INK, .75, 13.66, 13.98, 2.05, 2.3); // the cook
-      for (let z = 11.0; z < 16.2; z += 1.3) fr(INK, .95, z, z + .07, .75, 2.85);
-      fr(AMBER, .55, 9.5, 10.6, 0, 2.5); fr(INK, .6, 9.6, 10.5, .1, 1.3);
-      fr(INK, .9, z0 + .4, z1 - .4, 3.05, 3.75);
-      text('DINER', 13.6, 3.42, .55, FONT_SIGN, AMBER, .95, 4.6);
+    case 'bar': door(AMBER, .7); if (gwin1 - gwin0 > 1) shopWin(gwin0, gwin1, .9, 2.8, AMBER, .55, 2);
+      if (gwin1 - gwin0 > 1.6) text(e, 'BAR', (gwin0 + gwin1) / 2, 2.2, .45, FONT_SIGN, NEON.red, .95, 1.4, .9);
       break;
-    }
-    case 'hotel': {
-      fr(STONE, 1, z0, z1, 0, gh); fr(INK, .25, z0, z1, 0, gh);
-      for (let z = z0 + .3; z < z1; z += 1.1) fr(INK, .25, z, z + .05, 0, gh);
-      const r = RC(20.5, 22.6, 0, 2.7), gr = g.createLinearGradient(0, r[1], 0, r[1] + r[3]);
-      gr.addColorStop(0, rgba(AMBER, .95)); gr.addColorStop(1, rgba(ORANGE, .75));
-      g.fillStyle = gr; g.fillRect(r[0], r[1], r[2], r[3]);
-      for (const z of [21.05, 21.55, 22.05]) fr(INK, .8, z, z + .06, 0, 2.7);
-      fr(AMBER, .25, 18, 20, .9, 2.8); fr(AMBER, .25, 23.2, 25.5, .9, 2.8);
+    case 'restaurant': door(AMBER, .8); if (gwin1 - gwin0 > 1) shopWin(gwin0, gwin1, .8, 2.9, [250, 220, 160], .8, 3);
+      fr(g, INK, .9, z0 + .3, z1 - .3, 3.1, 3.75);
+      text(e, pick2(rnd, ['RESTAURANT', 'STEAKS · CHOPS', 'SEA FOOD']), mid, 3.42, .48, FONT_SIGN, NEON.white, .85, depth - .8, .6);
       break;
-    }
-    case 'bar': {
-      fr(INK, .7, z0 + .2, z1 - .2, 0, gh - .4);
-      fr(ORANGE, .6, 36.0, 37.4, 0, 2.4); fr(INK, .55, 36.1, 37.3, .1, 1.2);
-      fr(AMBER, .2, 38, 41.6, .8, 2.6);
-      text('COCKTAILS', 39.8, 1.9, .38, FONT_SIGN, AMBER, .95, 3.2);
+    case 'diner': door([250, 230, 190], .85); if (gwin1 - gwin0 > 1) shopWin(gwin0, gwin1, .75, 2.85, [250, 236, 200], .9, 4); break;
+    case 'liquor': door(AMBER, .6); if (gwin1 - gwin0 > 1) {
+      shopWin(gwin0, gwin1, .8, 2.8, [252, 220, 130], .65, 0);
+      for (let z = gwin0 + .15; z < gwin1 - .1; z += .13) fr(e, scl(AMBER, .35), .8, z, z + .07, .8, rr(1.0, 1.35)); // bottles
+    } break;
+    case 'hotel':
+      fr(g, [40, 40, 44], 1, z0, z1, 0, gh);
+      door(AMBER, .85); shopWin(gwin0, gwin1, .9, 2.9, AMBER, .3, 1);
       break;
-    }
-    case 'stoop': {
-      const dz = z0 + depth * .45;
-      b.doorZ = dz;
-      fr(INK, .9, dz, dz + 1.25, 1.35, 3.9);                            // parlour door
-      fr(AMBER, .5, dz + .1, dz + 1.15, 3.95, 4.3);                     // transom
-      fr(INK, .95, dz + .1, dz + 1.15, 0, 1.15);                       // basement door under the stoop
-      for (const zz of [z0 + .6, z1 - 1.6]) if (Math.abs(zz - dz) > 1.5) fr(INK, .9, zz, zz + 1, .3, 1.0); // area windows
-      break;
-    }
-    case 'shop': shopfront(rnd() < .35); break;
-    default: shopfront(false); fr(INK, .4, z0 + .6, z1 - 2.2, .7, gh - .9);
+    case 'shop': door(INK, 0); if (gwin1 - gwin0 > 1) shopWin(gwin0, gwin1, .7, 2.8, AMBER, rnd() < .5 ? .3 : .12, 0); break;
+    default: door(INK, 0); fr(g, [40, 42, 48], .9, gwin0, gwin1, 0, 2.9);                    // shuttered
+      for (let y = 0; y < 2.9; y += .08) fr(g, INK, .5, gwin0, gwin1, y, y + .025);
   }
-  // cold sky light on the upper floors, warm light from the street washing up the lower wall
-  const gc = g.createLinearGradient(0, 0, 0, V(6));
-  gc.addColorStop(0, rgba(COLD, .07)); gc.addColorStop(1, rgba(COLD, 0));
-  g.fillStyle = gc; g.fillRect(0, 0, tw, V(6));
-  const gr = g.createLinearGradient(0, V(0), 0, V(8));
-  gr.addColorStop(0, rgba(ORANGE, b.ground === 'club' ? .2 : .1)); gr.addColorStop(1, rgba(ORANGE, 0));
-  g.fillStyle = gr; g.fillRect(0, V(8), tw, 8 * ppm);
-  return c;
+  // light thrown on the wall by the signs mounted on it (and by its own shop windows)
+  for (const s of SIGNS) {
+    if (s.side !== b.side || s.z < b.z0 - 1 || s.z > b.z1 + 1) continue;
+    const r = RC(s.z - 1.2, s.z + 1.2, s.y0, s.y1), cxp = U(s.z), cyp = r[1] + r[3] / 2, rad = Math.max(r[3], 2.2 * ppm) * 1.1;
+    const gr = g.createRadialGradient(cxp, cyp, 0, cxp, cyp, rad);
+    gr.addColorStop(0, rgba(s.col, .15)); gr.addColorStop(.5, rgba(s.col, .045)); gr.addColorStop(1, rgba(s.col, 0));
+    g.fillStyle = gr; g.fillRect(cxp - rad, cyp - rad, 2 * rad, 2 * rad);
+  }
+  const gl = g.createLinearGradient(0, V(0), 0, V(6));
+  gl.addColorStop(0, rgba(ORANGE, b.ground === 'closed' || b.ground === 'shop' ? .03 : .08)); gl.addColorStop(1, rgba(ORANGE, 0));
+  g.fillStyle = gl; g.fillRect(0, V(6), tw, 6 * ppm);
+  return { wall, lit };
 }
+// A front-facing block across the cross street, lit at street level.
+function paintCrossFront(side, rnd) {
+  const wM = 30, hM = rr2(rnd, 16, 26), ppm = clamp(F / CROSS.z1, 4, 60);
+  const wall = mk(wM * ppm, hM * ppm), g = wall.getContext('2d'), lit = mk(wM * ppm, hM * ppm), e = lit.getContext('2d');
+  g.fillStyle = 'rgb(22,20,24)'; g.fillRect(0, 0, wall.width, wall.height);
+  for (let i = 0; i < 400; i++) { g.fillStyle = rgba(INK, rnd() * .25); g.fillRect(rnd() * wall.width, rnd() * wall.height, rnd() * 3 * ppm, rnd() * 2 * ppm); }
+  for (let y = 5; y < hM - 2; y += 3.1) for (let x = 1; x < wM - 1; x += 2.4) {
+    g.fillStyle = rgba(INK, .9); g.fillRect(x * ppm, (hM - y - 1.6) * ppm, 1.1 * ppm, 1.6 * ppm);
+    if (rnd() < .14) { e.fillStyle = rgba(rnd() < .5 ? AMBER : [230, 200, 130], rr2(rnd, .3, .8)); e.fillRect(x * ppm, (hM - y - 1.6) * ppm, 1.1 * ppm, 1.6 * ppm); }
+  }
+  const cols = [AMBER, [250, 230, 180], ORANGE];
+  for (let x = 1; x < wM - 3; x += rr2(rnd, 4, 7)) {
+    if (rnd() < .6) { const c = pick2(rnd, cols), w = rr2(rnd, 2, 4); e.fillStyle = rgba(c, .55); e.fillRect(x * ppm, (hM - 2.8) * ppm, w * ppm, 1.9 * ppm); }
+  }
+  const gr = g.createLinearGradient(0, 0, 0, wall.height); gr.addColorStop(0, rgba(INK, .7)); gr.addColorStop(.7, rgba(INK, 0));
+  g.fillStyle = gr; g.fillRect(0, 0, wall.width, wall.height);
+  return { wall, lit, wM, hM, side };
+}
+function rr2(rnd, a, b) { return a + rnd() * (b - a); }
 
-/* ---------- copy an elevation onto the screen, one column per pixel ---------- */
-function mapFacade(g, b, tex) {
-  const X = b.side < 0 ? XL : XR, dx = X - CAM.x, ppm = b.ppm;
-  const sa = px(X, b.z0), sb = px(X, b.z1);
-  const s0 = Math.max(0, Math.floor(Math.min(sa, sb))), s1 = Math.min(W, Math.ceil(Math.max(sa, sb)));
-  for (let sx = s0; sx < s1; sx++) {
-    // invert the projection: this column sees depth Z = F*dx / (sx - VPx)
-    const da = sx - VPx, db = sx + 1 - VPx;
-    if (da === 0 || db === 0 || Math.sign(da) !== Math.sign(dx) || Math.sign(db) !== Math.sign(dx)) continue;
-    let za = F * dx / da, zb = F * dx / db;
-    if (za > zb) [za, zb] = [zb, za];
-    za = clamp(za, b.z0, b.z1); zb = clamp(zb, b.z0, b.z1);
-    if (zb <= za) continue;
-    const zm = (za + zb) / 2;
-    const ua = (b.side < 0 ? za - b.z0 : b.z1 - zb) * ppm;
-    const uw = Math.max(.35, (zb - za) * ppm);
-    const yt = py(b.top, zm), yb = py(0, zm);
-    g.drawImage(tex, Math.min(ua, tex.width - uw), 0, uw, tex.height, sx, yt, 1, yb - yt);
-  }
-}
-// Darken the nearest buildings and fade distant ones into warm haze.
-function hazeFacade(g, b) {
-  const X = b.side < 0 ? XL : XR;
-  poly(g, [[X, 0, b.z0], [X, b.top, b.z0], [X, b.top, b.z1], [X, 0, b.z1]]);
-  g.save(); g.clip();
-  const sa = px(X, b.z0), sb = px(X, b.z1);
-  const gh = g.createLinearGradient(sa, 0, sb, 0), gd = g.createLinearGradient(sa, 0, sb, 0);
-  for (let i = 0; i <= 6; i++) {
-    const t = i / 6, sx = lerp(sa, sb, t), Z = F * (X - CAM.x) / (sx - VPx || 1e-3);
-    gh.addColorStop(t, rgba(HAZE, hazeAt(Z))); gd.addColorStop(t, rgba(INK, darkAt(Z)));
-  }
-  g.fillStyle = gh; g.fillRect(Math.min(sa, sb) - 1, 0, Math.abs(sb - sa) + 2, H);
-  g.fillStyle = gd; g.fillRect(Math.min(sa, sb) - 1, 0, Math.abs(sb - sa) + 2, H);
-  g.restore();
-}
-
-/* ---------- windows: drawn as projected quads so they can switch on/off ---------- */
-const WINCOL = [AMBER, [214, 186, 104], mixa(FROST, AMBER, .5)];
+/* ---------- windows: projected quads (they switch on and off) ---------- */
+const WINCOL = [AMBER, [226, 196, 120], [244, 226, 196]];
 function winQuad(w) {
   return [[px(w.X, w.za), py(w.ya, w.za)], [px(w.X, w.za), py(w.yb, w.za)], [px(w.X, w.zb), py(w.yb, w.zb)], [px(w.X, w.zb), py(w.ya, w.zb)]];
 }
 function quadPath(g, q) { g.beginPath(); g.moveTo(q[0][0], q[0][1]); for (let i = 1; i < 4; i++) g.lineTo(q[i][0], q[i][1]); g.closePath(); }
-function paintWindow(g, w) {
+function paintWindow(g, e, w) {
   const q = w.q, zm = (w.za + w.zb) / 2, hzA = hazeAt(zm);
   quadPath(g, q);
-  const glass = mixc(mixa(INK, COLD, .1), HAZE, hzA);
+  const glass = hz(mixa(INK, COLD, .06), zm);
   g.fillStyle = glass; g.strokeStyle = glass; g.lineWidth = 1; g.fill(); g.stroke();
-  if (w.on) {
-    const c = WINCOL[w.kind], top = Math.min(q[1][1], q[2][1]), bot = Math.max(q[0][1], q[3][1]);
-    const gr = g.createLinearGradient(0, top, 0, bot);
-    gr.addColorStop(0, rgba(c, w.a * .7 * (1 - hzA * .5))); gr.addColorStop(1, rgba(c, w.a * (1 - hzA * .5)));
-    g.fillStyle = gr; g.fill();
+  quadPath(e, q); e.save(); e.globalCompositeOperation = 'destination-out'; e.fillStyle = '#000'; e.fill(); e.stroke(); e.restore();
+  if (!w.on) return;
+  const c = WINCOL[w.kind], top = Math.min(q[1][1], q[2][1]), bot = Math.max(q[0][1], q[3][1]), k = 1 - hzA * .55;
+  for (const cx of [g, e]) {
+    const gr = cx.createLinearGradient(0, top, 0, bot);
+    gr.addColorStop(0, rgba(c, w.a * .55 * k)); gr.addColorStop(1, rgba(c, w.a * k));
+    quadPath(cx, q); cx.fillStyle = gr; cx.fill();
     if (w.shade) {
-      const t = w.shade;
-      g.beginPath(); g.moveTo(q[1][0], q[1][1]); g.lineTo(q[2][0], q[2][1]);
-      g.lineTo(q[2][0], lerp(q[2][1], q[3][1], t)); g.lineTo(q[1][0], lerp(q[1][1], q[0][1], t)); g.closePath();
-      g.fillStyle = rgba(mixa(INK, AMBER, .25), .85); g.fill();
+      cx.beginPath(); cx.moveTo(q[1][0], q[1][1]); cx.lineTo(q[2][0], q[2][1]);
+      cx.lineTo(q[2][0], lerp(q[2][1], q[3][1], w.shade)); cx.lineTo(q[1][0], lerp(q[1][1], q[0][1], w.shade)); cx.closePath();
+      cx.fillStyle = rgba(scl(c, .35), .9); cx.fill();
     }
-  } else {
-    g.fillStyle = rgba(COLD, .06 * (1 - hzA)); g.fill(); // a little sky in the glass
   }
-  // meeting rail of a double-hung sash
   const ml = (q[0][1] + q[1][1]) / 2, mr = (q[3][1] + q[2][1]) / 2;
-  g.strokeStyle = rgba(INK, .75); g.lineWidth = Math.max(.6, Math.abs(q[1][1] - q[0][1]) * .05);
+  g.strokeStyle = rgba(INK, .8); g.lineWidth = Math.max(.6, Math.abs(q[1][1] - q[0][1]) * .05);
   g.beginPath(); g.moveTo(q[0][0], ml); g.lineTo(q[3][0], mr); g.stroke();
 }
 
-/* ---------- roof clutter seen from below ---------- */
+/* ---------- ironwork, cornices, roof clutter ---------- */
+const IRONC = [12, 13, 17];
+const ironCol = Z => hz(IRONC, Z, .9);
 function drawRoof(g, b) {
   for (const o of b.roof) {
-    const Z = o.Z, k = kAt(Z), col = hz(mixa(INK, NIGHT, .4), Z, .95);
+    const Z = o.Z, k = kAt(Z), col = hz([12, 14, 20], Z, .9);
     g.fillStyle = col; g.strokeStyle = col;
     if (o.t === 'tower') {
-      const x = px(o.X, Z), yb = py(b.top, Z), s = o.s;
-      const legs = 2.4 * s * k, tw = 3.2 * s * k, th = 3.4 * s * k;
-      g.lineWidth = Math.max(1, .14 * k);
-      g.beginPath();
+      const x = px(o.X, Z), yb = py(b.top, Z), s = o.s, legs = 2.4 * s * k, tw = 3.2 * s * k, th = 3.4 * s * k;
+      g.lineWidth = Math.max(1, .14 * k); g.beginPath();
       for (const f of [-.45, -.1, .25, .45]) { g.moveTo(x + f * tw, yb); g.lineTo(x + f * tw * .92, yb - legs); }
-      g.moveTo(x - .45 * tw, yb); g.lineTo(x + .45 * tw, yb - legs); g.moveTo(x + .45 * tw, yb); g.lineTo(x - .45 * tw, yb - legs);
       g.stroke();
       g.fillRect(x - tw / 2, yb - legs - th, tw, th);
       g.beginPath(); g.moveTo(x - tw * .56, yb - legs - th); g.lineTo(x, yb - legs - th - tw * .42); g.lineTo(x + tw * .56, yb - legs - th); g.closePath(); g.fill();
-      g.fillStyle = rgba(INK, .4); for (let i = 1; i < 4; i++) g.fillRect(x - tw / 2, yb - legs - th * i / 4, tw, Math.max(.6, .05 * k));
-    } else if (o.t === 'chimney') {
-      box(g, o.X - o.w / 2, o.X + o.w / 2, b.top, b.top + o.h, Z, Z + o.w, col, col, col);
-    } else {
-      box(g, o.X - o.w / 2, o.X + o.w / 2, b.top, b.top + o.h, Z, Z + 2.4, col, col, col);
-    }
+    } else box(g, o.X - o.w / 2, o.X + o.w / 2, b.top, b.top + o.h, Z, Z + o.w, col, col, col);
   }
 }
-
-/* ---------- protruding things, drawn far to near after all the facades ---------- */
-function ironCol(Z) { return hz(mixa(INK, IRONC, .5), Z, .9); }
-const IRONC = [16, 17, 21];
 function fireEscape(g, b) {
   const X0 = b.side < 0 ? XL : XR, o = b.side < 0 ? 1.15 : -1.15, Xo = X0 + o, za = b.fez0, zb = b.fez1, zm = (za + zb) / 2;
   const k = kAt(zm), col = ironCol(zm), lw = Math.max(.7 * S, .045 * k);
-  const rim = b.ground === 'club' ? rgba(ORANGE, .35) : rgba(AMBER, .12 * (1 - hazeAt(zm)));
   const levels = [];
   for (let s = 1; s < b.st; s++) levels.push(b.gH + (s - 1) * b.fh + .1);
   levels.forEach((Y, i) => {
-    // slab (grating): we see its underside above eye level, its top below
-    face(g, [[X0, Y, za], [Xo, Y, za], [Xo, Y, zb], [X0, Y, zb]], rgba(mixa(INK, IRONC, .6), .82));
-    g.lineWidth = lw; g.strokeStyle = col;
-    g.beginPath();
+    face(g, [[X0, Y, za], [Xo, Y, za], [Xo, Y, zb], [X0, Y, zb]], rgba(IRONC, .85));
+    g.lineWidth = lw; g.strokeStyle = col; g.beginPath();
     line3(g, [Xo, Y, za], [Xo, Y, zb]); line3(g, [Xo, Y + .95, za], [Xo, Y + .95, zb]);
     line3(g, [X0, Y + .95, za], [Xo, Y + .95, za]); line3(g, [X0, Y + .95, zb], [Xo, Y + .95, zb]);
     for (let z = za; z <= zb + .01; z += .32) line3(g, [Xo, Y, z], [Xo, Y + .95, z]);
-    line3(g, [Xo, Y + .45, za], [Xo, Y + .45, zb]);
-    // stair to the next landing, alternating direction (the zig-zag)
     if (i < levels.length - 1) {
-      const Yn = levels[i + 1], xs = Xo - o * .3, up = i % 2 === 0;
-      const zA = up ? za + .4 : zb - .4, zB = up ? zb - 1.0 : za + 1.0;
+      const Yn = levels[i + 1], xs = Xo - o * .3, up = i % 2 === 0, zA = up ? za + .4 : zb - .4, zB = up ? zb - 1.0 : za + 1.0;
       line3(g, [xs, Y, zA], [xs, Yn, zB]); line3(g, [Xo - o * .05, Y + .9, zA], [Xo - o * .05, Yn + .9, zB]);
       for (let t = .08; t < 1; t += .09) { const z = lerp(zA, zB, t), y = lerp(Y, Yn, t); line3(g, [xs, y, z], [Xo - o * .05, y, z]); }
     }
     g.stroke();
-    g.strokeStyle = rim; g.lineWidth = lw * .6; g.beginPath(); line3(g, [Xo, Y + .97, za], [Xo, Y + .97, zb]); g.stroke();
   });
-  // drop ladder hanging from the lowest landing
-  const Y0 = levels[0], zl = zb - .7;
-  g.strokeStyle = col; g.lineWidth = lw; g.beginPath();
-  line3(g, [Xo - o * .2, Y0, zl - .22], [Xo - o * .2, Y0 - 1.9, zl - .22]); line3(g, [Xo - o * .2, Y0, zl + .22], [Xo - o * .2, Y0 - 1.9, zl + .22]);
-  for (let y = Y0 - .2; y > Y0 - 1.9; y -= .3) line3(g, [Xo - o * .2, y, zl - .22], [Xo - o * .2, y, zl + .22]);
-  g.stroke();
 }
 function cornice(g, b) {
-  const X0 = b.side < 0 ? XL : XR, o = b.side < 0 ? .55 : -.55, zm = (b.z0 + b.z1) / 2;
-  const c1 = hz(mixa(b.col, FROST, .08), zm), c2 = hz(mixa(b.col, INK, .5), zm);
-  box(g, Math.min(X0, X0 + o), Math.max(X0, X0 + o), b.top - .55, b.top, b.z0, b.z1, c2, c1, c2);
+  const X0 = b.side < 0 ? XL : XR, o = b.side < 0 ? .5 : -.5, zm = (b.z0 + b.z1) / 2;
+  const c1 = hz(mixa(b.col, [80, 76, 74], .15), zm), c2 = hz(scl(b.col, .6), zm);
+  box(g, Math.min(X0, X0 + o), Math.max(X0, X0 + o), b.top - .5, b.top, b.z0, b.z1, c2, c1, c2);
 }
-function stoop(g, b) {
-  const X0 = XL, z0 = b.doorZ - .1, z1 = b.doorZ + 1.35, out = 2.0, col = hz([40, 31, 27], z0), dk = hz([22, 18, 17], z0);
-  // stair profile seen end-on: steps climb from the kerb side to the door
-  const pts = [[X0, 0, z0]];
-  const n = 7;
-  for (let i = 0; i <= n; i++) { const x = X0 + out * (1 - i / n), y = 1.35 * i / n; pts.push([x, y, z0]); if (i < n) pts.push([x - out / n, y, z0]); }
-  pts.push([X0, 1.35, z0]);
-  face(g, [[X0 + out, 0, z0], [X0, 1.35, z0], [X0, 1.35, z1], [X0 + out, 0, z1]], col);
-  poly(g, [[X0, 0, z0], [X0 + out, 0, z0], ...pts.slice(1)]); g.fillStyle = dk; g.fill();
-  const k = kAt(z0); g.strokeStyle = ironCol(z0); g.lineWidth = Math.max(.7 * S, .04 * k);
-  g.beginPath();
-  for (const z of [z0 + .05, z1 - .05]) { line3(g, [X0 + out, .9, z], [X0, 2.25, z]); line3(g, [X0 + out, 0, z], [X0 + out, .95, z]); }
-  g.stroke();
-}
-function awning(g) {
-  const x0 = XL, x1 = XL + 2.1, yw = 3.55, yo = 3.0, za = 25.1, zb = 29.7, n = 14;
-  const A = [70, 40, 26], B = [20, 16, 17];
-  for (let i = 0; i < n; i++) {
-    const a = za + (zb - za) * i / n, c = za + (zb - za) * (i + 1) / n, col = i % 2 ? A : B;
-    face(g, [[x0, yw, a], [x1, yo, a], [x1, yo, c], [x0, yw, c]], rgba(col, 1));
-    // scalloped valance hanging from the outer edge
-    poly(g, [[x1, yo, a], [x1, yo, c], [x1, yo - .3, c], [x1, yo - .44, (a + c) / 2], [x1, yo - .3, a]]);
-    g.fillStyle = rgba(mixa(col, ORANGE, .12), 1); g.fill();
+function signHousing(g, s) {
+  const z = s.z, d = s.kind === 'marquee' ? s.depth : .25;
+  const dark = hz([16, 16, 20], z), side = hz([24, 24, 28], z), top = hz([20, 20, 24], z);
+  box(g, s.x0, s.x1, s.y0, s.y1, z, z + d, dark, side, top);
+  const wallX = s.side < 0 ? XL : XR, near = s.side < 0 ? s.x0 : s.x1;
+  if (s.kind !== 'marquee') {
+    g.strokeStyle = ironCol(z); g.lineWidth = Math.max(.8 * S, .05 * kAt(z)); g.beginPath();
+    for (const y of [s.y0 + .15, s.y1 - .15]) line3(g, [wallX, y + .2, z + .1], [near, y, z + .1]);
+    g.stroke();
+  } else { // marquee hangs on rods from the wall
+    g.strokeStyle = ironCol(z); g.lineWidth = Math.max(.8 * S, .04 * kAt(z)); g.beginPath();
+    const far = s.side < 0 ? s.x1 : s.x0;
+    line3(g, [wallX, s.y1 + 1.6, z + .2], [far, s.y1, z + .2]); line3(g, [wallX, s.y1 + 1.6, z + d - .2], [far, s.y1, z + d - .2]);
+    g.stroke();
   }
-  face(g, [[x0, yw, za], [x1, yo, za], [x1, yo - .3, za], [x0, yw - .1, za]], rgba(B, 1));
-  g.strokeStyle = rgba(ORANGE, .35); g.lineWidth = Math.max(.7, .03 * kAt(za));
-  g.beginPath(); line3(g, [x1, yo, za], [x1, yo, zb]); g.stroke();
-}
-function signBox(g, x0, x1, y0, y1, z) {
-  box(g, x0, x1, y0, y1, z, z + .22, mixc(INK, FROST, .03), mixc(INK, FROST, .06), mixc(INK, FROST, .05));
-  const k = kAt(z); g.strokeStyle = ironCol(z); g.lineWidth = Math.max(.8 * S, .05 * k);
-  const wallX = x0 < 0 ? XL : XR, near = x0 < 0 ? x0 : x1;
-  g.beginPath();
-  for (const y of [y0 + .2, y1 - .2]) line3(g, [wallX, y + .15, z + .1], [near, y, z + .1]);
-  g.stroke();
 }
 function lampPost(g, L) {
-  const Z = L.Z, col = ironCol(Z), k = kAt(Z), hx = L.X + L.arm;
-  box(g, L.X - .17, L.X + .17, 0, .9, Z - .17, Z + .17, col, col, col);
-  box(g, L.X - .07, L.X + .07, .9, 4.35, Z - .07, Z + .07, col, col, col);
-  g.strokeStyle = col; g.lineWidth = Math.max(.8 * S, .07 * k);
-  g.beginPath();
-  g.moveTo(px(L.X, Z), py(4.3, Z));
-  g.quadraticCurveTo(px(L.X, Z), py(4.95, Z), px(hx, Z), py(4.85, Z));
-  g.stroke();
-  box(g, hx - .17, hx + .17, 4.4, 4.78, Z - .17, Z + .17, col, col, col);
+  const Z = L.Z, col = ironCol(Z), k = kAt(Z);
+  box(g, L.X - .16, L.X + .16, 0, .8, Z - .16, Z + .16, col, col, col);
+  box(g, L.X - .065, L.X + .065, .8, 4.0, Z - .065, Z + .065, col, col, col);
+  const x = px(L.X, Z), y = py(4.0, Z);
+  g.fillStyle = col; g.beginPath(); g.ellipse(x, y, .14 * k, .06 * k, 0, 0, TAU); g.fill();
 }
-function smallProps(g) {
-  // hydrant
-  const zh = 15.5, xh = ROAD + .5, ch = hz([36, 30, 30], zh);
-  box(g, xh - .14, xh + .14, 0, .62, zh - .14, zh + .14, ch, ch, ch);
-  box(g, xh - .2, xh + .2, .38, .46, zh - .05, zh + .05, ch, ch, ch);
-  // trash can
-  const zt = 21.6, xt = -ROAD - .45, ct = hz([34, 36, 40], zt);
-  box(g, xt - .27, xt + .27, 0, .9, zt - .27, zt + .27, ct, ct, ct);
-  // chalkboard A-frame by the club
-  const zc = 24.4, xc = XL + 2.0;
-  box(g, xc - .32, xc + .32, 0, .95, zc, zc + .3, mixc(INK, NIGHT, .5), mixc(INK, NIGHT, .3), mixc(INK, NIGHT, .3));
-  const k = kAt(zc), x0 = px(xc - .26, zc), y0 = py(.88, zc);
-  ctxText(g, 'LIVE', x0 + .26 * k, y0 + .14 * k, .16 * k, FONT_SIGN, FROST, .55);
-  ctxText(g, 'TRIO', x0 + .26 * k, y0 + .34 * k, .14 * k, FONT_SIGN, FROST, .45);
-  g.strokeStyle = rgba(FROST, .35); g.lineWidth = Math.max(.5, .015 * k); g.beginPath();
-  for (let i = 0; i < 3; i++) { g.moveTo(x0 + .06 * k, y0 + (.48 + i * .1) * k); g.lineTo(x0 + (.3 + R() * .14) * k, y0 + (.48 + i * .1) * k); }
-  g.stroke();
-}
-function ctxText(g, s, x, y, size, font, col, a) {
-  if (size < 3) return;
-  g.font = `${size}px ${font}`; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.fillStyle = rgba(col, a); g.fillText(s, x, y);
+function signalPost(g, s) {
+  const Z = s.Z, col = ironCol(Z), k = kAt(Z);
+  box(g, s.X - .06, s.X + .06, 0, 3.4, Z - .06, Z + .06, col, col, col);
+  box(g, s.X - .17, s.X + .17, 3.0, 3.95, Z - .14, Z + .1, hz([20, 26, 22], Z), col, col);
+  void k;
 }
 
-/* ---------- ground ---------- */
+/* ---------- parked and moving cars ----------
+   A 1940s sedan: rounded fenders standing proud of the body, a fastback roof,
+   whitewalls, chrome. The flank is painted flat (like a facade) and mapped in
+   perspective; the tail is drawn facing us; roof, trunk and hood are polygons. */
+const CAR_SECT = [[0, .9, .92], [.25, .95, 1.04], [1.25, .95, 1.12], [1.42, .66, 1.17], [2.0, .6, 1.58], [3.05, .6, 1.6],
+                  [3.55, .66, 1.17], [3.72, .95, 1.12], [4.9, .9, 1.02], [5.2, .7, .78]];
+const PROFILE = [[0, .44], [.02, .7], [.15, .9], [.6, 1.02], [1.25, 1.1], [1.55, 1.17], [1.95, 1.5], [2.4, 1.62], [3.05, 1.6], [3.35, 1.5], [3.6, 1.18], [3.85, 1.12], [4.85, 1.03], [5.1, .92], [5.2, .7], [5.18, .44]];
+function carLook(c) {
+  const night = c.col[0] > 120 ? .55 : .8;          // pale cars still sit in the dark
+  return { body: scl(c.col, night), hl: c.hl || AMBER };
+}
+function paintCarSide(c, ppm) {
+  const L = c.len, Ht = 1.72, s = L / 5.2, tw = Math.max(2, Math.ceil(L * ppm)), th = Math.max(2, Math.ceil(Ht * ppm));
+  const cv0 = mk(tw, th), g = cv0.getContext('2d'), rnd = mulberry32(c.seed);
+  const U = u => u * s * ppm, V = y => (Ht - y) * ppm;
+  const { body, hl } = carLook(c);
+  // silhouette, smoothed through midpoints
+  g.beginPath();
+  const P = PROFILE.map(([u, y]) => [U(u), V(y)]);
+  g.moveTo(P[0][0], P[0][1]);
+  for (let i = 1; i < P.length - 1; i++) { const mx = (P[i][0] + P[i + 1][0]) / 2, my = (P[i][1] + P[i + 1][1]) / 2; g.quadraticCurveTo(P[i][0], P[i][1], mx, my); }
+  g.lineTo(P[P.length - 1][0], P[P.length - 1][1]); g.lineTo(U(5.1), V(.3)); g.lineTo(U(.1), V(.3)); g.closePath();
+  const gr = g.createLinearGradient(0, V(1.62), 0, V(.3));
+  gr.addColorStop(0, rgba(mixa(body, FROST, .18), 1)); gr.addColorStop(.32, rgba(scl(body, .7), 1));
+  gr.addColorStop(.42, rgba(mixa(body, FROST, .22), 1)); gr.addColorStop(.47, rgba(scl(body, .8), 1));
+  gr.addColorStop(.85, rgba(scl(body, .45), 1)); gr.addColorStop(1, rgba(mixa(scl(body, .5), hl, .25), 1));
+  g.fillStyle = gr; g.fill();
+  g.save(); g.globalCompositeOperation = 'source-atop';
+  // neon caught in the paint: soft horizontal streaks of the nearest sign's colour
+  for (let i = 0; i < 4; i++) {
+    const u = rr2(rnd, .4, 4.6), y = rr2(rnd, .55, 1.05), rx = rr2(rnd, .4, 1.3), ry = rr2(rnd, .05, .12);
+    const g2 = g.createRadialGradient(U(u), V(y), 0, U(u), V(y), rx * ppm);
+    g2.addColorStop(0, rgba(hl, rr2(rnd, .25, .5))); g2.addColorStop(1, rgba(hl, 0));
+    g.save(); g.translate(U(u), V(y)); g.scale(1, ry / rx); g.translate(-U(u), -V(y)); g.fillStyle = g2; g.fillRect(U(u) - rx * ppm, V(y) - rx * ppm, 2 * rx * ppm, 2 * rx * ppm); g.restore();
+  }
+  // fender outlines: rear fender over the rear wheel, front fender sweeping down to the nose
+  g.lineWidth = Math.max(.6, .025 * ppm);
+  g.strokeStyle = rgba(INK, .55);
+  g.beginPath(); g.moveTo(U(.15), V(.86)); g.bezierCurveTo(U(.6), V(1.08), U(1.5), V(1.06), U(1.82), V(.32)); g.stroke();
+  g.beginPath(); g.moveTo(U(3.25), V(1.08)); g.bezierCurveTo(U(4.0), V(1.1), U(4.9), V(1.0), U(5.12), V(.5)); g.stroke();
+  g.strokeStyle = rgba(mixa(hl, FROST, .4), .45); g.lineWidth = Math.max(.6, .018 * ppm);
+  g.beginPath(); g.moveTo(U(.25), V(.9)); g.bezierCurveTo(U(.65), V(1.05), U(1.3), V(1.05), U(1.6), V(.82)); g.stroke();
+  g.beginPath(); g.moveTo(U(3.4), V(1.07)); g.bezierCurveTo(U(4.0), V(1.08), U(4.7), V(1.0), U(5.0), V(.82)); g.stroke();
+  // windows
+  g.beginPath();
+  g.moveTo(U(1.62), V(1.19)); g.lineTo(U(1.98), V(1.47)); g.quadraticCurveTo(U(2.4), V(1.57), U(3.0), V(1.55));
+  g.lineTo(U(3.3), V(1.45)); g.lineTo(U(3.5), V(1.19)); g.closePath();
+  const gw = g.createLinearGradient(0, V(1.57), 0, V(1.19));
+  gw.addColorStop(0, rgba(mixa(INK, COLD, .25), 1)); gw.addColorStop(.45, rgba(INK, 1)); gw.addColorStop(1, rgba(mixa(INK, hl, .2), 1));
+  g.fillStyle = gw; g.fill();
+  g.strokeStyle = rgba(FROST, .3); g.lineWidth = Math.max(.6, .015 * ppm); g.stroke();
+  g.fillStyle = rgba(scl(body, .6), 1); g.fillRect(U(2.47), V(1.56), Math.max(1, .06 * ppm), .38 * ppm); // B-pillar
+  // door seams and handles, chrome strips
+  g.strokeStyle = rgba(INK, .55); g.lineWidth = Math.max(.5, .012 * ppm);
+  g.beginPath(); for (const u of [1.6, 2.5, 3.45]) { g.moveTo(U(u), V(1.17)); g.lineTo(U(u), V(.42)); } g.stroke();
+  g.fillStyle = rgba(FROST, .5); for (const u of [2.3, 3.25]) g.fillRect(U(u), V(1.0), .12 * ppm, Math.max(1, .025 * ppm));
+  g.fillStyle = rgba(FROST, .35); g.fillRect(U(.5), V(1.13), U(4.2), Math.max(.8, .018 * ppm));
+  g.fillStyle = rgba(FROST, .18); g.fillRect(U(1.7), V(.62), U(1.7), Math.max(.8, .02 * ppm));
+  g.restore();
+  // wheels: black tyre, whitewall, chrome hubcap; a skirt half-hides the rear one
+  for (const [u, skirt] of [[.98, true], [4.12, false]]) {
+    const x = U(u), y = V(.38), r = .38 * s * ppm;
+    g.fillStyle = 'rgb(6,6,8)'; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+    g.strokeStyle = rgba(FROST, .42); g.lineWidth = r * .18; g.beginPath(); g.arc(x, y, r * .7, 0, TAU); g.stroke();
+    const hc = g.createRadialGradient(x - r * .1, y - r * .15, 0, x, y, r * .42);
+    hc.addColorStop(0, rgba(FROST, .7)); hc.addColorStop(.6, rgba([110, 112, 118], .6)); hc.addColorStop(1, rgba(INK, .8));
+    g.fillStyle = hc; g.beginPath(); g.arc(x, y, r * .42, 0, TAU); g.fill();
+    if (skirt) { g.fillStyle = rgba(scl(body, .55), 1); g.fillRect(x - r * 1.05, V(.95), r * 2.1, (.95 - .4) * ppm); g.strokeStyle = rgba(FROST, .2); g.lineWidth = 1; g.strokeRect(x - r * 1.05, V(.95), r * 2.1, (.95 - .4) * ppm); }
+  }
+  return cv0;
+}
+function drawCar(g, c, opts = {}) {
+  const z = c.z, L = c.len, X = c.x, k = kAt(z), hzA = hazeAt(z + 2);
+  if (z < 1.5) return;
+  const { body, hl } = carLook(c);
+  const bodyH = hza(body, z + 2), dark = hza(scl(body, .5), z + 2);
+  // shadow and the dark reflection that blocks the lights behind it
+  groundGlow(g, X, z + L / 2, 1.3, L * .55, INK, .85);
+  const rx = px(X, z), ry = py(0, z);
+  const rg = g.createLinearGradient(0, ry, 0, ry + 1.1 * k);
+  rg.addColorStop(0, rgba(INK, .75)); rg.addColorStop(1, rgba(INK, 0));
+  g.fillStyle = rg; g.fillRect(rx - 1.0 * k, ry, 2.0 * k, 1.1 * k);
+  // the flank facing the middle of the street, if any
+  const hw = .98;
+  if (Math.abs(CAM.x - X) > hw) {
+    const sideX = CAM.x > X ? X + hw : X - hw;
+    if (!c.tex || c.texPpm < Math.min(150, k * .8)) { c.texPpm = clamp(k, 6, 150); c.tex = paintCarSide(c, c.texPpm); }
+    mapPlane(g, c.tex, sideX, z, z + L, 1.72, c.texPpm, false);
+    if (hzA > .05) { // haze over the flank, matching everything else at that depth
+      poly(g, [[sideX, 0, z], [sideX, 1.7, z], [sideX, 1.7, z + L], [sideX, 0, z + L]]);
+      g.fillStyle = rgba(HAZE, hzA * .9); g.fill();
+    }
+  }
+  const s = L / 5.2;
+  // The upper surfaces as a loft: cross-sections (position along the car, half
+  // width, height) joined by strips, drawn front to back so nearer strips win.
+  const topCol = hz(mixa(scl(body, .82), hl, .06), z + 3), roofCol = hz(mixa(scl(body, .85), COLD, .1), z + 2), glassCol = hz(mixa(INK, hl, .08), z + 2);
+  for (let i = CAR_SECT.length - 2; i >= 0; i--) {
+    const [sa, wa, ya] = CAR_SECT[i], [sb, wb, yb] = CAR_SECT[i + 1], za = z + sa * s, zb = z + sb * s;
+    const col = (i === 3 || i === 5) ? glassCol : i === 4 ? roofCol : topCol;
+    face(g, [[X - wa, ya, za], [X + wa, ya, za], [X + wb, yb, zb], [X - wb, yb, zb]], col);
+  }
+  g.strokeStyle = rgba(mixa(hl, FROST, .5), .22 * (1 - hzA)); g.lineWidth = Math.max(.6, .02 * k);
+  g.beginPath(); line3(g, [X, 1.6, z + 2.1 * s], [X, 1.6, z + 3.0 * s]); line3(g, [X, 1.08, z + .4 * s], [X, 1.12, z + 1.2 * s]); g.stroke();
+  // the tail, facing us
+  const P2 = (u, v) => [rx + u * k, ry - v * k];
+  g.fillStyle = 'rgb(5,5,7)';
+  for (const u of [-.8, .8]) { const [tx, ty] = P2(u, .3); g.beginPath(); g.ellipse(tx, ty, .13 * k, .3 * k, 0, 0, TAU); g.fill(); }
+  // rear window / roof cap
+  g.beginPath();
+  g.moveTo(...P2(-.7, 1.1)); g.lineTo(...P2(-.6, 1.5)); g.quadraticCurveTo(...P2(-.55, 1.62), ...P2(0, 1.63));
+  g.quadraticCurveTo(...P2(.55, 1.62), ...P2(.6, 1.5)); g.lineTo(...P2(.7, 1.1)); g.closePath();
+  g.fillStyle = bodyH; g.fill();
+  g.beginPath(); g.moveTo(...P2(-.45, 1.17)); g.lineTo(...P2(-.4, 1.44)); g.quadraticCurveTo(...P2(0, 1.52), ...P2(.4, 1.44)); g.lineTo(...P2(.45, 1.17)); g.closePath();
+  g.fillStyle = hz(mixa(INK, hl, .15), z); g.fill();
+  // trunk and fenders: a rounded lump with fenders bulging either side
+  const gt = g.createLinearGradient(0, ry - 1.12 * k, 0, ry - .3 * k);
+  gt.addColorStop(0, rgba(hza(mixa(body, FROST, .2), z), 1)); gt.addColorStop(.35, rgba(hza(body, z), 1)); gt.addColorStop(1, rgba(hza(scl(body, .4), z), 1));
+  g.beginPath();
+  g.moveTo(...P2(-1.0, .32)); g.lineTo(...P2(-1.0, .7)); g.quadraticCurveTo(...P2(-1.0, .98), ...P2(-.78, .98));
+  g.quadraticCurveTo(...P2(-.72, 1.12), ...P2(-.45, 1.13)); g.lineTo(...P2(.45, 1.13)); g.quadraticCurveTo(...P2(.72, 1.12), ...P2(.78, .98));
+  g.quadraticCurveTo(...P2(1.0, .98), ...P2(1.0, .7)); g.lineTo(...P2(1.0, .32)); g.closePath();
+  g.fillStyle = gt; g.fill();
+  g.strokeStyle = rgba(INK, .5); g.lineWidth = Math.max(.6, .02 * k);
+  g.beginPath(); g.moveTo(...P2(-.66, .95)); g.lineTo(...P2(-.66, .42)); g.moveTo(...P2(.66, .95)); g.lineTo(...P2(.66, .42)); g.stroke();
+  g.strokeStyle = rgba(mixa(hl, FROST, .5), .35 * (1 - hzA)); g.lineWidth = Math.max(.6, .02 * k);
+  g.beginPath(); g.moveTo(...P2(-.42, 1.12)); g.lineTo(...P2(.42, 1.12)); g.stroke();
+  // chrome bumper, plate, tail lamps
+  const [bx, by] = P2(-1.04, .44);
+  const gb = g.createLinearGradient(0, by, 0, by + .12 * k);
+  gb.addColorStop(0, rgba(mixa(FROST, hl, .3), .75 * (1 - hzA))); gb.addColorStop(1, rgba([60, 60, 66], .8 * (1 - hzA)));
+  g.fillStyle = gb; g.fillRect(bx, by, 2.08 * k, .12 * k);
+  g.fillStyle = rgba([200, 190, 150], .5 * (1 - hzA)); g.fillRect(...P2(-.16, .62), .32 * k, .14 * k);
+  for (const u of [-.86, .86]) {
+    const [lx, ly] = P2(u, .86);
+    g.fillStyle = opts.lit ? rgba([255, 80, 70], 1) : rgba([120, 24, 26], 1 - hzA * .6);
+    g.beginPath(); g.ellipse(lx, ly, .05 * k, .09 * k, 0, 0, TAU); g.fill();
+  }
+  if (opts.lit) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (const u of [-.86, .86]) {
+      const [lx, ly] = P2(u, .86);
+      glow(g, lx, ly, .9 * k, RED, .3); glow(g, lx, ly, .18 * k, [255, 120, 100], .9);
+      const sg = g.createLinearGradient(0, ry, 0, Math.min(H, ry + 4 * k));
+      sg.addColorStop(0, rgba(RED, .35)); sg.addColorStop(1, rgba(RED, 0));
+      g.fillStyle = sg; g.fillRect(lx - .12 * k, ry, .24 * k, Math.min(H, ry + 4 * k) - ry);
+    }
+    g.restore();
+  }
+  if (c.cab) box(g, X - .22, X + .22, 1.62, 1.8, z + 2.2 * s, z + 2.45 * s, rgba(AMBER, .9), rgba(AMBER, .7), rgba(AMBER, .8));
+}
+
+/* ---------- the road ---------- */
 function drawGround(g) {
   const pR = g.createPattern(roadTile, 'repeat'), pS = g.createPattern(walkTile, 'repeat');
   for (let sy = Math.ceil(VPy); sy < H; sy++) {
     const Z = F * CAM.y / (sy + .5 - VPy);
-    if (Z > ZFAR) { g.fillStyle = mixc(NIGHT, HAZE, .8); g.fillRect(0, sy, W, 1); continue; }
-    const k = kAt(Z);
-    const xl = clamp(px(XL, Z), 0, W), xr = clamp(px(XR, Z), 0, W), xa = clamp(px(-ROAD, Z), 0, W), xb = clamp(px(ROAD, Z), 0, W);
-    // pattern space: u = X*TP, v = Z*TP.  Map so this row samples the tile row for its Z,
-    // and horizontally the tile is squeezed by F/Z like everything else at that depth.
+    if (Z > ZFAR) { g.fillStyle = rgba(HAZE, 1); g.fillRect(0, sy, W, 1); continue; }
+    const k = kAt(Z), inCross = Z > CROSS.z0 && Z < CROSS.z1;
     const m = new DOMMatrix([k / TP, 0, 0, 1, VPx - k * CAM.x, sy - Z * TP]);
+    const xl = inCross ? 0 : clamp(px(XL, Z), 0, W), xr = inCross ? W : clamp(px(XR, Z), 0, W);
+    const xa = clamp(px(-CURB, Z), 0, W), xb = clamp(px(CURB, Z), 0, W);
+    if (inCross) { pR.setTransform(m); g.fillStyle = pR; g.fillRect(0, sy, W, 1); continue; }
     pS.setTransform(m); g.fillStyle = pS; g.fillRect(xl, sy, xa - xl, 1); g.fillRect(xb, sy, xr - xb, 1);
     pR.setTransform(m); g.fillStyle = pR; g.fillRect(xa, sy, xb - xa, 1);
   }
-  // haze with distance, darker near us, wet sheen toward the horizon
   const gh = g.createLinearGradient(0, VPy, 0, H);
-  for (let i = 0; i <= 10; i++) {
-    const t = i / 10, sy = lerp(VPy, H, t), Z = F * CAM.y / Math.max(.5, sy - VPy);
-    gh.addColorStop(t, rgba(HAZE, Math.min(.92, hazeAt(Z) * 1.05)));
-  }
+  for (let i = 0; i <= 10; i++) { const t = i / 10, Z = F * CAM.y / Math.max(.5, lerp(VPy, H, t) - VPy); gh.addColorStop(t, rgba(HAZE, hazeAt(Z))); }
   g.fillStyle = gh; g.fillRect(0, VPy, W, H - VPy);
-  const gd = g.createLinearGradient(0, VPy, 0, H);
-  gd.addColorStop(0, rgba(INK, 0)); gd.addColorStop(.5, rgba(INK, .12)); gd.addColorStop(1, rgba(INK, .4));
-  g.fillStyle = gd; g.fillRect(0, VPy, W, H - VPy);
-  // kerbs, gutters, tram rails
-  for (const X of [-ROAD, ROAD]) {
-    face(g, [[X, 0, ZNEAR - 3], [X, .16, ZNEAR - 3], [X, .16, ZFAR], [X, 0, ZFAR]], mixc(NIGHT, FROST, .07));
-    g.strokeStyle = rgba(FROST, .1); g.lineWidth = 1.2 * S; g.beginPath(); line3(g, [X, .16, ZNEAR - 3], [X, .16, ZFAR]); g.stroke();
-    g.strokeStyle = rgba(INK, .55); g.lineWidth = 2 * S; g.beginPath(); line3(g, [X + Math.sign(-X) * .25, 0, ZNEAR - 3], [X + Math.sign(-X) * .25, 0, ZFAR]); g.stroke();
+  for (const X of [-CURB, CURB]) {
+    for (const [za, zb] of [[ZNEAR - 3, CROSS.z0], [CROSS.z1, ZFAR]]) {
+      face(g, [[X, 0, za], [X, .15, za], [X, .15, zb], [X, 0, zb]], rgba([26, 27, 33], 1));
+      g.strokeStyle = rgba(FROST, .09); g.lineWidth = 1.1 * S; g.beginPath(); line3(g, [X, .15, za], [X, .15, zb]); g.stroke();
+    }
   }
-  g.strokeStyle = rgba(FROST, .13); g.lineWidth = 1.1 * S;
-  g.beginPath(); for (const X of [-.72, .72]) line3(g, [X, 0, 6], [X, 0, ZFAR]); g.stroke();
-  // grate (steam source) and a manhole
-  const gz = 17.6, gx = .4;
-  face(g, [[gx - .5, 0, gz - .35], [gx + .5, 0, gz - .35], [gx + .5, 0, gz + .35], [gx - .5, 0, gz + .35]], rgba(INK, .95));
-  g.strokeStyle = rgba(COLD, .25); g.lineWidth = Math.max(.6, .03 * kAt(gz)); g.beginPath();
-  for (let x = gx - .45; x < gx + .5; x += .1) line3(g, [x, 0, gz - .33], [x, 0, gz + .33]);
-  g.stroke();
-  const mz = 30, mx = -1.6, mk0 = kAt(mz);
-  g.fillStyle = rgba(INK, .7); g.beginPath(); g.ellipse(px(mx, mz), py(0, mz), .38 * mk0, .38 * mk0 * CAM.y / mz, 0, 0, TAU); g.fill();
+  // manhole with steam
+  const mz = 17.5, mx = -.6, mk0 = kAt(mz);
+  g.fillStyle = rgba([4, 5, 8], .8); g.beginPath(); g.ellipse(px(mx, mz), py(0, mz), .4 * mk0, .4 * mk0 * CAM.y / mz, 0, 0, TAU); g.fill();
+  // pools of light on the ground, under everything else
+  for (const b of BLD) {
+    if (b.z0 > 120) continue;
+    const zc = b.side < 0 ? b.z1 - 1.1 : b.z0 + 1.1, X = b.side < 0 ? XL + 1.2 : XR - 1.2;
+    const lit = { club: [ORANGE, .45], bar: [AMBER, .3], restaurant: [AMBER, .38], diner: [[250, 230, 190], .4], liquor: [AMBER, .28], hotel: [AMBER, .34] }[b.ground];
+    if (lit) groundGlow(g, X, zc, 2.2, 2.6, lit[0], lit[1] * (1 - hazeAt(zc) * .5));
+    if (lit && b.z1 - b.z0 > 4) groundGlow(g, X, (b.z0 + b.z1) / 2, 2.0, 3.2, lit[0], lit[1] * .5);
+  }
+  for (const s of SIGNS) if (s.z < 90) groundGlow(g, (s.x0 + s.x1) / 2, s.z, 2.2, 2.4, s.col, .16 * (1 - hazeAt(s.z) * .6));
+  for (const L of LAMPS) groundGlow(g, L.X, L.Z, 3.2, 3.2, [250, 226, 180], .22 * (1 - hazeAt(L.Z) * .6));
 }
 
-/* ---------- the whole static street ---------- */
+/* ---------- build every static layer ---------- */
 function buildStatic() {
-  const g = staticX;
-  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
-  // sky: cold blue-grey above, warm city haze down at the vanishing point
-  let gr = g.createLinearGradient(0, 0, 0, VPy + 20 * S);
-  gr.addColorStop(0, mixc(INK, COLD, .08)); gr.addColorStop(.5, mixc(INK, COLD, .2));
-  gr.addColorStop(.85, mixc(NIGHT, COLD, .3)); gr.addColorStop(1, mixc(mixa(NIGHT, COLD, .3), AMBER, .25));
-  g.fillStyle = gr; g.fillRect(0, 0, W, H);
-  for (let i = 0; i < 6; i++) {
-    const rnd = mulberry32(300 + i), cx = VPx + (rnd() - .5) * W * .5, cy = VPy * (.2 + rnd() * .6), rx = W * (.15 + rnd() * .2);
-    g.save(); g.translate(cx, cy); g.scale(1, .08 + rnd() * .1);
-    const cg = g.createRadialGradient(0, 0, 0, 0, 0, rx);
-    cg.addColorStop(0, rgba(HAZE, .12)); cg.addColorStop(1, rgba(HAZE, 0));
-    g.fillStyle = cg; g.fillRect(-rx, -rx, 2 * rx, 2 * rx); g.restore();
-  }
-  drawGround(g);
-  // the street turns at the far end: a block across it, lost in haze
-  face(g, [[XL - 30, 0, ZFAR], [XR + 30, 0, ZFAR], [XR + 30, 26, ZFAR], [XL - 30, 26, ZFAR]], mixc(NIGHT, HAZE, .82));
+  const b0 = backX, f = frontX, e = emissX;
+  for (const g of [b0, f, e]) { g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; }
+  f.clearRect(0, 0, W, H); e.clearRect(0, 0, W, H);
+  // sky: nearly black, a low warm glow over the far end of the street
+  let gr = b0.createLinearGradient(0, 0, 0, VPy + 10 * S);
+  gr.addColorStop(0, rgba([6, 8, 13], 1)); gr.addColorStop(.6, rgba([12, 14, 22], 1)); gr.addColorStop(1, rgba([34, 28, 30], 1));
+  b0.fillStyle = gr; b0.fillRect(0, 0, W, H);
+  drawGround(b0);
+  // far end, lost in the dark
+  face(f, [[XL - 40, 0, ZFAR], [XR + 40, 0, ZFAR], [XR + 40, 24, ZFAR], [XL - 40, 24, ZFAR]], rgba(HAZE, 1));
 
-  // Buildings, far to near (both sides interleaved). Roof clutter and exposed side
-  // walls go before the facade so nearer, taller fronts cover them correctly.
+  // across the cross street: the next block's corner faces us
+  const rnd = mulberry32(5);
+  for (const side of [-1, 1]) {
+    const cf = paintCrossFront(side, rnd), Z = CROSS.z1;
+    const xa = side < 0 ? XL - cf.wM : XR, xb = side < 0 ? XL : XR + cf.wM;
+    const r = frontRect(xa, xb, 0, cf.hM, Z);
+    f.drawImage(cf.wall, r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+    f.fillStyle = rgba(HAZE, hazeAt(Z) * .85); f.fillRect(r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
+    for (const g of [f, e]) { g.globalAlpha = 1 - hazeAt(Z) * .4; g.drawImage(cf.lit, r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0); g.globalAlpha = 1; }
+  }
+
+  // buildings far to near, both sides interleaved
   const order = [...BLD].sort((a, b) => b.z0 - a.z0);
   for (const b of order) {
-    b.ppm = clamp(Math.min(F / b.z0, 3800 / b.top, 3800 / (b.z1 - b.z0)), 3, 170);
-    drawRoof(g, b);
+    b.ppm = clamp(Math.min(F / b.z0, 3600 / b.top, 3600 / (b.z1 - b.z0)), 3, 160);
+    drawRoof(f, b);
+    const X = b.side < 0 ? XL : XR;
     const nearer = BLD.find(o => o.side === b.side && Math.abs(o.z1 - b.z0) < .01);
-    if (nearer && nearer.top < b.top) { // exposed party wall above a lower neighbour
-      const X = b.side < 0 ? XL : XR, back = b.side < 0 ? -18 : 18;
-      face(g, [[X, nearer.top, b.z0], [X + back, nearer.top, b.z0], [X + back, b.top, b.z0], [X, b.top, b.z0]], hz(mixa(b.col, INK, .35), b.z0));
-      face(g, [[X, nearer.top, b.z0], [X + back, nearer.top, b.z0], [X + back, nearer.top + .25, b.z0], [X, nearer.top + .25, b.z0]], rgba(INK, .4));
+    if (nearer && nearer.top < b.top) {
+      const back = b.side < 0 ? -18 : 18;
+      face(f, [[X, nearer.top, b.z0], [X + back, nearer.top, b.z0], [X + back, b.top, b.z0], [X, b.top, b.z0]], hz(scl(b.col, .7), b.z0));
     }
-    const tex = paintFacade(b);
-    mapFacade(g, b, tex);
-    hazeFacade(g, b);
-    for (const w of b.windows) { w.q = winQuad(w); paintWindow(g, w); }
+    if (Math.abs(b.z1 - CROSS.z0) < .01) { // the corner: its side wall along the cross street faces away; nothing to draw
+    }
+    const t = paintFacade(b);
+    mapPlane(f, t.wall, X, b.z0, b.z1, b.top, b.ppm, b.side > 0);
+    mapPlane(f, t.lit, X, b.z0, b.z1, b.top, b.ppm, b.side > 0);
+    mapPlane(e, t.lit, X, b.z0, b.z1, b.top, b.ppm, b.side > 0);
+    // haze across the facade by depth
+    poly(f, [[X, 0, b.z0], [X, b.top, b.z0], [X, b.top, b.z1], [X, 0, b.z1]]);
+    f.save(); f.clip();
+    const sa = px(X, b.z0), sb = px(X, b.z1), gh = f.createLinearGradient(sa, 0, sb, 0);
+    for (let i = 0; i <= 6; i++) { const t2 = i / 6, sx = lerp(sa, sb, t2), Z = F * (X - CAM.x) / (sx - VPx || 1e-3); gh.addColorStop(t2, rgba(HAZE, hazeAt(Z) * .92)); }
+    f.fillStyle = gh; f.fillRect(Math.min(sa, sb) - 1, 0, Math.abs(sb - sa) + 2, H);
+    f.restore();
+    for (const w of b.windows) { w.q = winQuad(w); paintWindow(f, e, w); }
   }
-  // Everything that sticks out from the walls, far to near.
-  PROTS = [];
+  // everything that stands in front of the walls, far to near
+  const items = [];
   for (const b of BLD) {
-    if (b.z0 < 160) PROTS.push({ z: b.z1, f: () => cornice(g, b) });
-    if (b.fe && b.z0 < 200) PROTS.push({ z: (b.fez0 + b.fez1) / 2, f: () => fireEscape(g, b), bb: () => sbox(Math.min(XL, XL + 1.2) * (b.side < 0 ? 1 : 0) + (b.side < 0 ? 0 : XR - 1.2), b.side < 0 ? XL + 1.2 : XR, 1.5, b.top, b.fez0, b.fez1) });
-    if (b.ground === 'stoop') PROTS.push({ z: b.doorZ, f: () => stoop(g, b), bb: () => sbox(XL, XL + 2, 0, 2.3, b.doorZ - .1, b.doorZ + 1.35) });
+    if (b.z0 < 150) items.push([b.z1, () => cornice(f, b)]);
+    if (b.fe && b.z0 < 160) items.push([(b.fez0 + b.fez1) / 2, () => fireEscape(f, b)]);
   }
-  PROTS.push({ z: 25.1, f: () => awning(g), bb: () => sbox(XL, XL + 2.1, 2.5, 3.6, 25.1, 29.7) });
-  PROTS.push({ z: 24.8, f: () => signBox(g, XL + .3, XL + 1.3, 4.5, 9.2, 24.8), bb: () => sbox(XL, XL + 1.3, 4.5, 9.4, 24.8, 25.1) });
-  PROTS.push({ z: 29.0, f: () => signBox(g, XL + .15, XL + 3.35, 3.85, 4.85, 29.0), bb: () => sbox(XL, XL + 3.35, 3.8, 4.9, 29, 29.3) });
-  PROTS.push({ z: 35.0, f: () => signBox(g, XR - 1.25, XR - .25, 3.6, 6.4, 35.0), bb: () => sbox(XR - 1.25, XR, 3.5, 6.5, 35, 35.3) });
-  PROTS.push({ z: 13.5, f: () => signBox(g, XR - 1.75, XR - .15, 4.3, 5.0, 13.5), bb: () => sbox(XR - 1.75, XR, 4.2, 5.1, 13.5, 13.8) });
-  PROTS.push({ z: 20.0, f: () => {
-    const c = mixc(INK, NIGHT, .6);
-    box(g, XR - 3.3, XR, 3.0, 3.35, 20.0, 23.2, mixc(INK, NIGHT, .4), c, c);
-    const col = ironCol(20); for (const z of [20.05, 23.1]) box(g, XR - 3.25, XR - 3.17, 0, 3.0, z, z + .08, col, col, col);
-  }, bb: () => sbox(XR - 3.3, XR, 0, 3.4, 20, 23.2) });
-  for (const L of LAMPS) PROTS.push({ z: L.Z, f: () => lampPost(g, L), bb: () => sbox(Math.min(L.X, L.X + L.arm) - .2, Math.max(L.X, L.X + L.arm) + .2, 0, 5, L.Z - .2, L.Z + .2) });
-  PROTS.push({ z: 15.5, f: () => smallProps(g) });
-  PROTS.sort((a, b) => b.z - a.z);
-  for (const p of PROTS) p.f();
-  // windows hidden behind anything that sticks out can't switch (repainting would erase it)
-  const boxes = PROTS.filter(p => p.bb).map(p => p.bb());
-  for (const w of WINS) {
-    if (w.locked) continue;
-    const xs = w.q.map(p => p[0]), ys = w.q.map(p => p[1]);
-    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
-    if (x1 < 0 || x0 > W || y1 < 0 || y0 > H || x1 - x0 < .8) { w.locked = true; continue; }
-    if (boxes.some(bb => x1 > bb.x0 && x0 < bb.x1 && y1 > bb.y0 && y0 < bb.y1)) w.locked = true;
+  for (const s of SIGNS) items.push([s.z + .01, () => signHousing(f, s)]);
+  for (const L of LAMPS) items.push([L.Z, () => lampPost(f, L)]);
+  for (const s of SIGNALS) items.push([s.Z, () => signalPost(f, s)]);
+  items.sort((a, b) => b[0] - a[0]);
+  for (const it of items) it[1]();
+  // Parked cars are rendered once into their own little canvases, then sorted
+  // with the people and moving cars every frame so nearer things cover farther ones.
+  for (const c of CARS) {
+    c.sprite = null;
+    const bb = { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity };
+    for (const X of [c.x - 1.4, c.x + 1.4]) for (const Y of [0, 1.9]) for (const Z of [c.z, c.z + c.len]) {
+      bb.x0 = Math.min(bb.x0, px(X, Z)); bb.x1 = Math.max(bb.x1, px(X, Z)); bb.y0 = Math.min(bb.y0, py(Y, Z)); bb.y1 = Math.max(bb.y1, py(Y, Z));
+    }
+    bb.y1 += 1.3 * kAt(c.z);
+    const x0 = Math.max(0, Math.floor(bb.x0)), y0 = Math.max(0, Math.floor(bb.y0)), x1 = Math.min(W, Math.ceil(bb.x1)), y1 = Math.min(H, Math.ceil(bb.y1));
+    if (x1 - x0 < 2 || y1 - y0 < 2) continue;
+    const sp = mk(x1 - x0, y1 - y0), sg = sp.getContext('2d');
+    sg.translate(-x0, -y0); drawCar(sg, c); c.tex = null;
+    c.sprite = sp; c.bx = x0; c.by = y0;
   }
-  // haze bloom at the vanishing point
-  gr = g.createRadialGradient(VPx, VPy, 0, VPx, VPy, Math.max(W, H) * .35);
-  gr.addColorStop(0, rgba(mixa(HAZE, AMBER, .5), .3)); gr.addColorStop(1, rgba(HAZE, 0));
-  g.fillStyle = gr; g.fillRect(0, 0, W, H);
 
-  // pick a few lit windows to come alive
+  // a few lit windows come alive
   ANIMWIN = [];
-  const cands = WINS.filter(w => w.on && !w.locked && (w.za + w.zb) / 2 > 12 && (w.za + w.zb) / 2 < 70 && Math.abs(w.q[0][1] - w.q[1][1]) > 9 * S);
-  const rnd = mulberry32(7);
-  for (let i = 0; i < 7 && cands.length; i++) {
-    const w = cands.splice((rnd() * cands.length) | 0, 1)[0];
-    w.anim = { type: i % 3 === 2 ? 'curtain' : 'person', u: rnd(), target: rnd(), wait: rnd() * 6, ph: rnd() * TAU };
-    w.shade = 0; paintWindow(g, w);
-    ANIMWIN.push(w);
+  const cands = WINS.filter(w => w.on && !w.locked && (w.za + w.zb) / 2 > 9 && (w.za + w.zb) / 2 < 55 && Math.abs(w.q[0][1] - w.q[1][1]) > 9 * S);
+  const r2 = mulberry32(7);
+  for (let i = 0; i < 6 && cands.length; i++) {
+    const w = cands.splice((r2() * cands.length) | 0, 1)[0];
+    w.anim = { type: i % 3 === 2 ? 'curtain' : 'person', u: r2(), target: r2(), wait: r2() * 6, ph: r2() * TAU };
+    w.shade = 0; paintWindow(f, e, w); ANIMWIN.push(w);
   }
 }
 
 /* =============================================================================
-   LIGHT LAYER: neon, lamps, light pools. Redrawn only when a sign flickers.
+   SIGNS, LAMPS AND SIGNALS (redrawn when a letter flickers or a signal changes)
    ============================================================================= */
 function tube(g, ch, x, y, size, family, col, level, sx) {
   g.save();
   g.font = `${size}px ${family}`; g.textAlign = 'center'; g.textBaseline = 'middle';
   g.translate(x, y); g.scale(sx, 1);
   g.lineJoin = 'round'; g.lineCap = 'round';
-  const lw = Math.max(1, size * .065);
-  g.lineWidth = lw; g.strokeStyle = rgba(col, .18); g.strokeText(ch, 0, 0); // dead glass tube
+  const lw = Math.max(1, size * .07);
+  g.lineWidth = lw; g.strokeStyle = rgba(scl(col, .5), .35); g.strokeText(ch, 0, 0);
   if (level > .01) {
     const a = Math.min(1, level);
-    g.shadowColor = rgba(col, a); g.shadowBlur = size * .55;
-    g.strokeStyle = rgba(col, .92 * a); g.strokeText(ch, 0, 0);
-    g.shadowBlur = size * .18; g.strokeText(ch, 0, 0);
-    if (level > 1) { g.shadowBlur = size * .9; g.globalAlpha = level - 1; g.strokeText(ch, 0, 0); g.globalAlpha = 1; }
-    g.shadowBlur = 0; g.lineWidth = lw * .38; g.strokeStyle = rgba(mixa(FROST, col, .3), .7 * a); g.strokeText(ch, 0, 0);
+    g.shadowColor = rgba(col, a); g.shadowBlur = size * .6;
+    g.strokeStyle = rgba(col, .95 * a); g.strokeText(ch, 0, 0);
+    g.shadowBlur = size * .2; g.strokeText(ch, 0, 0);
+    if (level > 1) { g.shadowBlur = size; g.globalAlpha = level - 1; g.strokeText(ch, 0, 0); g.globalAlpha = 1; }
+    g.shadowBlur = 0; g.lineWidth = lw * .42; g.strokeStyle = rgba(mixa(FROST, col, .25), .85 * a); g.strokeText(ch, 0, 0);
   }
   g.restore();
 }
 function tubeRect(g, x0, y0, x1, y1, col, level, w) {
   g.save(); g.lineJoin = 'round'; g.lineWidth = w;
-  g.strokeStyle = rgba(col, .18); g.strokeRect(x0, y0, x1 - x0, y1 - y0);
   const a = Math.min(1, level);
   g.shadowColor = rgba(col, a); g.shadowBlur = w * 5; g.strokeStyle = rgba(col, .9 * a); g.strokeRect(x0, y0, x1 - x0, y1 - y0);
-  g.shadowBlur = 0; g.lineWidth = w * .4; g.strokeStyle = rgba(FROST, .45 * a); g.strokeRect(x0, y0, x1 - x0, y1 - y0);
+  g.shadowBlur = 0; g.lineWidth = w * .4; g.strokeStyle = rgba(FROST, .5 * a); g.strokeRect(x0, y0, x1 - x0, y1 - y0);
   g.restore();
 }
-function frontRect(x0, x1, y0, y1, z) { return { x0: px(x0, z), x1: px(x1, z), y0: py(y1, z), y1: py(y0, z) }; }
-function verticalSign(g, r, word, levels, col, font) {
-  const n = word.length, size = Math.min((r.y1 - r.y0) / n * .82, (r.x1 - r.x0) * 1.25);
-  g.font = `${size}px ${font}`;
-  for (let i = 0; i < n; i++) {
-    const m = g.measureText(word[i]).width || size * .5;
-    tube(g, word[i], (r.x0 + r.x1) / 2, r.y0 + (r.y1 - r.y0) * (i + .53) / n, size, font, col, levels[i], Math.min(1, (r.x1 - r.x0) * .72 / m));
-  }
+function bulbs(g, r, col, a, step) {
+  if (step < 2) return;
+  const pts = [];
+  for (let x = r.x0; x <= r.x1; x += step) { pts.push([x, r.y0]); pts.push([x, r.y1]); }
+  for (let y = r.y0 + step; y < r.y1; y += step) { pts.push([r.x0, y]); pts.push([r.x1, y]); }
+  for (const [x, y] of pts) { glow(g, x, y, step * .9, col, .35 * a); g.fillStyle = rgba(mixa(FROST, col, .3), .95 * a); g.beginPath(); g.arc(x, y, Math.max(.6, step * .16), 0, TAU); g.fill(); }
 }
-function horizontalSign(g, r, word, levels, col, font, fill) {
-  const size = (r.y1 - r.y0) * .7;
+function wordFit(g, word, size, font, width) {
   g.font = `${size}px ${font}`;
   const ws = word.split('').map(c => g.measureText(c).width || size * .5), tot = ws.reduce((a, b) => a + b, 0);
-  const sc = Math.min(1, (r.x1 - r.x0) * (fill || .84) / tot);
+  return { ws, tot, sc: Math.min(1, width / tot) };
+}
+function hText(g, r, word, levels, col, font, sizeK, fill) {
+  const size = (r.y1 - r.y0) * sizeK, { ws, tot, sc } = wordFit(g, word, size, font, (r.x1 - r.x0) * fill);
   let x = (r.x0 + r.x1) / 2 - tot * sc / 2;
   word.split('').forEach((c, i) => { tube(g, c, x + ws[i] * sc / 2, (r.y0 + r.y1) / 2 + size * .04, size, font, col, levels[i], sc); x += ws[i] * sc; });
 }
-function drawLights() {
-  const g = lightX, nb = settings.neon;
+function drawSign(g, s, nb) {
+  const r = frontRect(s.x0, s.x1, s.y0, s.y1, s.z - .002), w = r.x1 - r.x0, h = r.y1 - r.y0;
+  if (r.x1 < -50 || r.x0 > W + 50 || w < 1) return;
+  const fade = 1 - hazeAt(s.z) * .55, lv = s.levels.map(v => v * nb * fade), avgL = avg(lv.length ? lv : [nb * fade]);
+  s.r = r;
+  glow(g, (r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2, Math.max(w, h) * .8, s.col, .07 * avgL);
+  if (s.kind !== 'box') { g.fillStyle = hz([16, 16, 20], s.z); g.fillRect(r.x0, r.y0, w, h); } // opaque backing hides signs behind it
+  if (s.kind === 'blade') {
+    const n = s.text.length, inset = Math.min(w, h) * .08;
+    if (s.bulbs) bulbs(g, { x0: r.x0 + inset, y0: r.y0 + inset, x1: r.x1 - inset, y1: r.y1 - inset }, NEON.white, fade, Math.max(3, w * .16));
+    else tubeRect(g, r.x0 + inset, r.y0 + inset, r.x1 - inset, r.y1 - inset, s.col, .8 * nb * fade, Math.max(1, w * .03));
+    let top = r.y0 + inset * 2, bottom = r.y1 - inset * 2;
+    if (s.top) { // a small lit panel on top ("CLUB")
+      const th = h * .1; g.fillStyle = rgba(mixa(NEON.white, AMBER, .3), .85 * fade); g.fillRect(r.x0 + inset * 1.6, top, w - inset * 3.2, th);
+      g.fillStyle = rgba(INK, .9); g.font = `${th * .78}px ${FONT_SIGN}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(s.top, (r.x0 + r.x1) / 2, top + th * .55);
+      top += th * 1.25;
+    }
+    if (s.under) { const uh = h * .09; bottom -= uh * 1.3; hText(g, { x0: r.x0, x1: r.x1, y0: bottom + uh * .3, y1: bottom + uh * 1.3 }, s.under, [1, 1, 1].map(() => nb * fade), NEON.red, FONT_SIGN, .9, .7); }
+    const size = Math.min((bottom - top) / n * .86, w * 1.1);
+    g.font = `${size}px ${s.font}`;
+    for (let i = 0; i < n; i++) {
+      const m = g.measureText(s.text[i]).width || size * .5;
+      tube(g, s.text[i], (r.x0 + r.x1) / 2, top + (bottom - top) * (i + .55) / n, size, s.font, s.col, lv[i], Math.min(1, w * .66 / m));
+    }
+  } else if (s.kind === 'neonbox') {
+    tubeRect(g, r.x0 + 2 * S, r.y0 + 2 * S, r.x1 - 2 * S, r.y1 - 2 * S, s.col, .55 * nb * fade, Math.max(1, h * .03));
+    hText(g, r, s.text, lv, s.col, s.font, .66, .84);
+  } else if (s.kind === 'box') { // backlit panel, painted letters
+    const gp = g.createLinearGradient(0, r.y0, 0, r.y1);
+    gp.addColorStop(0, rgba(s.panel, .92 * fade)); gp.addColorStop(1, rgba(mixa(s.panel, AMBER, .35), .85 * fade));
+    g.fillStyle = gp; g.fillRect(r.x0 + 1, r.y0 + 1, w - 2, h - 2);
+    g.save(); g.font = `${h * .64}px ${s.font}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    const tw = g.measureText(s.text).width, sc = Math.min(1, w * .86 / tw);
+    g.translate((r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2 + h * .03); g.scale(sc, 1);
+    g.fillStyle = rgba(scl(s.col, .8), .95); g.fillText(s.text, 0, 0); g.restore();
+    glow(g, (r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2, w * .7, s.panel, .2 * fade);
+  } else if (s.kind === 'marquee') {
+    // underside: rows of bare bulbs we can see because we're below it
+    const d = s.depth;
+    poly(g, [[s.x0, s.y0, s.z], [s.x1, s.y0, s.z], [s.x1, s.y0, s.z + d], [s.x0, s.y0, s.z + d]]);
+    g.fillStyle = rgba([255, 214, 150], .55 * fade); g.fill();
+    for (let z = s.z + .2; z < s.z + d; z += .35) for (let x = s.x0 + .2; x < s.x1; x += .35) {
+      const bx = px(x, z), by = py(s.y0, z), kk = kAt(z);
+      glow(g, bx, by, .25 * kk, [255, 220, 160], .5 * fade); g.fillStyle = rgba(FROST, .9 * fade); g.beginPath(); g.arc(bx, by, Math.max(.6, .03 * kk), 0, TAU); g.fill();
+    }
+    // the front: neon name above, a lit letter-board below, a ring of bulbs
+    const nameR = { x0: r.x0, x1: r.x1, y0: r.y0, y1: r.y0 + h * .52 }, boardR = { x0: r.x0 + w * .05, x1: r.x1 - w * .05, y0: r.y0 + h * .56, y1: r.y1 - h * .07 };
+    hText(g, nameR, s.text, lv, s.col, s.font, .82, .86);
+    const gp = g.createLinearGradient(0, boardR.y0, 0, boardR.y1);
+    gp.addColorStop(0, rgba([252, 244, 222], .9 * fade)); gp.addColorStop(1, rgba([240, 214, 160], .85 * fade));
+    g.fillStyle = gp; g.fillRect(boardR.x0, boardR.y0, boardR.x1 - boardR.x0, boardR.y1 - boardR.y0);
+    const lines = s.board, lh = (boardR.y1 - boardR.y0) / (lines.length + .4);
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    lines.forEach((t, i) => {
+      g.save(); g.font = `${lh * (i ? .82 : .62)}px ${FONT_SIGN}`;
+      const tw = g.measureText(t).width, sc = Math.min(1, (boardR.x1 - boardR.x0) * .9 / tw);
+      g.translate((boardR.x0 + boardR.x1) / 2, boardR.y0 + lh * (i + .7)); g.scale(sc, 1);
+      g.fillStyle = rgba(i ? [20, 18, 22] : [150, 30, 30], .92); g.fillText(t, 0, 0); g.restore();
+    });
+    bulbs(g, { x0: r.x0 + 2, y0: r.y0 + 2, x1: r.x1 - 2, y1: r.y1 - 2 }, NEON.white, fade, Math.max(3, h * .09));
+  }
+}
+function drawSigns() {
+  const g = signsX, nb = settings.neon;
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
   g.clearRect(0, 0, W, H);
-  const jA = avg(neon.jazz) * nb, vA = avg(neon.velvet) * nb, bA = avg(neon.bar) * nb, eA = avg(neon.eats) * nb;
-  const dz = (CLUB.door0 + CLUB.door1) / 2;
-
-  // the club doorway: the strongest light on the street
-  groundGlow(g, XL + 1.7, dz, 3.0, 3.4, ORANGE, .5);
-  groundGlow(g, XL + .8, dz, 1.6, 1.8, AMBER, .5);
-  glow(g, px(XL, dz), py(1.6, dz), 3.2 * kAt(dz), ORANGE, .32);
-  glow(g, px(XL + 1, 27), py(2.6, 27), 2.4 * kAt(27), ORANGE, .14);
-  glow(g, px(XL, 23.4), py(.3, 23.4), 1.3 * kAt(23.4), ORANGE, .3);         // basement window
-  glow(g, px(XL, 23.4), py(1.4, 23.4), .7 * kAt(23.4), ORANGE, .2);          // porthole
-  glow(g, px(XL, 29.7), py(1.4, 29.7), .7 * kAt(29.7), ORANGE, .2);
-  // diner, hotel, bar
-  groundGlow(g, XR - 2, 13.6, 3.2, 4.5, AMBER, .3); glow(g, px(XR, 13.6), py(1.8, 13.6), 3 * kAt(13.6), AMBER, .16);
-  groundGlow(g, XR - 1.6, 21.5, 2.2, 2.2, AMBER, .3); glow(g, px(XR, 21.5), py(1.5, 21.5), 2 * kAt(21.5), AMBER, .16);
-  groundGlow(g, XR - 1.2, 36.7, 1.6, 1.6, ORANGE, .3);
-
-  // street lamps: cold halo, a cone of light, a pool on the pavement
+  const order = [...SIGNS].sort((a, b) => b.z - a.z);
+  for (const s of order) drawSign(g, s, nb);
+  // street lamps: warm globes with a halo
   for (const L of LAMPS) {
-    const hx = L.X + L.arm, Z = L.Z, k = kAt(Z), x = px(hx, Z), y = py(4.5, Z), fade = 1 - hazeAt(Z) * .6;
-    const gy = py(0, Z), gw = 2.4 * k;
-    const cg = g.createLinearGradient(0, y, 0, gy);
-    cg.addColorStop(0, rgba(COLD, .12 * fade)); cg.addColorStop(1, rgba(COLD, .02 * fade));
-    g.fillStyle = cg; g.beginPath(); g.moveTo(x - .12 * k, y); g.lineTo(x - gw, gy); g.lineTo(x + gw, gy); g.lineTo(x + .12 * k, y); g.closePath(); g.fill();
-    groundGlow(g, hx, Z, 2.6, 2.6, COLD, .2 * fade);
-    glow(g, x, y, 3.2 * k, COLD, .12 * fade);
-    glow(g, x, y, .9 * k, mixa(COLD, FROST, .5), .55 * fade);
-    glow(g, x, y + .05 * k, .22 * k, FROST, .95 * fade);
+    const Z = L.Z, k = kAt(Z), x = px(L.X, Z), y = py(4.25, Z), fade = 1 - hazeAt(Z) * .5;
+    glow(g, x, y, 3.0 * k, [250, 220, 170], .14 * fade);
+    glow(g, x, y, .7 * k, [255, 236, 200], .55 * fade);
+    g.fillStyle = rgba([255, 244, 220], .95 * fade); g.beginPath(); g.ellipse(x, y, .17 * k, .22 * k, 0, 0, TAU); g.fill();
+    L.r = { x0: x - .5 * k, x1: x + .5 * k, y0: y - .5 * k, y1: y + .5 * k };
   }
-
-  // neon
-  const jr = frontRect(XL + .3, XL + 1.3, 4.5, 9.2, 24.79);
-  glow(g, (jr.x0 + jr.x1) / 2, (jr.y0 + jr.y1) / 2, (jr.y1 - jr.y0) * .9, RED, .16 * jA);
-  tubeRect(g, jr.x0 + 3 * S, jr.y0 + 3 * S, jr.x1 - 3 * S, jr.y1 - 3 * S, RED, .8 * nb, Math.max(1, .05 * kAt(24.8)));
-  verticalSign(g, jr, 'JAZZ', neon.jazz.map(v => v * nb), RED, FONT_SIGN);
-
-  const vr = frontRect(XL + .15, XL + 3.35, 3.85, 4.85, 28.99);
-  glow(g, (vr.x0 + vr.x1) / 2, (vr.y0 + vr.y1) / 2, (vr.x1 - vr.x0) * .8, ORANGE, .14 * vA);
-  tubeRect(g, vr.x0 + 2 * S, vr.y0 + 2 * S, vr.x1 - 2 * S, vr.y1 - 2 * S, AMBER, .7 * nb, Math.max(1, .04 * kAt(29)));
-  horizontalSign(g, vr, 'Velvet', neon.velvet.map(v => v * nb), ORANGE, FONT_SCRIPT);
-
-  const br = frontRect(XR - 1.25, XR - .25, 3.6, 6.4, 34.99);
-  glow(g, (br.x0 + br.x1) / 2, (br.y0 + br.y1) / 2, (br.y1 - br.y0) * .9, AMBER, .13 * bA);
-  verticalSign(g, br, 'BAR', neon.bar.map(v => v * nb), AMBER, FONT_SIGN);
-
-  const er = frontRect(XR - 1.75, XR - .15, 4.3, 5.0, 13.49);
-  glow(g, (er.x0 + er.x1) / 2, (er.y0 + er.y1) / 2, (er.x1 - er.x0) * .7, AMBER, .12 * eA);
-  horizontalSign(g, er, 'EATS', neon.eats.map(v => v * nb), AMBER, FONT_SIGN, .7);
-
-  // hotel canopy lettering (lit, steady)
-  const hr = frontRect(XR - 3.25, XR - .05, 3.02, 3.33, 19.99);
-  const hs = (hr.y1 - hr.y0) * .62;
-  g.save(); g.font = `${hs}px ${FONT_DECO}`; g.textAlign = 'center'; g.textBaseline = 'middle';
-  const tw = g.measureText('HOTEL MERIDIAN').width, sc = Math.min(1, (hr.x1 - hr.x0) * .9 / tw);
-  g.translate((hr.x0 + hr.x1) / 2, (hr.y0 + hr.y1) / 2); g.scale(sc, 1);
-  g.shadowColor = rgba(AMBER, .8); g.shadowBlur = hs * .5; g.fillStyle = rgba(mixa(FROST, AMBER, .45), .92);
-  g.fillText('HOTEL MERIDIAN', 0, 0); g.restore();
+  // traffic signals at the corner
+  const scol = [NEON.green, NEON.yellow, NEON.red][signal.state];
+  for (const s of SIGNALS) {
+    const Z = s.Z, k = kAt(Z), x = px(s.X, Z), yy = [3.8, 3.5, 3.2][signal.state];
+    const y = py(yy, Z);
+    glow(g, x, y, 1.6 * k, scol, .3); glow(g, x, y, .12 * k, mixa(FROST, scol, .5), 1);
+    s.r = { x0: x - .4 * k, x1: x + .4 * k, y0: y - .4 * k, y1: y + .4 * k };
+  }
 }
 
 /* =============================================================================
-   WET-ROAD REFLECTIONS (half res, rebuilt with the light layer)
-   A light at (X, Y, Z) reflects in a wet road as if mirrored to (X, -Y, Z).
-   On rough wet asphalt that image smears into a long vertical streak running
-   from the light's foot toward the viewer; ripples break it into bands.
+   WET-ROAD REFLECTIONS
+   Facade light is mirrored column by column about each column's own ground
+   line. Signs, lamps and signals face us, so each is mirrored about the ground
+   line at its own depth. Then the image is smeared vertically (wet asphalt is
+   rough, so reflections stretch toward us) and broken by ripples.
    ============================================================================= */
 function buildRipple() {
   const g = ripC.getContext('2d'), w = ripC.width, h = ripC.height, q = .5, rnd = mulberry32(77);
   g.clearRect(0, 0, w, h);
   for (let y = Math.ceil(VPy * q); y < h; y++) {
-    const Z = F * CAM.y / (y / q - VPy), ph = Z * 5.5 + Math.sin(Z * .9) * 2.2;
-    const a = Z > 140 ? .7 : .52 + .48 * Math.pow(.5 + .5 * Math.sin(ph), 1.6);
+    const Z = F * CAM.y / (y / q - VPy), ph = Z * 6 + Math.sin(Z * .8) * 2.4;
+    const a = Z > 120 ? .75 : .45 + .55 * Math.pow(.5 + .5 * Math.sin(ph), 1.5);
     g.fillStyle = `rgba(0,0,0,${a.toFixed(3)})`; g.fillRect(0, y, w, 1);
   }
   g.globalCompositeOperation = 'destination-out';
-  for (let i = 0; i < w * h / 70; i++) { g.fillStyle = `rgba(0,0,0,${(rnd() * .6).toFixed(3)})`; g.fillRect(rnd() * w, VPy * q + rnd() * (h - VPy * q), 3 + rnd() * 30, 1); }
-  // only the ground can reflect: cut away everything above the facades' base lines
-  g.globalCompositeOperation = 'destination-in';
-  const Zb = F * CAM.y / (H - VPy);
-  g.beginPath(); g.moveTo(VPx * q, VPy * q); g.lineTo(px(XL, Zb) * q, h); g.lineTo(px(XR, Zb) * q, h); g.closePath();
-  g.fillStyle = '#000'; g.fill();
+  for (let i = 0; i < w * h / 50; i++) { g.fillStyle = `rgba(0,0,0,${(rnd() * .65).toFixed(3)})`; g.fillRect(rnd() * w, VPy * q + rnd() * (h - VPy * q), 2 + rnd() * 26, 1); }
   g.globalCompositeOperation = 'source-over';
+  for (let i = 0; i < 70; i++) { // puddles shine harder
+    const y = lerp(VPy * q + 4, h, Math.pow(rnd(), .7)), Z = F * CAM.y / (y / q - VPy), kq = kAt(Z) * q;
+    const X = lerp(-CURB, CURB, rnd()), x = px(X, Z) * q, rx = rr2(rnd, .6, 2.4) * kq, ry = rx * CAM.y / Z * rr2(rnd, .6, 1.2);
+    g.fillStyle = 'rgba(0,0,0,.6)'; g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, TAU); g.fill();
+  }
 }
 function buildReflection() {
-  const g = reflX, q = .5, nb = settings.neon;
+  const g = reflX, q = .5, rw = reflC.width;
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
-  g.clearRect(0, 0, reflC.width, reflC.height);
-  g.globalCompositeOperation = 'lighter';
-  const streak = (X, Y, Z, wm, col, a) => {
-    if (a <= .003) return;
-    const k = kAt(Z), sx = px(X, Z), y0 = py(0, Z), ym = py(-Y, Z);
-    const len = Math.min(H - y0, (ym - y0) * 2 + 40 * S), w = Math.max(2 * S, wm * k * .85);
-    const gr = g.createLinearGradient(0, y0 * q, 0, (y0 + len) * q);
-    gr.addColorStop(0, rgba(col, a * .5)); gr.addColorStop(clamp((ym - y0) / len, .05, .9), rgba(col, a)); gr.addColorStop(1, rgba(col, 0));
-    g.fillStyle = gr; g.fillRect((sx - w / 2) * q, y0 * q, w * q, len * q);
-  };
-  const dz = (CLUB.door0 + CLUB.door1) / 2;
-  streak(XL + .2, 1.3, dz, 1.8, ORANGE, .7);
-  streak(XL + .9, 1.3, dz, 3.4, ORANGE, .25);
-  streak(XL + .8, 6.8, 24.9, .9, RED, .55 * avg(neon.jazz) * nb);
-  streak(XL + 1.75, 4.35, 29.1, 2.8, ORANGE, .45 * avg(neon.velvet) * nb);
-  streak(XR - .75, 5.0, 35.1, .9, AMBER, .4 * avg(neon.bar) * nb);
-  streak(XR - .95, 4.65, 13.6, 1.4, AMBER, .35 * avg(neon.eats) * nb);
-  for (const z of [11.6, 13.0, 14.4, 15.7]) streak(XR - .1, 1.8, z, 1.2, AMBER, .28);
-  streak(XR - .1, 1.4, 21.5, 2, AMBER, .32);
-  streak(XR - .1, 1.2, 36.7, 1.3, ORANGE, .3);
-  streak(XL + .1, .3, 23.4, 1.5, ORANGE, .25);
-  for (const L of LAMPS) streak(L.X + L.arm, 4.5, L.Z, .45, COLD, .4 * (1 - hazeAt(L.Z) * .5));
-  for (const w of WINS) {
-    const zm = (w.za + w.zb) / 2;
-    if (!w.on || w.ya > 11 || zm > 90) continue;
-    streak(w.X, (w.ya + w.yb) / 2, zm, w.zb - w.za, WINCOL[w.kind], .07 * w.a);
+  g.clearRect(0, 0, rw, reflC.height);
+  // 1. facades
+  for (let c = 0; c < rw; c++) {
+    const sx = (c + .5) / q, X = sx < VPx ? XL : XR, dx = X - CAM.x, den = sx - VPx;
+    if (den === 0 || Math.sign(den) !== Math.sign(dx)) continue;
+    const Z = F * dx / den;
+    if (Z < 3 || Z > ZFAR) continue;
+    const gy = py(0, Z);
+    if (gy <= 0) continue;
+    g.setTransform(1, 0, 0, -1, 0, 2 * gy * q);
+    g.drawImage(emissC, sx - 1 / q / 2, 0, 1 / q, gy, c, 0, 1, gy * q);
   }
-  // smear vertically: squash to a few rows and stretch back
+  // 2. everything that faces us
+  const flipRect = (r, Z, src, pad) => {
+    if (!r) return;
+    const m = py(0, Z), x0 = clamp(r.x0 - pad, 0, W), x1 = clamp(r.x1 + pad, 0, W), y0 = clamp(r.y0 - pad, 0, H), y1 = clamp(r.y1 + pad, 0, m);
+    if (x1 - x0 < 1 || y1 - y0 < 1) return;
+    g.setTransform(q, 0, 0, -q, 0, 2 * m * q);
+    g.drawImage(src, x0, y0, x1 - x0, y1 - y0, x0, y0, x1 - x0, y1 - y0);
+  };
+  for (const s of SIGNS) flipRect(s.r, s.z, signsC, Math.max(4, (s.r ? s.r.x1 - s.r.x0 : 0) * .3));
+  for (const L of LAMPS) flipRect(L.r, L.Z, signsC, 4);
+  for (const s of SIGNALS) flipRect(s.r, s.Z, signsC, 4);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  // 3. smear toward the viewer, keep a little of the sharp mirror for the puddles
   reflSX.globalCompositeOperation = 'copy';
   reflSX.drawImage(reflC, 0, 0, reflS.width, reflS.height);
-  g.globalCompositeOperation = 'source-over';
-  g.globalAlpha = .55; g.drawImage(reflS, 0, 0, reflC.width, reflC.height); g.globalAlpha = 1;
+  g.globalCompositeOperation = 'destination-in';           // keep 45% of the sharp mirror
+  g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(0, 0, rw, reflC.height);
+  g.globalCompositeOperation = 'lighter';
+  g.drawImage(reflS, 0, 0, rw, reflC.height);
+  g.globalAlpha = .6; g.drawImage(reflS, 0, 0, rw, reflC.height); g.globalAlpha = 1;
   g.globalCompositeOperation = 'destination-in';
   g.drawImage(ripC, 0, 0);
   g.globalCompositeOperation = 'source-over';
 }
-function buildBloom() {
-  const g = bloomX, bw = bloomC.width, bh = bloomC.height;
-  g.globalCompositeOperation = 'copy';
-  if (HAS_FILTER) { g.filter = 'blur(3px)'; g.drawImage(lightC, 0, 0, bw, bh); g.filter = 'none'; }
-  else { t2X.clearRect(0, 0, t2C.width, t2C.height); t2X.drawImage(lightC, 0, 0, t2C.width, t2C.height); g.drawImage(t2C, 0, 0, bw, bh); }
-  g.globalCompositeOperation = 'source-over';
+function buildGlows() {
+  allX.globalCompositeOperation = 'copy'; allX.drawImage(emissC, 0, 0);
+  allX.globalCompositeOperation = 'source-over'; allX.drawImage(signsC, 0, 0);
+  // halation: a tight bloom pushed toward red, like light bleeding through film
+  bloomX.globalCompositeOperation = 'copy';
+  if (HAS_FILTER) { bloomX.filter = 'blur(3px)'; bloomX.drawImage(allC, 0, 0, bloomC.width, bloomC.height); bloomX.filter = 'none'; }
+  else { t2X.clearRect(0, 0, t2C.width, t2C.height); t2X.drawImage(allC, 0, 0, t2C.width, t2C.height); bloomX.drawImage(t2C, 0, 0, bloomC.width, bloomC.height); }
+  bloomX.globalCompositeOperation = 'source-atop'; bloomX.fillStyle = 'rgba(255,90,50,.22)'; bloomX.fillRect(0, 0, bloomC.width, bloomC.height);
+  // mist: a very wide, soft glow that makes the wet air itself light up
+  mistX.globalCompositeOperation = 'copy';
+  if (HAS_FILTER) { mistX.filter = 'blur(5px)'; mistX.drawImage(bloomC, 0, 0, mistC.width, mistC.height); mistX.filter = 'none'; }
+  else mistX.drawImage(t2C, 0, 0, mistC.width, mistC.height);
+  mistX.globalCompositeOperation = 'source-over';
 }
+let lightDirty = true;
+function rebuildLights() { drawSigns(); buildReflection(); buildGlows(); lightDirty = false; }
 
 /* =============================================================================
    STREET LIFE
    ============================================================================= */
 const peds = [], cars = [], steam = [], rain = [], splashes = [];
-let nextPed = 0, nextCar = 3, nextExit = 18, nextSteam = 0;
-const doorman = { x: XL + .45, z: CLUB.door0 - .45, ph: 0, smoke: 0, nextPuff: 4 };
-
+let nextPed = 0, nextCar = 4, nextSteam = 0;
 function spawnPed(initial) {
-  const side = R() < .55 ? -1 : 1, dir = R() < .5 ? 1 : -1;
-  const x = side < 0 ? rand(-8.0, -5.7) : rand(5.7, 8.0);
-  const z = initial ? rand(11, 95) : dir > 0 ? 7.2 : rand(95, 140);
-  peds.push({ x, z, side, dir, spd: rand(.95, 1.3), ph: R() * TAU, h: rand(1.66, 1.86), umb: R() < .42, hat: R() < .85,
-    skirt: R() < .25, alpha: initial || dir > 0 ? 1 : 0, state: 'walk', decided: false });
+  const side = R() < .5 ? -1 : 1, dir = R() < .5 ? 1 : -1;
+  const x = side < 0 ? rand(-7.0, -4.9) : rand(4.9, 7.0);
+  const z = initial ? rand(8, 80) : dir > 0 ? 5 : rand(80, 110);
+  peds.push({ x, z, side, dir, spd: rand(.9, 1.25), ph: R() * TAU, h: rand(1.64, 1.86), umb: R() < .4, hat: R() < .8, skirt: R() < .3,
+    alpha: initial || dir > 0 ? 1 : 0, state: 'walk', decided: false });
 }
 function spawnCar(initial) {
-  const dir = R() < .5 ? -1 : 1;
-  const z = initial ? rand(60, 160) : dir < 0 ? 280 : 2.5;
-  cars.push({ dir, x: dir < 0 ? -2.45 : 2.45, z, spd: rand(5, 7.5), cab: R() < .22,
-    col: pick([[22, 26, 34], [30, 20, 22], [18, 26, 24], [26, 26, 30], [34, 28, 22]]), swished: false });
-  if (!initial && dir > 0) carSound(1, 6, .5);
+  const c = { x: rand(-.15, .15), z: initial ? rand(30, 90) : 1.6, len: rand(5.0, 5.4), spd: rand(4.5, 7), cab: R() < .3, seed: (R() * 1e9) | 0 };
+  c.col = c.cab ? [200, 160, 46] : pick([[14, 15, 18], [44, 16, 18], [18, 30, 26], [150, 140, 118], [18, 22, 36]]);
+  c.hl = pick([NEON.red, NEON.orange, NEON.yellow, NEON.pink]);
+  cars.push(c);
+  if (!initial) carSound(1, 6, .1);
 }
+const marquees = () => SIGNS.filter(s => s.kind === 'marquee');
 function updateLife(dt) {
   nextPed -= dt;
   if (nextPed <= 0) { nextPed = rand(2.5, 6); if (peds.length < 14) spawnPed(false); }
-  nextExit -= dt;
-  if (nextExit <= 0) {
-    nextExit = rand(25, 50);
-    peds.push({ x: XL + .5, z: (CLUB.door0 + CLUB.door1) / 2, side: -1, dir: R() < .5 ? 1 : -1, spd: rand(.95, 1.2), ph: 0, h: rand(1.7, 1.85),
-      umb: false, hat: true, skirt: R() < .3, alpha: 0, state: 'exit', decided: true });
-  }
-  const dzc = (CLUB.door0 + CLUB.door1) / 2;
   for (let i = peds.length - 1; i >= 0; i--) {
     const p = peds[i];
     if (p.state === 'walk') {
       p.z += p.dir * p.spd * dt; p.ph += p.spd * dt * 4.2;
       if (p.alpha < 1) p.alpha = Math.min(1, p.alpha + dt / 2.5);
-      if (p.side < 0 && !p.decided && Math.abs(p.z - dzc) < .3) { p.decided = true; if (R() < .35) p.state = 'enter'; }
-      if (p.z < 6.3 || p.z > 150) peds.splice(i, 1);
-    } else if (p.state === 'enter') {          // ducks into the club
-      p.x -= .9 * dt; p.z += (dzc - p.z) * Math.min(1, dt * 2); p.ph += dt * 3.5;
-      if (p.x < XL + 1) p.alpha -= dt / 1.1;
+      if (!p.decided) for (const m of marquees()) if (m.side === p.side && Math.abs(p.z - (m.z + .7)) < .3) { p.decided = true; if (R() < .35) { p.state = 'enter'; p.tz = m.z + .7; } }
+      if (p.z < 4.5 || p.z > 120) peds.splice(i, 1);
+    } else {
+      p.x += (p.side < 0 ? -1 : 1) * .9 * dt; p.z += (p.tz - p.z) * Math.min(1, dt * 2); p.ph += dt * 3.5;
+      if (Math.abs(p.x) > 6.6) p.alpha -= dt / 1.1;
       if (p.alpha <= 0) peds.splice(i, 1);
-    } else {                                  // steps out of the club
-      p.x += .8 * dt; p.ph += dt * 3.5; p.alpha = Math.min(1, p.alpha + dt / 1.2);
-      if (p.x > -7.2) p.state = 'walk';
     }
   }
   nextCar -= dt;
-  if (nextCar <= 0) { nextCar = rand(8, 20); if (cars.length < 3) spawnCar(false); }
-  for (let i = cars.length - 1; i >= 0; i--) {
-    const c = cars[i]; c.z += c.dir * c.spd * dt;
-    if (c.dir < 0 && !c.swished && c.z < 34) { c.swished = true; carSound(-1, 5.5, -.45); }
-    if (c.z > 320 || c.z < 1.5) cars.splice(i, 1);
-  }
+  if (nextCar <= 0) { nextCar = rand(9, 20); if (cars.length < 2) spawnCar(false); }
+  for (let i = cars.length - 1; i >= 0; i--) { const c = cars[i]; c.z += c.spd * dt; if (c.z > 220) cars.splice(i, 1); }
   nextSteam -= dt;
-  while (nextSteam <= 0) {
-    nextSteam += .32;
-    steam.push({ x: .4 + rand(-.35, .35), y: .05, z: 17.6 + rand(-.25, .25), r: rand(.25, .4), vy: rand(.3, .5), vx: rand(-.05, .15), life: rand(5, 8), age: 0 });
-  }
-  for (let i = steam.length - 1; i >= 0; i--) {
-    const s = steam[i]; s.age += dt; s.y += s.vy * dt; s.x += s.vx * dt; s.r += .32 * dt; s.vy *= 1 - .08 * dt;
-    if (s.age > s.life) steam.splice(i, 1);
-  }
-  doorman.ph += dt;
-  doorman.nextPuff -= dt;
-  if (doorman.nextPuff <= 0) { doorman.smoke = 1; doorman.nextPuff = rand(6, 12); }
-  doorman.smoke = Math.max(0, doorman.smoke - dt / 1.6);
+  while (nextSteam <= 0) { nextSteam += .3; steam.push({ x: -.6 + rand(-.3, .3), y: .05, z: 17.5 + rand(-.25, .25), r: rand(.25, .4), vy: rand(.3, .5), vx: rand(-.04, .14), life: rand(5, 8), age: 0 }); }
+  for (let i = steam.length - 1; i >= 0; i--) { const s = steam[i]; s.age += dt; s.y += s.vy * dt; s.x += s.vx * dt; s.r += .3 * dt; if (s.age > s.life) steam.splice(i, 1); }
+  for (const p of GROUPS) { p.ph += dt; p.puff -= dt; if (p.puff < 0) p.puff = rand(6, 12); }
   for (const w of ANIMWIN) {
     const a = w.anim;
     if (a.type === 'person') {
@@ -1128,148 +1252,52 @@ function updateLife(dt) {
     }
   }
 }
-
-// A person in hat and overcoat, drawn in metres around their feet (y up is negative).
 function personPath(g, p, sw) {
   const st = .16 * sw;
   g.beginPath();
-  g.moveTo(st - .07, 0); g.lineTo(st + .05, 0); g.lineTo(.03, -.86); g.lineTo(-.1, -.86); g.closePath();
-  g.moveTo(-st - .07, 0); g.lineTo(-st + .05, 0); g.lineTo(.1, -.86); g.lineTo(-.03, -.86); g.closePath();
-  const hem = p.skirt ? .5 : .6, flare = p.skirt ? .3 : .27;
-  g.moveTo(-flare, -hem); g.lineTo(flare, -hem); g.lineTo(.23, -1.42); g.quadraticCurveTo(.2, -1.52, .1, -1.53);
-  g.lineTo(-.1, -1.53); g.quadraticCurveTo(-.2, -1.52, -.23, -1.42); g.closePath();
-  g.moveTo(.1, -1.62); g.arc(0, -1.62, .1, 0, TAU);
+  g.moveTo(st - .07, 0); g.lineTo(st + .05, 0); g.lineTo(.04, -.86); g.lineTo(-.1, -.86); g.closePath();
+  g.moveTo(-st - .07, 0); g.lineTo(-st + .05, 0); g.lineTo(.1, -.86); g.lineTo(-.04, -.86); g.closePath();
+  const hem = p.skirt ? .48 : .58, flare = p.skirt ? .3 : .27;
+  g.moveTo(-flare, -hem); g.quadraticCurveTo(0, -hem + .03, flare, -hem); g.lineTo(.24, -1.38);
+  g.quadraticCurveTo(.23, -1.5, .11, -1.53); g.lineTo(-.11, -1.53); g.quadraticCurveTo(-.23, -1.5, -.24, -1.38); g.closePath();
+  g.moveTo(.06, -1.5); g.lineTo(.06, -1.58); g.lineTo(-.06, -1.58); g.lineTo(-.06, -1.5); g.closePath();
+  g.moveTo(.095, -1.63); g.ellipse(0, -1.63, .095, .11, 0, 0, TAU);
   if (p.hat) {
-    g.moveTo(.2, -1.7); g.ellipse(0, -1.7, .2, .035, 0, 0, TAU);
-    g.moveTo(.1, -1.7); g.lineTo(.09, -1.83); g.quadraticCurveTo(0, -1.79, -.09, -1.83); g.lineTo(-.1, -1.7); g.closePath();
+    g.moveTo(.21, -1.71); g.ellipse(0, -1.71, .21, .035, 0, 0, TAU);
+    g.moveTo(.1, -1.71); g.lineTo(.09, -1.84); g.quadraticCurveTo(0, -1.8, -.09, -1.84); g.lineTo(-.1, -1.71); g.closePath();
   }
   if (p.umb) {
-    g.moveTo(.68, -1.98); g.ellipse(.04, -1.98, .64, .32, 0, Math.PI, TAU);
-    for (let i = 0; i < 6; i++) { const a = -.6 + i * .256; g.moveTo(.04 + a * 1.06, -1.98); g.quadraticCurveTo(.04 + (a + .128) * 1.06, -1.9, .04 + (a + .256) * 1.06, -1.98); }
+    g.moveTo(.68, -1.98); g.ellipse(.04, -1.98, .64, .3, 0, Math.PI, TAU);
     g.rect(.03, -1.98, .03, .8);
   }
 }
-function drawPerson(g, p) {
-  if (p.z < 4) return;
+function drawPerson(g, p, rimCol, rimA) {
+  if (p.z < 3.5) return;
   const k = kAt(p.z), x = px(p.x, p.z), y = py(0, p.z), hz0 = hazeAt(p.z);
   if (y - 2.4 * k > H || x < -k * 2 || x > W + k * 2) return;
-  const sw = Math.sin(p.ph), bob = Math.abs(Math.cos(p.ph)) * .025;
-  const dzc = (CLUB.door0 + CLUB.door1) / 2;
-  const warm = p.side < 0 ? clamp(1 - Math.abs(p.z - dzc) / 7, 0, 1) : 0;
+  const sw = p.state === 'stand' ? 0 : Math.sin(p.ph), bob = p.state === 'stand' ? 0 : Math.abs(Math.cos(p.ph)) * .025;
   g.save();
-  g.globalAlpha = p.alpha;
-  // reflection in the wet pavement: a dark smudge that blocks the light behind it
-  g.setTransform(k, 0, 0, -k * .8, x, y);
-  personPath(g, p, sw); g.fillStyle = rgba(INK, .32 * (1 - hz0)); g.fill();
-  g.setTransform(k, 0, 0, k, x, y - bob * k);
-  // rim light, then the silhouette over it, offset so only an edge shows
-  g.save(); g.translate(p.side < 0 ? .03 : -.03, 0);
-  personPath(g, p, sw); g.fillStyle = warm > .05 ? rgba(ORANGE, .55 * warm) : rgba(COLD, .22 * (1 - hz0)); g.fill();
+  g.globalAlpha = p.alpha ?? 1;
+  g.setTransform(k, 0, 0, -k * .85, x, y);                       // dark reflection on the wet pavement
+  personPath(g, p, sw); g.fillStyle = rgba(INK, .5 * (1 - hz0)); g.fill();
+  const lean = p.state === 'stand' ? Math.sin(p.ph * .5) * .012 : 0;
+  g.setTransform(k, 0, 0, k, x + lean * k, y - bob * k);
+  g.save(); g.translate(p.side < 0 ? .028 : -.028, -.01);     // rim light from the signs
+  personPath(g, p, sw); g.fillStyle = rgba(rimCol, rimA * (1 - hz0 * .7)); g.fill();
   g.restore();
-  personPath(g, p, sw); g.fillStyle = mixc(mixa(INK, [8, 9, 12], .5), HAZE, hz0 * .92); g.fill();
+  personPath(g, p, sw); g.fillStyle = hz([7, 8, 11], p.z, .95); g.fill();
   g.restore();
 }
-function drawDoorman(g) {
-  const p = { x: doorman.x, z: doorman.z, side: -1, h: 1.84, umb: false, hat: true, skirt: false };
-  const k = kAt(p.z), x = px(p.x, p.z), y = py(0, p.z), sway = Math.sin(doorman.ph * .4) * .015;
-  g.save();
-  g.setTransform(k, 0, 0, k, x + sway * k, y);
-  g.save(); g.translate(.035, 0); personPath(g, p, 0); g.fillStyle = rgba(ORANGE, .7); g.fill(); g.restore();
-  personPath(g, p, 0); g.fillStyle = rgba(mixa(INK, [8, 9, 12], .5), 1); g.fill();
-  g.restore();
-  // cigarette ember, brightening slowly on a draw
-  const ex = x + (.16 + sway) * k, ey = y - 1.55 * k;
-  g.globalCompositeOperation = 'lighter';
-  glow(g, ex, ey, (.05 + doorman.smoke * .06) * k, ORANGE, .5 + doorman.smoke * .5);
-  g.globalCompositeOperation = 'source-over';
-}
-// A rounded 1940s sedan: lower body, narrower cabin, bulging fenders on the near face.
-function drawCar(g, c) {
-  const z0 = c.z, L = 5;
-  if (z0 < 2.2) return;
-  const X = c.x, hw = .95, k0 = kAt(z0), haz = hazeAt(z0 + 2);
-  const body = mixc(c.cab ? CABY : c.col, HAZE, haz * .9), bodyTop = mixc(mixa(c.cab ? CABY : c.col, FROST, .12), HAZE, haz * .9);
-  const glass = mixc(mixa(INK, COLD, .18), HAZE, haz * .9);
-  const toward = c.dir < 0;
-  const cz0 = z0 + (toward ? 1.75 : 1.6), cz1 = z0 + (toward ? 3.4 : 3.3);
-  g.save();
-  // headlight pool / tail glow on the road first (under the car)
-  g.globalCompositeOperation = 'lighter';
-  if (toward) {
-    groundGlow(g, X, Math.max(2.5, z0 - 6), 2.2, 7, AMBER, .22 * (1 - haz));
-    for (const s of [-.62, .62]) {
-      const sx = px(X + s, z0), y0 = py(0, z0), w = .4 * k0;
-      const gr = g.createLinearGradient(0, y0, 0, H);
-      gr.addColorStop(0, rgba(AMBER, .32 * (1 - haz))); gr.addColorStop(1, rgba(AMBER, 0));
-      g.fillStyle = gr; g.fillRect(sx - w / 2, y0, w, H - y0);
-    }
-  } else {
-    for (const s of [-.72, .72]) {
-      const sx = px(X + s, z0), y0 = py(0, z0), w = .25 * k0;
-      const gr = g.createLinearGradient(0, y0, 0, Math.min(H, y0 + 5 * k0));
-      gr.addColorStop(0, rgba(RED, .2 * (1 - haz))); gr.addColorStop(1, rgba(RED, 0));
-      g.fillStyle = gr; g.fillRect(sx - w / 2, y0, w, Math.min(H, y0 + 5 * k0) - y0);
-    }
-  }
-  g.globalCompositeOperation = 'source-over';
-  // shadow under the car
-  groundGlow(g, X, z0 + 2.5, 1.2, 2.8, INK, .7);
-  // side panel facing us, if we can see one
-  if (Math.abs(CAM.x - X) > hw) {
-    const sX = CAM.x > X ? X + hw : X - hw, cX = CAM.x > X ? X + .72 : X - .72;
-    face(g, [[sX, .3, z0], [sX, 1.0, z0], [sX, 1.0, z0 + L], [sX, .3, z0 + L]], body);
-    face(g, [[cX, 1.0, cz0], [cX, 1.55, cz0 + .35], [cX, 1.55, cz1 - .3], [cX, 1.0, cz1]], glass);
-  }
-  // hood / trunk tops and the roof
-  face(g, [[X - hw, 1.0, z0 + .15], [X + hw, 1.0, z0 + .15], [X + hw, 1.0, z0 + L], [X - hw, 1.0, z0 + L]], bodyTop);
-  face(g, [[X - .72, 1.0, cz0], [X + .72, 1.0, cz0], [X + .62, 1.56, cz0 + .35], [X - .62, 1.56, cz0 + .35]], glass);
-  face(g, [[X - .62, 1.58, cz0 + .35], [X + .62, 1.58, cz0 + .35], [X + .62, 1.58, cz1 - .3], [X - .62, 1.58, cz1 - .3]], bodyTop);
-  if (c.cab) { box(g, X - .2, X + .2, 1.58, 1.75, cz0 + 1, cz0 + 1.2, rgba(AMBER, .8), rgba(AMBER, .6), rgba(AMBER, .7)); }
-  // near face: rounded body with fenders, then tyres
-  const x = px(X, z0), y = py(0, z0), k = k0;
-  const P2 = (u, v) => [x + u * k, y - v * k];
-  g.fillStyle = rgba(INK, .95);
-  for (const s of [-.78, .78]) { const [tx, ty] = P2(s, .32); g.beginPath(); g.ellipse(tx, ty, .17 * k, .32 * k, 0, 0, TAU); g.fill(); }
-  g.beginPath();
-  let p = P2(-1.0, .32); g.moveTo(...p);
-  p = P2(-1.02, .78); g.lineTo(...p);
-  g.quadraticCurveTo(...P2(-1.0, 1.0), ...P2(-.78, 1.0));
-  g.lineTo(...P2(.78, 1.0));
-  g.quadraticCurveTo(...P2(1.0, 1.0), ...P2(1.02, .78));
-  g.lineTo(...P2(1.0, .32)); g.closePath();
-  g.fillStyle = body; g.fill();
-  g.strokeStyle = rgba(FROST, .14 * (1 - haz)); g.lineWidth = Math.max(.6, .03 * k);
-  g.beginPath(); g.moveTo(...P2(-.78, 1.0)); g.lineTo(...P2(.78, 1.0)); g.stroke();
-  g.fillStyle = rgba(FROST, .1 * (1 - haz)); g.fillRect(...P2(-.9, .42), 1.8 * k, .06 * k); // bumper
-  if (toward) { // grille
-    g.fillStyle = rgba(INK, .6); g.fillRect(...P2(-.28, .9), .56 * k, .42 * k);
-    g.strokeStyle = rgba(FROST, .12 * (1 - haz)); g.beginPath(); for (let i = 1; i < 6; i++) { const [a, b] = P2(-.28 + i * .093, .9); g.moveTo(a, b); g.lineTo(a, b + .42 * k); } g.stroke();
-  }
-  // lights
-  g.globalCompositeOperation = 'lighter';
-  if (toward) {
-    for (const s of [-.68, .68]) {
-      const [lx, ly] = P2(s, .82);
-      glow(g, lx, ly, 2.2 * k, AMBER, .3 * (1 - haz * .6));
-      glow(g, lx, ly, .5 * k, mixa(FROST, AMBER, .4), .8 * (1 - haz * .5));
-      glow(g, lx, ly, .14 * k, FROST, 1);
-    }
-  } else {
-    for (const s of [-.74, .74]) {
-      const [lx, ly] = P2(s, .78);
-      glow(g, lx, ly, .6 * k, RED, .35 * (1 - haz * .5));
-      glow(g, lx, ly, .1 * k, mixa(RED, AMBER, .4), .9);
-    }
-  }
-  g.globalCompositeOperation = 'source-over';
-  g.restore();
+function rimFor(p) {
+  let best = null, bd = 1e9;
+  for (const s of SIGNS) { const d = Math.abs(s.z - p.z) + (s.side === p.side ? 0 : 5); if (d < bd) { bd = d; best = s; } }
+  return best && bd < 6 ? [best.col, .26 * (1 - bd / 6) + .06] : [COLD, .1];
 }
 function drawSteam(g) {
   g.globalCompositeOperation = 'lighter';
   for (const s of steam) {
-    const k = kAt(s.z), x = px(s.x, s.z), y = py(s.y, s.z), r = s.r * k;
-    const t = s.age / s.life, a = Math.min(1, s.age / 1.2) * (1 - t) * .09;
-    g.globalAlpha = a; g.drawImage(puff, x - r, y - r, 2 * r, 2 * r);
+    const k = kAt(s.z), x = px(s.x, s.z), y = py(s.y, s.z), r = s.r * k, t = s.age / s.life;
+    g.globalAlpha = Math.min(1, s.age / 1.2) * (1 - t) * .06; g.drawImage(puff, x - r, y - r, 2 * r, 2 * r);
   }
   g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
 }
@@ -1277,88 +1305,66 @@ function drawAnimWindows(g, t) {
   for (const w of ANIMWIN) {
     if (!w.on) continue;
     const q = w.q, x0 = Math.min(q[0][0], q[2][0]), x1 = Math.max(q[0][0], q[2][0]);
-    const top = Math.min(q[1][1], q[2][1]), bot = Math.max(q[0][1], q[3][1]), hh = bot - top;
+    const top = Math.min(q[1][1], q[2][1]), bot = Math.max(q[0][1], q[3][1]), hh = bot - top, a = w.anim;
     g.save(); quadPath(g, q); g.clip();
-    const a = w.anim;
     if (a.type === 'person') {
-      const cx = lerp(x0, x1, a.u), sc = hh;
-      g.fillStyle = rgba(mixa(INK, AMBER, .15), .78);
-      g.beginPath(); g.ellipse(cx, bot - sc * .1, sc * .2, sc * .2, 0, Math.PI, TAU); g.fill();
-      g.beginPath(); g.arc(cx, bot - sc * .4, sc * .1, 0, TAU); g.fill();
+      const cx = lerp(x0, x1, a.u);
+      g.fillStyle = rgba(scl(AMBER, .18), .82);
+      g.beginPath(); g.ellipse(cx, bot - hh * .1, hh * .2, hh * .2, 0, Math.PI, TAU); g.fill();
+      g.beginPath(); g.arc(cx, bot - hh * .4, hh * .1, 0, TAU); g.fill();
     } else {
-      const e = .32 + .1 * Math.sin(t * .45 + a.ph) + .04 * Math.sin(t * 1.3 + a.ph * 2);
-      const xe = lerp(x0, x1, e);
-      g.fillStyle = rgba(mixa(AMBER, INK, .55), .6);
+      const e = .32 + .1 * Math.sin(t * .45 + a.ph) + .04 * Math.sin(t * 1.3 + a.ph * 2), xe = lerp(x0, x1, e);
+      g.fillStyle = rgba(scl(AMBER, .45), .6);
       g.beginPath(); g.moveTo(x0 - 2, top); g.lineTo(xe, top);
       g.quadraticCurveTo(xe + (x1 - x0) * .08 * Math.sin(t * .7 + a.ph), (top + bot) / 2, xe - (x1 - x0) * .04, bot);
       g.lineTo(x0 - 2, bot); g.closePath(); g.fill();
-      g.strokeStyle = rgba(INK, .3); g.lineWidth = 1;
-      g.beginPath(); for (let f = .25; f < 1; f += .25) { const xf = lerp(x0, xe, f); g.moveTo(xf, top); g.lineTo(xf + Math.sin(t * .5 + f * 9) * 1.2, bot); } g.stroke();
     }
     g.restore();
   }
 }
-
-/* ---------- rain falling through the street, brighter inside the light ---------- */
-let rainLights = [];
-function buildRainLights() {
-  rainLights = LAMPS.filter(L => L.Z < 100).map(L => {
-    const k = kAt(L.Z); return { x: px(L.X + L.arm, L.Z), y: py(4.5, L.Z), gy: py(0, L.Z), gw: 2.4 * k, r: 1.4 * k, warm: false };
-  });
-  const dz = (CLUB.door0 + CLUB.door1) / 2, k = kAt(dz);
-  rainLights.push({ x: px(XL + 1.2, dz), y: py(2.6, dz), gy: py(0, dz), gw: 2.2 * k, r: 2.6 * k, warm: true });
-  const kd = kAt(13.6);
-  rainLights.push({ x: px(XR - 1.4, 13.6), y: py(2.8, 13.6), gy: py(0, 13.6), gw: 2.2 * kd, r: 2.6 * kd, warm: true });
-}
-function seedRain() {
-  rain.length = 0;
-  const n = Math.round((W / S) * (H / S) / (1920 * 1080) * (160 + 700 * settings.rain));
-  for (let i = 0; i < n; i++) rain.push(newDrop(true));
-}
 function newDrop(anywhere) {
-  const d = R(), near = d > .8;
-  return { x: R() * W * 1.1 - W * .05, y: anywhere ? R() * H : -40 * S, len: (near ? rand(18, 34) : rand(7, 16)) * S,
-    spd: (near ? rand(520, 700) : rand(300, 460)) * S, w: near ? .9 * S : .6 * S };
+  const near = R() > .78;
+  return { x: R() * W * 1.15 - W * .1, y: anywhere ? R() * H : -40 * S, len: (near ? rand(20, 38) : rand(8, 18)) * S, spd: (near ? rand(560, 760) : rand(320, 480)) * S };
 }
+function rainWanted() { return Math.round((W / S) * (H / S) / (1920 * 1080) * (220 + 900 * settings.rain)); }
 function updateRain(dt) {
-  const want = Math.round((W / S) * (H / S) / (1920 * 1080) * (160 + 700 * settings.rain));
-  while (rain.length < want) rain.push(newDrop(false));
+  const want = rainWanted();
+  while (rain.length < want) rain.push(newDrop(true));
   if (rain.length > want) rain.length = want;
-  for (const d of rain) {
-    d.y += d.spd * dt; d.x += d.spd * .1 * dt;
-    if (d.y > H + 40 * S) { Object.assign(d, newDrop(false)); }
-  }
-  const nS = (12 + 60 * settings.rain) * dt;
-  for (let i = 0; i < nS; i++) if (R() < 1) {
-    const sy = rand(VPy + (H - VPy) * .08, H), Z = F * CAM.y / (sy - VPy), X = rand(XL, XR);
+  for (const d of rain) { d.y += d.spd * dt; d.x += d.spd * .09 * dt; if (d.y > H + 40 * S) Object.assign(d, newDrop(false)); }
+  const nS = (14 + 70 * settings.rain) * dt;
+  for (let i = 0; i < nS; i++) {
+    const sy = rand(VPy + (H - VPy) * .06, H), Z = F * CAM.y / (sy - VPy), X = rand(XL, XR);
     splashes.push({ x: px(X, Z), y: sy, k: kAt(Z), age: 0 });
   }
   for (let i = splashes.length - 1; i >= 0; i--) { splashes[i].age += dt; if (splashes[i].age > .4) splashes.splice(i, 1); }
 }
+// Rain is only visible where there is light behind it, so we draw every streak
+// in white and then keep only what sits in front of the glow (source-in), which
+// also tints each streak the colour of the light it falls through.
 function drawRain(g) {
-  const paths = [new Path2D(), new Path2D(), new Path2D()];
-  for (const d of rain) {
-    let b = 0;
-    for (const L of rainLights) {
-      if (d.y > L.y && d.y < L.gy) {
-        const t = (d.y - L.y) / (L.gy - L.y);
-        if (Math.abs(d.x - L.x) < L.gw * t + L.r * .3) { b = L.warm ? 2 : 1; break; }
-      }
-      if (Math.hypot(d.x - L.x, d.y - L.y) < L.r) { b = L.warm ? 2 : 1; break; }
-    }
-    paths[b].moveTo(d.x, d.y); paths[b].lineTo(d.x - d.len * .1, d.y - d.len);
-  }
-  g.lineCap = 'round';
-  g.lineWidth = .7 * S;
-  g.strokeStyle = rgba(COLD, .16); g.stroke(paths[0]);
-  g.strokeStyle = rgba(mixa(COLD, FROST, .5), .42); g.stroke(paths[1]);
-  g.strokeStyle = rgba(AMBER, .38); g.stroke(paths[2]);
+  const r = rainX, q = .5;
+  r.setTransform(1, 0, 0, 1, 0, 0); r.globalCompositeOperation = 'source-over';
+  r.clearRect(0, 0, rainC.width, rainC.height);
+  r.strokeStyle = '#fff'; r.lineWidth = Math.max(.6, .7 * S * q); r.lineCap = 'round';
+  r.beginPath();
+  for (const d of rain) { r.moveTo(d.x * q, d.y * q); r.lineTo((d.x - d.len * .09) * q, (d.y - d.len) * q); }
+  r.stroke();
+  r.globalCompositeOperation = 'source-in';
+  r.drawImage(bloomC, 0, 0, rainC.width, rainC.height);
+  r.drawImage(bloomC, 0, 0, rainC.width, rainC.height);
+  r.globalCompositeOperation = 'source-over';
+  g.globalCompositeOperation = 'lighter';
+  g.drawImage(rainC, 0, 0, W, H); g.drawImage(rainC, 0, 0, W, H);
+  g.globalCompositeOperation = 'source-over';
+  g.strokeStyle = rgba(COLD, .05); g.lineWidth = .6 * S; g.beginPath();
+  for (let i = 0; i < rain.length; i += 3) { const d = rain[i]; g.moveTo(d.x, d.y); g.lineTo(d.x - d.len * .09, d.y - d.len); }
+  g.stroke();
   g.strokeStyle = rgba(FROST, 1); g.lineWidth = .6 * S;
   for (const s of splashes) {
-    const t = s.age / .4, r = (.04 + .16 * t) * s.k;
-    if (r < .6) continue;
-    g.globalAlpha = .22 * (1 - t);
-    g.beginPath(); g.ellipse(s.x, s.y, r, r * .3, 0, 0, TAU); g.stroke();
+    const t = s.age / .4, rr = (.04 + .15 * t) * s.k;
+    if (rr < .6) continue;
+    g.globalAlpha = .16 * (1 - t); g.beginPath(); g.ellipse(s.x, s.y, rr, rr * .3, 0, 0, TAU); g.stroke();
   }
   g.globalAlpha = 1;
 }
@@ -1367,23 +1373,35 @@ function drawRain(g) {
 function composeScene(t) {
   const g = sceneX;
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
-  g.drawImage(staticC, 0, 0);
-  g.globalCompositeOperation = 'lighter';
-  g.drawImage(reflC, 0, 0, W, H);
-  g.drawImage(lightC, 0, 0);
+  g.drawImage(backC, 0, 0);
+  g.globalCompositeOperation = 'lighter'; g.drawImage(reflC, 0, 0, W, H);
   g.globalCompositeOperation = 'source-over';
+  g.drawImage(frontC, 0, 0);
+  g.drawImage(signsC, 0, 0);
   drawAnimWindows(g, t);
-  // people, cars, the doorman and the steam, sorted far to near
   const items = [];
-  for (const p of peds) items.push([p.z, () => drawPerson(g, p)]);
-  for (const c of cars) items.push([c.z, () => drawCar(g, c)]);
-  items.push([doorman.z, () => drawDoorman(g)]);
-  items.push([17.6, () => drawSteam(g)]);
+  for (const p of peds) { const [c, a] = rimFor(p); items.push([p.z, () => drawPerson(g, p, c, a)]); }
+  for (const c of CARS) if (c.sprite) items.push([c.z, () => g.drawImage(c.sprite, c.bx, c.by)]);
+  for (const p of GROUPS) items.push([p.z, () => {
+    drawPerson(g, Object.assign(p, { state: 'stand', alpha: 1 }), p.col, .3);
+    if (p.smoke) { const k = kAt(p.z), x = px(p.x, p.z) + .16 * k, y = py(1.56, p.z), br = p.puff < 1.5 ? 1 : 0;
+      g.globalCompositeOperation = 'lighter'; glow(g, x, y, (.05 + br * .05) * k, ORANGE, .55 + br * .4); g.globalCompositeOperation = 'source-over'; }
+  }]);
+  for (const c of cars) items.push([c.z, () => {
+    // the car's own headlights light the road ahead of it
+    g.globalCompositeOperation = 'lighter';
+    groundGlow(g, c.x, c.z + c.len + 9, 2.4, 9, [250, 226, 170], .2 * (1 - hazeAt(c.z + 12)));
+    g.globalCompositeOperation = 'source-over';
+    drawCar(g, c, { lit: true });
+  }]);
+  items.push([17.5, () => drawSteam(g)]);
   items.sort((a, b) => b[0] - a[0]);
   for (const it of items) it[1]();
+  g.globalCompositeOperation = 'lighter';
+  g.globalAlpha = .3; g.drawImage(mistC, 0, 0, W, H);        // the air glows around every light
+  g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
   drawRain(g);
 }
-
 /* =============================================================================
    THE GLASS
    ============================================================================= */
@@ -1541,38 +1559,28 @@ function buildFogTarget() {
   gt.drawImage(c, 0, 0, fogT.width, fogT.height);
 }
 function buildFrame() {
+  // A slim, dark window frame and one thin glazing bar near the right edge.
   const g = frameC.getContext('2d'), rnd = mulberry32(11);
   g.clearRect(0, 0, W, H);
-  const t = Math.round(Math.max(16 * S, Math.min(W, H) * .028));
-  const wood = [24, 19, 17];
-  const fillBar = (x, y, w, h, vert) => {
+  const t = Math.round(Math.max(10 * S, Math.min(W, H) * .016)), wood = [18, 14, 13];
+  const bar = (x, y, w, h, vert) => {
     g.fillStyle = rgba(wood, 1); g.fillRect(x, y, w, h);
-    for (let i = 0; i < (vert ? h : w) / (3 * S); i++) { // grain
-      g.fillStyle = rgba(rnd() < .5 ? INK : [60, 44, 34], rnd() * .25);
+    for (let i = 0; i < (vert ? h : w) / (3 * S); i++) {
+      g.fillStyle = rgba(rnd() < .5 ? INK : [50, 36, 28], rnd() * .25);
       if (vert) g.fillRect(x + rnd() * w, y + i * 3 * S, Math.max(1, S * .6), rnd() * 40 * S);
       else g.fillRect(x + i * 3 * S, y + rnd() * h, rnd() * 40 * S, Math.max(1, S * .6));
     }
   };
-  fillBar(0, 0, W, t, false); fillBar(0, H - t * 1.4, W, t * 1.4, false); fillBar(0, 0, t, H, true); fillBar(W - t, 0, t, H, true);
-  // a thin mullion and a muntin making a narrow pane at the right and the top
-  const mx = Math.round(W * .885), my = Math.round(H * .13), mw = Math.max(5 * S, t * .32);
-  fillBar(mx - mw / 2, 0, mw, H, true); fillBar(0, my - mw / 2, W, mw, false);
-  // bevels: street light catches the lower inner edges, the top edges stay dark
-  const edge = (x, y, w, h, col, a) => { g.fillStyle = rgba(col, a); g.fillRect(x, y, w, h); };
+  bar(0, 0, W, t, false); bar(0, H - t * 1.3, W, t * 1.3, false); bar(0, 0, t, H, true); bar(W - t, 0, t, H, true);
+  const mx = Math.round(W * .93), mw = Math.max(4 * S, t * .4);
+  bar(mx - mw / 2, 0, mw, H, true);
   const e = Math.max(1, S);
-  edge(t, H - t * 1.4, W - 2 * t, e * 1.5, AMBER, .35);
-  edge(t, t, W - 2 * t, e * 2, INK, .7);
-  edge(t - e, t, e, H - t * 2.4, ORANGE, .14); edge(W - t, t, e, H - t * 2.4, COLD, .12);
-  edge(mx - mw / 2 - e, 0, e, H, AMBER, .1); edge(mx + mw / 2, 0, e, H, INK, .5);
-  edge(0, my + mw / 2, W, e, AMBER, .14); edge(0, my - mw / 2 - e, W, e, INK, .5);
-  // inner shadow where the frame meets the glass
-  const sh = 10 * S;
-  let gr = g.createLinearGradient(0, t, 0, t + sh); gr.addColorStop(0, rgba(INK, .45)); gr.addColorStop(1, rgba(INK, 0));
+  g.fillStyle = rgba(AMBER, .3); g.fillRect(t, H - t * 1.3, W - 2 * t, e * 1.5);
+  g.fillStyle = rgba(ORANGE, .12); g.fillRect(t - e, t, e, H - t * 2.3);
+  g.fillStyle = rgba(AMBER, .1); g.fillRect(mx - mw / 2 - e, 0, e, H);
+  const sh = 8 * S;
+  let gr = g.createLinearGradient(0, t, 0, t + sh); gr.addColorStop(0, rgba(INK, .5)); gr.addColorStop(1, rgba(INK, 0));
   g.fillStyle = gr; g.fillRect(t, t, W - 2 * t, sh);
-  gr = g.createLinearGradient(t, 0, t + sh, 0); gr.addColorStop(0, rgba(INK, .4)); gr.addColorStop(1, rgba(INK, 0));
-  g.fillStyle = gr; g.fillRect(t, t, sh, H - 2 * t);
-  gr = g.createLinearGradient(W - t, 0, W - t - sh, 0); gr.addColorStop(0, rgba(INK, .4)); gr.addColorStop(1, rgba(INK, 0));
-  g.fillStyle = gr; g.fillRect(W - t - sh, t, sh, H - 2 * t);
 }
 function buildVignette() {
   const w = vigC.width, h = vigC.height, g = vigC.getContext('2d');
@@ -1704,25 +1712,25 @@ function updateDrops(dt, warm) {
    ============================================================================= */
 let nextWin = 2, nextFlicker = 4;
 const flicks = [];
-let lightDirty = true;
 function toggleWindow() {
-  const pool = WINS.filter(w => !w.locked && (w.za + w.zb) / 2 < 120);
+  const pool = WINS.filter(w => !w.locked && (w.za + w.zb) / 2 < 100);
   if (!pool.length) return;
   const w = pool[(R() * pool.length) | 0];
   if (w.on) { if (w.anim && R() < .7) return; w.on = false; }
-  else { if (R() > .45) return; w.on = true; w.kind = (R() * 3) | 0; w.a = rand(.4, 1); }
-  paintWindow(staticX, w);
+  else { if (R() > .3) return; w.on = true; w.kind = (R() * 3) | 0; w.a = rand(.35, .9); }
+  paintWindow(frontX, emissX, w);
 }
 function startFlicker() {
-  const r = R(), key = r < .35 ? 'jazz' : r < .65 ? 'velvet' : r < .82 ? 'eats' : 'bar';
-  const arr = neon[key], i = (R() * arr.length) | 0;
-  if (flicks.some(f => f.arr === arr && f.i === i)) return;
-  const seq = [], dim = rand(.05, .25);
+  const pool = SIGNS.filter(s => s.flick && s.z < 80 && s.levels.length);
+  if (!pool.length) return;
+  const s = pick(pool), i = (R() * s.levels.length) | 0;
+  if (flicks.some(f => f.arr === s.levels && f.i === i)) return;
+  const seq = [], dim = rand(.04, .2);
   if (R() < .5) seq.push([dim, rand(.12, .4)]);
   else { const n = 2 + ((R() * 2) | 0); for (let k = 0; k < n; k++) seq.push([dim, rand(.04, .09)], [rand(.6, 1), rand(.04, .1)]); seq.push([dim, rand(.1, .25)]); }
   seq.push([1, 0]);
-  arr[i] = seq[0][0]; lightDirty = true;
-  flicks.push({ arr, i, seq, k: 0, t: 0 });
+  s.levels[i] = seq[0][0]; lightDirty = true;
+  flicks.push({ arr: s.levels, i, seq, k: 0, t: 0 });
 }
 function updFlickers(dt) {
   for (let j = flicks.length - 1; j >= 0; j--) {
@@ -1734,46 +1742,15 @@ function updFlickers(dt) {
     }
   }
 }
+function updSignal(dt) {
+  signal.t += dt;
+  const dur = [14, 3, 16][signal.state];
+  if (signal.t > dur) { signal.t = 0; signal.state = (signal.state + 1) % 3; lightDirty = true; }
+}
 
 /* =============================================================================
    FRAME
    ============================================================================= */
-function render() {
-  const fw = fogComp.width, fh = fogComp.height;
-  // fogged glass: unwiped mask x condensation map, filled with the blurred street
-  fcX.globalCompositeOperation = 'copy';            fcX.drawImage(fogM, 0, 0);
-  fcX.globalCompositeOperation = 'destination-in';  fcX.drawImage(fogT, 0, 0);
-  fcX.globalCompositeOperation = 'source-in';       fcX.drawImage(blurC, 0, 0, fw, fh);
-  fcX.globalCompositeOperation = 'source-over';
-  // water film on fresh trails: alpha = 1 - unwiped, filled with a soft, shifted street
-  wcX.globalCompositeOperation = 'copy';            wcX.fillStyle = '#000'; wcX.fillRect(0, 0, fw, fh);
-  wcX.globalCompositeOperation = 'destination-out'; wcX.drawImage(fogM, 0, 0);
-  wcX.globalCompositeOperation = 'source-in';       wcX.drawImage(softC, 0, 1.2 * S, fw, fh);
-  wcX.globalCompositeOperation = 'source-over';
-
-  const g = ctx;
-  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
-  g.drawImage(sceneC, 0, 0);
-  g.globalAlpha = .85; g.drawImage(wetComp, 0, 0, W, H); g.globalAlpha = 1;
-  g.drawImage(fogComp, 0, 0, W, H);
-  g.drawImage(sdC, 0, 0);
-  for (const d of runners) if (!d.big) drawRunner(g, d);
-  for (const d of runners) if (d.big) drawRunner(g, d);
-  g.globalCompositeOperation = 'lighter';
-  g.globalAlpha = clamp(.38 * settings.neon, 0, .65); g.drawImage(bloomC, 0, 0, W, H);
-  g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
-  g.drawImage(frameC, 0, 0);
-  g.drawImage(vigC, 0, 0, W, H);
-  g.globalCompositeOperation = 'soft-light';          // slight warm grade
-  g.fillStyle = rgba([235, 150, 80], .08); g.fillRect(0, 0, W, H);
-  g.globalCompositeOperation = 'source-over';
-  if (settings.grain > 0) {
-    if (frame % 3 === 0) { grainIdx = (grainIdx + 1) % grainPats.length; gox = (R() * 256) | 0; goy = (R() * 256) | 0; }
-    g.globalAlpha = settings.grain * .075; g.fillStyle = grainPats[grainIdx];
-    g.setTransform(1, 0, 0, 1, -gox, -goy); g.fillRect(gox, goy, W, H);
-    g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
-  }
-}
 function buildSoftAndBlur() {
   const sw = softC.width, sh = softC.height;
   softX.globalCompositeOperation = 'copy';
@@ -1785,9 +1762,46 @@ function buildSoftAndBlur() {
   g.fillStyle = rgba(INK, 1); g.fillRect(0, 0, bw, bh);
   if (HAS_FILTER) { g.filter = `blur(${((4 + 10 * fog) * S * .25).toFixed(2)}px)`; g.drawImage(softC, 0, 0, bw, bh); g.filter = 'none'; }
   else { t2X.drawImage(softC, 0, 0, t2C.width, t2C.height); g.drawImage(t2C, 0, 0, bw, bh); }
-  g.fillStyle = rgba(mixa(COLD, FROST, .4), .12); g.fillRect(0, 0, bw, bh);   // condensation scatters light
+  g.fillStyle = rgba(mixa(COLD, FROST, .4), .1); g.fillRect(0, 0, bw, bh);
 }
+function render() {
+  const fw = fogComp.width, fh = fogComp.height;
+  fcX.globalCompositeOperation = 'copy';            fcX.drawImage(fogM, 0, 0);
+  fcX.globalCompositeOperation = 'destination-in';  fcX.drawImage(fogT, 0, 0);
+  fcX.globalCompositeOperation = 'source-in';       fcX.drawImage(blurC, 0, 0, fw, fh);
+  fcX.globalCompositeOperation = 'source-over';
+  wcX.globalCompositeOperation = 'copy';            wcX.fillStyle = '#000'; wcX.fillRect(0, 0, fw, fh);
+  wcX.globalCompositeOperation = 'destination-out'; wcX.drawImage(fogM, 0, 0);
+  wcX.globalCompositeOperation = 'source-in';       wcX.drawImage(softC, 0, 1.2 * S, fw, fh);
+  wcX.globalCompositeOperation = 'source-over';
 
+  const g = ctx;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  g.drawImage(sceneC, 0, 0);
+  // a photograph is never razor sharp: lay a soft copy over the crisp one
+  g.globalAlpha = .3; g.drawImage(softC, 0, 0, W, H);
+  g.globalAlpha = .85; g.drawImage(wetComp, 0, 0, W, H); g.globalAlpha = 1;
+  g.drawImage(fogComp, 0, 0, W, H);
+  g.drawImage(sdC, 0, 0);
+  for (const d of runners) if (!d.big) drawRunner(g, d);
+  for (const d of runners) if (d.big) drawRunner(g, d);
+  g.globalCompositeOperation = 'lighter';
+  g.globalAlpha = clamp(.28 * settings.neon, 0, .5); g.drawImage(bloomC, 0, 0, W, H);
+  g.globalAlpha = 1;
+  g.globalCompositeOperation = 'saturation';                    // colour-film punch
+  g.fillStyle = 'rgba(255,40,40,.07)'; g.fillRect(0, 0, W, H);
+  g.globalCompositeOperation = 'soft-light';                    // slight warm grade
+  g.fillStyle = rgba([235, 150, 80], .07); g.fillRect(0, 0, W, H);
+  g.globalCompositeOperation = 'source-over';
+  g.drawImage(frameC, 0, 0);
+  g.drawImage(vigC, 0, 0, W, H);
+  if (settings.grain > 0) {
+    if (frame % 3 === 0) { grainIdx = (grainIdx + 1) % grainPats.length; gox = (R() * 256) | 0; goy = (R() * 256) | 0; }
+    g.globalAlpha = settings.grain * .09; g.fillStyle = grainPats[grainIdx];
+    g.setTransform(1, 0, 0, 1, -gox, -goy); g.fillRect(gox, goy, W, H);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
+  }
+}
 let raf = 0, last = 0;
 function loop(now) {
   raf = requestAnimationFrame(loop);
@@ -1795,14 +1809,12 @@ function loop(now) {
   if (!(dt > 0)) dt = 1 / 60;
   dt = Math.min(dt, .05);
   simT += dt; frame++;
-  nextWin -= dt; if (nextWin <= 0) { nextWin = rand(1.5, 4.5); toggleWindow(); }
-  nextFlicker -= dt; if (nextFlicker <= 0) { nextFlicker = rand(3.5, 9); startFlicker(); }
-  updFlickers(dt);
-  updateLife(dt);
-  updateRain(dt);
-  updateDrops(dt, false);
-  recoverFog(dt);
-  if (lightDirty) { drawLights(); buildBloom(); buildReflection(); lightDirty = false; }
+  nextWin -= dt; if (nextWin <= 0) { nextWin = rand(2, 5); toggleWindow(); }
+  nextFlicker -= dt; if (nextFlicker <= 0) { nextFlicker = rand(3, 8); startFlicker(); }
+  updFlickers(dt); updSignal(dt);
+  updateLife(dt); updateRain(dt);
+  updateDrops(dt, false); recoverFog(dt);
+  if (lightDirty) rebuildLights();
   composeScene(simT);
   buildSoftAndBlur();
   if (simT - lastStaticRender > .25) renderStatics();
@@ -1813,18 +1825,23 @@ function loop(now) {
    RESIZE
    ============================================================================= */
 function alloc() {
-  staticC = mk(W, H); staticX = cx2d(staticC, true);
-  lightC = mk(W, H);  lightX = cx2d(lightC);
+  backC = mk(W, H);   backX = cx2d(backC, true);
+  frontC = mk(W, H);  frontX = cx2d(frontC);
+  emissC = mk(W, H);  emissX = cx2d(emissC);
+  signsC = mk(W, H);  signsX = cx2d(signsC);
+  allC = mk(W, H);    allX = cx2d(allC);
   sceneC = mk(W, H);  sceneX = cx2d(sceneC, true);
   sdC = mk(W, H);     sdX = cx2d(sdC);
   frameC = mk(W, H);
   reflC = mk(W / 2, H / 2); reflX = cx2d(reflC);
-  reflS = mk(W / 2, Math.max(4, H / 24)); reflSX = cx2d(reflS);
+  reflS = mk(W / 2, Math.max(4, H / 16)); reflSX = cx2d(reflS);
   ripC = mk(W / 2, H / 2);
+  rainC = mk(W / 2, H / 2); rainX = cx2d(rainC);
   softC = mk(W / 2, H / 2); softX = cx2d(softC);
   blurC = mk(W / 4, H / 4); blurX = cx2d(blurC, true);
   t2C = mk(W / 24, H / 24); t2X = cx2d(t2C);
   bloomC = mk(W / 8, H / 8); bloomX = cx2d(bloomC);
+  mistC = mk(W / 24, H / 24); mistX = cx2d(mistC);
   vigC = mk(W / 4, H / 4);
   fogT = mk(W / 2, H / 2);
   fogComp = mk(W / 2, H / 2); fcX = cx2d(fogComp);
@@ -1836,9 +1853,9 @@ function resize() {
   if (nW === W && nH === H && dpr === S) return false;
   const oW = W, oH = H, oS = S, oFog = fogM;
   W = nW; H = nH; S = dpr;
-  // Landscape: a normal lens. Portrait: a wider lens so the club stays in view.
-  if (W >= H) { F = Math.max(.75 * W, 1.05 * H); VPx = W * .55; VPy = H * .44; }
-  else { F = W * 1.0; VPx = W * .58; VPy = H * .41; }
+  // Landscape: a normal lens. Portrait: a wider one so both sides of the street stay in view.
+  if (W >= H) { F = Math.max(.8 * W, 1.18 * H); VPx = W * .55; VPy = H * .56; }
+  else { F = W * 1.05; VPx = W * .57; VPy = H * .52; }
   cv.width = W; cv.height = H;
   alloc();
   fogM = mk(W / 2, H / 2); fogX = cx2d(fogM);
@@ -1852,13 +1869,13 @@ function resize() {
       for (const k of ['r', 'rT', 'vx', 'vy', 'grow', 'drift', 'shed']) if (typeof d[k] === 'number') d[k] *= sr;
     }
   }
-  buildStatic(); buildRipple(); buildFogTarget(); buildFrame(); buildVignette(); buildRainLights(); seedRain();
+  buildStatic(); buildRipple(); buildFogTarget(); buildFrame(); buildVignette();
+  rain.length = 0;
   lightDirty = true;
   return true;
 }
 let resizeT = 0;
-addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (resize()) { drawLights(); buildBloom(); buildReflection(); lightDirty = false; composeScene(simT); buildSoftAndBlur(); renderStatics(); } }, 150); });
-
+addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (resize()) { rebuildLights(); composeScene(simT); buildSoftAndBlur(); renderStatics(); } }, 150); });
 /* =============================================================================
    AUDIO: a trio playing inside the club, heard through walls and rain.
    Off by default; M (or the "music" button) starts it.
@@ -2190,18 +2207,17 @@ document.addEventListener('visibilitychange', () => {
 makeTiles();
 planStreet();
 resize();
-for (let i = 0; i < 9; i++) spawnPed(true);
+for (let i = 0; i < 10; i++) spawnPed(true);
 spawnCar(true);
 while (statics.length < staticTarget()) addStatic(R() * W, R() * H, null, true);
 for (let t = 0; t < 20; t += 1 / 20) { simT += 1 / 20; updateDrops(1 / 20, true); recoverFog(1 / 20); }
-drawLights(); buildBloom(); buildReflection(); lightDirty = false;
-composeScene(simT); buildSoftAndBlur(); renderStatics();
+rebuildLights(); composeScene(simT); buildSoftAndBlur(); renderStatics();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { lightDirty = true; });
-toast('h controls · m music · f fullscreen', 5500);
+toast('h controls \u00b7 m music \u00b7 f fullscreen', 5500);
 last = performance.now();
 if (!document.hidden) raf = requestAnimationFrame(loop);
 
-window.__street = { settings, peds, cars, runners, statics, WINS: () => WINS, HAS_FILTER, audio, mus };
+window.__street = { settings, peds, cars, runners, statics, SIGNS: () => SIGNS, CARS: () => CARS, HAS_FILTER, audio, mus };
 })();
 </script>
 </body>
