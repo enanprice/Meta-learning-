@@ -230,7 +230,7 @@ function buildSprite(bb, sc, opts, layers) {
     L.draw(lg);
     if (opts.brush !== false) brushPass(lc, {
       atop: true, count: (w * h) / (opts.density || 26), seed: (R(1) * 1e6) | 0,
-      len: [2.4 * S * 1.4, 7 * S * 1.4], width: [1 * S * 1.4, 2.6 * S * 1.4], alpha: 0.6, jitter: 0.3,
+      len: [2.4 * S * 1.4, 7 * S * 1.4], width: [1 * S * 1.4, 2.6 * S * 1.4], alpha: 0.6, jitter: 0.3, passes: [[1, 1], [0.45, 1.3]],
       dir: opts.dir || ((x, y) => Math.atan2(y - cy, x - cx) + Math.PI / 2 + Noise.n2(x * 0.02, y * 0.02 + sd) * 0.8)
     });
     const rs = opts.rimScale || 1;
@@ -247,7 +247,7 @@ function buildSprite(bb, sc, opts, layers) {
 // draw a sprite in local units at world pos, with chained pivot rotations [px,py,ang,dx,dy]
 function drawSp(g, sp, x, y, sc, flip, xf, alpha) {
   g.save(); g.translate(x, y); g.scale(flip * sc, sc);
-  if (xf) for (const q of xf) { g.translate(q[0] + (q[3] || 0), q[1] + (q[4] || 0)); g.rotate(q[2]); g.translate(-q[0], -q[1]); }
+  if (xf) for (const q of xf) { g.translate(q[0] + (q[3] || 0), q[1] + (q[4] || 0)); g.rotate(q[2]); if (q[5]) g.scale(q[5], 1); g.translate(-q[0], -q[1]); }
   if (alpha !== undefined) g.globalAlpha = alpha;
   const s = 1 / sp.k; g.drawImage(sp.cv, sp.x0 - sp.pad * s, sp.y0 - sp.pad * s, sp.cv.width * s, sp.cv.height * s);
   g.restore();
@@ -256,7 +256,7 @@ function drawSp(g, sp, x, y, sc, flip, xf, alpha) {
 function loc2w(x, y, sc, flip, xf, lx, ly) {
   let px = lx, py = ly;
   if (xf) for (let i = xf.length - 1; i >= 0; i--) {
-    const q = xf[i], c = Math.cos(q[2]), s = Math.sin(q[2]), ox = px - q[0], oy = py - q[1];
+    const q = xf[i], c = Math.cos(q[2]), s = Math.sin(q[2]), ox = (px - q[0]) * (q[5] || 1), oy = py - q[1];
     px = q[0] + (q[3] || 0) + ox * c - oy * s; py = q[1] + (q[4] || 0) + ox * s + oy * c;
   }
   return [x + flip * sc * px, y + sc * py];
@@ -287,6 +287,12 @@ function torso(g, o = {}) {
   fillWob(g, [[0.4, -83.2], [4.3, -81], [2.7, -74], [1.2, -80]], o.shirt || C.shirt, { amp: 0.12, step: 0.6 });
   fillWob(g, [[2.3, -80.6], [3.4, -80.2], [3.1, -72.4], [2.2, -73.4]], '#2a0c07', { amp: 0.08, step: 0.5 });
   fillWob(g, [[-2.6, -82], [2.6, -83], [3, -87.2], [-2.1, -87.2]], C.skin, W2);
+  g.lineCap = 'round';
+  g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 0.35; g.beginPath(); g.moveTo(3.6, -80.5); g.quadraticCurveTo(5.4, -72, 4.6, -62); g.stroke(); // lapel
+  g.strokeStyle = 'rgba(150,90,50,0.4)'; g.lineWidth = 0.3; g.beginPath(); g.moveTo(-6, -76); g.quadraticCurveTo(-3, -70, -5, -62); g.moveTo(-7, -56); g.quadraticCurveTo(-3, -52, -6, -47); g.stroke(); // creases
+  g.fillStyle = '#c8b48a'; for (const y of [-63, -56.5]) { g.beginPath(); g.arc(5.6, y, 0.45, 0, TAU); g.fill(); } // buttons
+  fillWob(g, [[2.2, -73.5], [4.6, -74.2], [4.2, -72.4], [2.6, -72.2]], o.square || '#b8a07a', { amp: 0.05, step: 0.4 }); // pocket square
+  g.strokeStyle = 'rgba(0,0,0,0.5)'; g.lineWidth = 0.3; g.beginPath(); g.moveTo(1.6, -60); g.lineTo(5.6, -60.4); g.stroke(); // pocket flap
 }
 
 // ---------------------------------------------------------------- BAND
@@ -455,7 +461,9 @@ function buildKit() {
 
 // ---------------------------------------------------------------- PATRONS (seated)
 function seated(g, o) {
+  const part = o.part || 'all', P = k => part === 'all' || part === k;
   const sw = (o.woman ? 15 : 20) * (o.sw || 1);
+  if (P('body')) {
   fillWob(g, [[-sw, 6], [-sw - 1, -18], [-sw + 1, -30], [-sw + 6, -37], [-4, -39.6], [4, -39.6], [sw - 6, -37], [sw - 1, -30], [sw + 1, -18], [sw, 6]], o.woman ? '#120706' : '#0c0605', W1);
   if (o.woman) {
     fillWob(g, [[-14, -23], [-15, -31], [-10, -36], [-3, -38.6], [3, -38.6], [10, -36], [15, -31], [14, -23], [6, -21], [0, -19.6], [-6, -21]], '#3a1a10', W1);
@@ -463,29 +471,114 @@ function seated(g, o) {
   } else if (o.collar) {
     fillWob(g, [[-4.6, -39.4], [4.6, -39.4], [4, -41.8], [-4, -41.8]], '#8a6a4c', W2);
   }
-  g.save(); g.translate(0, -39); g.rotate(o.ht || 0); g.translate(o.hx || 0, 39);
+  // cloth: centre seam, shoulder creases, a sagging fold where the back meets the chair
+  g.lineCap = 'round';
+  if (!o.woman) {
+    g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 0.5; g.beginPath(); g.moveTo(0.4, -38); g.quadraticCurveTo(-0.6, -16, 0.5, 6); g.stroke();
+    g.strokeStyle = 'rgba(120,70,40,0.35)'; g.lineWidth = 0.6;
+    for (const sd of [-1, 1]) { g.beginPath(); g.moveTo(sd * (sw - 4), -34); g.quadraticCurveTo(sd * (sw - 9), -28, sd * (sw - 7), -20); g.stroke(); g.beginPath(); g.moveTo(sd * (sw - 2), -12); g.quadraticCurveTo(sd * (sw - 8), -6, sd * (sw - 4), 2); g.stroke(); }
+  } else {
+    g.strokeStyle = 'rgba(255,190,140,0.18)'; g.lineWidth = 0.5; g.beginPath(); g.moveTo(-1.5, -37); g.quadraticCurveTo(-1, -30, -1.6, -23); g.stroke(); // spine
+    g.fillStyle = 'rgba(0,0,0,0.5)'; for (let y = -20; y < 4; y += 4) { g.beginPath(); g.ellipse(0, y, 0.6, 0.6, 0, 0, TAU); g.fill(); } // buttons down the back
+  }
+  if (o.smoke) fillWob(g, [[13, -34], [19, -33], [23.5, -16], [21.5, -11.5], [18, -15], [15, -30]], '#0c0605', W1); // upper arm
+  }
+  if (P('head')) {
+  g.save(); if (part === 'all') { g.translate(0, -39); g.rotate(o.ht || 0); g.translate(o.hx || 0, 39); }
   fillWob(g, [[-3.6, -38], [3.6, -38], [3.2, -45], [-3.2, -45]], o.woman ? '#3a1a10' : '#24110b', W2);
   fillWob(g, [[-6.6, -47], [-6, -53], [-2.6, -57.6], [2.6, -57.6], [6, -53], [6.6, -47], [4.6, -42.6], [0, -41.4], [-4.6, -42.6]], o.woman ? '#2e140c' : '#20100a', W2);
   if (o.hat) {
     fillWob(g, [[-13.5, -54.8], [-6, -57.6], [6, -57.6], [13.5, -54.8], [6, -52.2], [-6, -52.2]], '#0d0705', W2);
     fillWob(g, [[-7.6, -56], [-7, -63], [-3, -65.6], [0, -63.6], [3, -65.6], [7, -63], [7.6, -56]], '#170c08', W2);
     g.fillStyle = '#050201'; g.fillRect(-7.6, -57.8, 15.2, 1.6);
+    g.strokeStyle = 'rgba(160,100,60,0.45)'; g.lineWidth = 0.3; g.beginPath(); g.moveTo(-7.4, -57.9); g.lineTo(7.4, -57.9); g.stroke(); // hatband sheen
+    g.strokeStyle = 'rgba(0,0,0,0.6)'; g.lineWidth = 0.4; g.beginPath(); g.moveTo(-1, -64.5); g.quadraticCurveTo(0, -60, 1, -64.5); g.stroke(); // crown pinch
+    fillWob(g, [[-7.1, -50], [-8.4, -49], [-8.2, -46.4], [-6.8, -46.6]], '#2a140c', W2); fillWob(g, [[7.1, -50], [8.4, -49], [8.2, -46.4], [6.8, -46.6]], '#2a140c', W2); // ears
   } else if (o.woman) {
     g.fillStyle = '#100604';
     const curls = [[-7, -46], [-7.6, -51], [-6, -56], [-2.6, -59.4], [1.6, -59.8], [5.6, -57], [7.6, -52], [7.2, -46.6], [3.6, -44.6], [-3.6, -44.4], [0, -49]];
     for (const [x, y] of curls) { ell(g, x, y, 3.4 + R(0.6), 3.1 + R(0.6)); g.fill(); }
+    g.strokeStyle = 'rgba(120,60,30,0.5)'; g.lineWidth = 0.25;
+    for (const [x, y] of curls) { g.beginPath(); g.arc(x, y, 2 + R(1), R(TAU), R(TAU) + 3.5); g.stroke(); } // the set of each curl
+    g.fillStyle = '#ffe8b8'; g.beginPath(); g.arc(-7.4, -43.6, 0.55, 0, TAU); g.arc(7.4, -43.6, 0.55, 0, TAU); g.fill(); // earrings
   } else {
     fillWob(g, [[-6.9, -46], [-6.6, -53.6], [-2.8, -58.4], [2.8, -58.4], [6.6, -53.6], [6.9, -46], [5, -50.6], [0, -52.6], [-5, -50.6]], C.hair, W2);
+    g.strokeStyle = 'rgba(200,140,90,0.12)'; g.lineWidth = 0.22;
+    for (let i = -4; i <= 4; i++) { g.beginPath(); g.moveTo(i * 1.2, -57.6 + Math.abs(i) * 0.3); g.quadraticCurveTo(i * 1.5, -53, i * 1.45, -48.5); g.stroke(); } // combed lines
+    fillWob(g, [[-6.8, -50], [-8, -49], [-7.8, -46.4], [-6.6, -46.6]], '#2a140c', W2); fillWob(g, [[6.8, -50], [8, -49], [7.8, -46.4], [6.6, -46.6]], '#2a140c', W2);
   }
   g.restore();
-  if (o.smoke) { // arm raised with cigarette
-    fillWob(g, [[13, -34], [19, -33], [23, -16], [21.5, -12], [17.4, -18], [19.4, -36.6], [16, -37]], '#0c0605', W1);
+  }
+  if (o.smoke && P('arm')) { // forearm, hand and cigarette: pivots at the elbow (22,-14)
+    fillWob(g, [[20, -13], [24.2, -14.6], [20.4, -36.4], [16.8, -35.6]], '#0c0605', W1);
     fillWob(g, [[15.4, -38.6], [19.6, -37.8], [20, -33.4], [16.4, -34]], C.skinLit, W2);
+    g.strokeStyle = '#d8ccb4'; g.lineWidth = 0.7; g.lineCap = 'butt'; g.beginPath(); g.moveTo(18.2, -37.6); g.lineTo(20.6, -37.6); g.stroke();
+    g.fillStyle = '#9a6a4a'; g.fillRect(19.6, -38.2, 0.6, 1.2); // cuff
   }
 }
 function chairBack(g) {
   g.lineCap = 'round'; g.strokeStyle = '#140905'; g.lineWidth = 2;
   g.beginPath(); g.moveTo(-12, 9); g.bezierCurveTo(-13, -6, -10, -17, 0, -17.5); g.bezierCurveTo(10, -17, 13, -6, 12, 9); g.stroke();
+}
+// a seated person in three moving parts: body, head (turns, tilts, nods) and the smoking forearm
+function buildRig(sc, L, o, extra = {}) {
+  const rims = [[L, 1.5, RIM_ORANGE, 0.75], [L, 0.55, RIM_CREAM, 0.85], [[-L[0], L[1] * 0.4 - 0.4], 0.7, RIM_DEEP, 0.35]];
+  const one = (bb, part) => buildSprite(bb, sc, { flip: 1, density: 16 }, [{ draw: g => seated(g, Object.assign({}, o, { part })), rims }]);
+  return Object.assign({ body: one([-26, -46, 28, 10], 'body'), head: one([-17, -70, 17, -34], 'head'), arm: o.smoke ? one([8, -44, 30, -8], 'arm') : null, o, sc, smoke: !!o.smoke }, extra);
+}
+// natural motion: second-order springs (they lag, overshoot a touch and settle like a body does)
+function spr(a, key, target, dt, k = 30, c = 9) {
+  const v = key + '_v'; let x = a[key] ?? target, vv = a[v] || 0;
+  const n = Math.max(1, Math.ceil(dt / 0.02)), h = dt / n;
+  for (let i = 0; i < n; i++) { vv += ((target - x) * k - vv * c) * h; x += vv * h; }
+  a[key] = x; a[v] = vv; return x;
+}
+function animateRig(p, t, dt, beat) {
+  const a = p.a || (p.a = { nextAct: t + 1 + Math.random() * 9, act: null, actT: 0, ph: Math.random() * 99, leanT: 0, dir: 1 });
+  let yawT = Noise.n2(t * 0.12, a.ph) * 0.4, tiltT = Noise.n2(t * 0.1, a.ph + 5) * 0.06 + (p.o.ht || 0) * 0.6, armT = 1.25, drag = 0, exhale = 0;
+  if (p.nod) { const ph = beat % 1; tiltT += (ph < 0.2 ? 0.06 : -0.01) * p.nod; }
+  if (!a.act && t > a.nextAct) {
+    const r = Math.random();
+    a.act = p.smoke && r < 0.65 ? 'drag' : r < 0.85 ? 'talk' : 'shift'; a.actT = 0; a.dir = p.talkDir || (Math.random() < 0.5 ? -1 : 1);
+    a.dur = a.act === 'drag' ? 5.4 : a.act === 'talk' ? 2.5 + Math.random() * 3.5 : 0.1;
+    if (a.act === 'shift') a.leanT = (Math.random() - 0.5) * 0.11;
+  }
+  if (a.act) {
+    a.actT += dt; const T = a.actT;
+    if (a.act === 'drag') {
+      if (T < 2.6) { armT = 0; drag = smooth(0.8, 1.3, T) * (1 - smooth(2.0, 2.5, T)); tiltT -= 0.06 * drag; yawT *= 0.3; }
+      if (T > 3.0 && T < 4.9) { exhale = 1; tiltT -= 0.13; yawT = 0.25 * a.dir; }
+    } else if (a.act === 'talk') { yawT = 0.8 * a.dir; tiltT += Math.sin(T * 6.5) * 0.03 * (1 - smooth(1.5, a.dur, T)) + 0.03; }
+    if (T > a.dur) { a.act = null; a.nextAct = t + 3 + Math.random() * 11; }
+  }
+  spr(a, 'yaw', yawT, dt, 14, 6); spr(a, 'tilt', tiltT, dt, 28, 8); spr(a, 'arm', armT, dt, 9, 5.2); spr(a, 'lean', a.leanT, dt, 3, 2.6);
+  a.drag = drag; a.exhale = exhale; a.breath = Math.sin(t * 1.45 + a.ph);
+}
+function rigXf(p) {
+  const a = p.a, body = [[0, 0, (p.rot || 0) + a.lean + a.breath * 0.003]];
+  return {
+    body, head: body.concat([[0, -40, a.tilt, Math.sin(a.yaw) * 2.8 + (p.o.hx || 0), -a.breath * 0.3, 0.78 + 0.22 * Math.cos(a.yaw)]]),
+    arm: body.concat([[22, -14, a.arm]])
+  };
+}
+function drawRig(g, fxg, p, t) {
+  const f = p.flip || 1, X = rigXf(p);
+  for (const ctx of [g, fxg]) {
+    if (ctx === fxg) fxg.globalCompositeOperation = 'destination-out';
+    drawSp(ctx, p.r.body, p.x, p.y, p.sc, f, X.body); drawSp(ctx, p.r.head, p.x, p.y, p.sc, f, X.head);
+    if (p.r.arm) drawSp(ctx, p.r.arm, p.x, p.y, p.sc, f, X.arm);
+    if (ctx === fxg) fxg.globalCompositeOperation = 'lighter';
+  }
+  if (p.r.arm) {
+    const e = loc2w(p.x, p.y, p.sc, f, X.arm, 20.8, -37.6), d = p.a.drag, k = p.sc / 3.3;
+    glowAt(fxg, e[0], e[1], 7 * k, [255, 140, 60], 0.65 + 0.35 * d + 0.1 * Noise.n2(t * 3, p.x));
+    glowAt(fxg, e[0], e[1], 24 * k, [255, 80, 20], 0.12 + 0.45 * d);
+    if (p.rib) { p.rib.x = e[0]; p.rib.y = e[1] - 1; }
+  }
+  if (p.a.exhale) { // a long breath of smoke from the mouth, drifting up and toward the stage
+    const m = loc2w(p.x, p.y, p.sc, f, X.head, Math.sin(p.a.yaw) * 5, -46);
+    for (let i = 0; i < 3; i++) feedSmoke(m[0] + (Math.random() - 0.5) * 8 * p.sc / 3, m[1] - Math.random() * 14 * p.sc / 3, 0.9 + Math.random() * 0.8);
+  }
 }
 function patronSprite(sc, L, o) {
   const layers = [{ draw: g => seated(g, o), rims: [[L, 1.5, RIM_ORANGE, 0.75], [L, 0.55, RIM_CREAM, 0.85], [[-L[0], L[1] * 0.4 - 0.4], 0.7, RIM_DEEP, 0.35]] }];
@@ -592,6 +685,12 @@ function paintDir(x, y) {
 function makeImpasto() {
   const c = mk(Wpx, Hpx), g = c.getContext('2d'); g.fillStyle = '#808080'; g.fillRect(0, 0, Wpx, Hpx);
   const rr = mulberry32(99); g.lineCap = 'round';
+  // fine, short dabs first (the surface tooth), then the broad strokes over them
+  for (let i = 0; i < Wpx * Hpx / 9; i++) {
+    const px = rr() * Wpx, py = rr() * Hpx, a = paintDir((px - CX) / S, py / S) + (rr() - 0.5) * 0.9, L = (2 + rr() * 4) * S * 1.4, v = 128 + (rr() - 0.5) * 90;
+    g.strokeStyle = `rgba(${v | 0},${v | 0},${v | 0},0.35)`; g.lineWidth = (1 + rr() * 1.6) * S * 1.4;
+    g.beginPath(); g.moveTo(px - Math.cos(a) * L / 2, py - Math.sin(a) * L / 2); g.lineTo(px + Math.cos(a) * L / 2, py + Math.sin(a) * L / 2); g.stroke();
+  }
   const n = Wpx * Hpx / 24;
   for (let i = 0; i < n; i++) {
     const px = rr() * Wpx, py = rr() * Hpx, x = (px - CX) / S, y = py / S;
@@ -605,6 +704,7 @@ function makeImpasto() {
 
 // ---------------------------------------------------------------- STATIC LAYERS
 let bgC, midC, nearC, curC, fgC, impC, bottleGlowC, neonPaths;
+const MIDP = [], STAND = [];
 const MIDEMBERS = [];
 function paintBackground() {
   const c = mk(Wpx, Hpx), g = c.getContext('2d'); worldT(g);
@@ -733,10 +833,51 @@ function paintBackground() {
     }
   }
   bottleGlowC = glow;
+  // ---- the life of the room, painted in before the brushwork
+  // plaster patched over the brick, a long water stain
+  for (const [x, y, w, h] of [[300, 210, 110, 70], [-120, 160, 70, 40], [430, 330, 50, 90]]) {
+    const pg = g.createRadialGradient(x, y, 2, x, y, Math.max(w, h)); pg.addColorStop(0, 'rgba(120,70,46,0.55)'); pg.addColorStop(1, 'rgba(120,70,46,0)');
+    g.fillStyle = pg; wob(g, [[x - w / 2, y - h / 2], [x + w / 2, y - h / 2 + 6], [x + w / 2 - 8, y + h / 2], [x - w / 2 + 5, y + h / 2 - 4]], { amp: 6, step: 6, freq: 0.08 }); g.fill();
+  }
+  const ws = g.createLinearGradient(0, 150, 0, 330); ws.addColorStop(0, 'rgba(10,4,2,0.5)'); ws.addColorStop(1, 'rgba(10,4,2,0)');
+  g.fillStyle = ws; wob(g, [[180, 150], [215, 150], [222, 260], [205, 330], [190, 260]], { amp: 3, step: 5 }); g.fill();
+  // gig posters, pasted and torn, faded by smoke
+  const poster = (x, y, w, h, rot, col, seed) => {
+    const pr = mulberry32(seed); g.save(); g.translate(x, y); g.rotate(rot);
+    const edgePts = [[-w / 2, -h / 2], [w / 2, -h / 2 + 2], [w / 2 - 1, h / 2 - 8], [w / 2 - 12, h / 2], [-w / 2 + 3, h / 2 - 1]];
+    fillWob(g, edgePts, col, { amp: 1.2, step: 3, freq: 0.3, seed });
+    g.fillStyle = 'rgba(40,14,8,0.85)'; g.fillRect(-w / 2 + 5, -h / 2 + 6, w - 10, h * 0.14); // headline band
+    g.fillStyle = 'rgba(40,14,8,0.6)';
+    for (let i = 0; i < 7; i++) g.fillRect(-w / 2 + 6 + pr() * 4, -h / 2 + h * 0.3 + i * h * 0.085, (w - 14) * (0.4 + pr() * 0.55), 1.3);
+    g.fillStyle = 'rgba(30,10,6,0.7)'; ell(g, 0, h * 0.18, w * 0.2, h * 0.12); g.fill(); // a horn player in silhouette
+    g.restore();
+  };
+  poster(392, 262, 46, 66, 0.04, 'rgba(96,70,46,0.75)', 3);
+  poster(436, 300, 38, 54, -0.05, 'rgba(92,36,22,0.75)', 7);
+  poster(-452, 250, 34, 50, 0.07, 'rgba(84,62,40,0.7)', 11);
+  // framed photograph of somebody famous who once sat in here
+  fillRough(g, [[234, 196], [272, 197], [271, 242], [233, 241]], '#0c0503', 0.4, 4);
+  fillRough(g, [[238, 200], [268, 201], [267, 238], [237, 237]], 'rgba(130,100,72,0.7)', 0.3, 4);
+  g.fillStyle = 'rgba(30,14,8,0.8)'; ell(g, 252, 214, 6, 7); g.fill(); g.fillRect(244, 222, 16, 15);
+  g.strokeStyle = 'rgba(255,220,170,0.35)'; g.lineWidth = 0.8; g.beginPath(); g.moveTo(239, 203); g.lineTo(250, 201); g.stroke();
+  // ceiling: cracked plaster between the beams
+  g.strokeStyle = 'rgba(0,0,0,0.5)'; g.lineWidth = 0.9;
+  for (let i = 0; i < 9; i++) { let x = R(-600, 600), y = R(10, 140); g.beginPath(); g.moveTo(x, y); for (let k = 0; k < 6; k++) { x += R(-14, 18); y += R(-4, 6); g.lineTo(x, y); } g.stroke(); }
+  // stage boards: grain, scuffs, a cable snaking to the mic, gaffer tape
+  g.strokeStyle = 'rgba(12,5,3,0.35)'; g.lineWidth = 0.5;
+  for (let i = 0; i < 60; i++) { const x = R(-480, 480), y = R(444, 488); g.beginPath(); g.moveTo(x, y); g.lineTo(x + R(10, 40) * (1 + (y - 440) / 50), y + R(-0.6, 0.6)); g.stroke(); }
+  g.fillStyle = 'rgba(255,200,140,0.07)'; for (let i = 0; i < 40; i++) { ell(g, R(-400, 400), R(448, 488), R(4, 18), R(0.6, 1.6)); g.fill(); }
+  g.strokeStyle = '#070302'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(66, 487); g.bezierCurveTo(30, 470, -60, 492, -120, 474); g.bezierCurveTo(-170, 462, -240, 470, -300, 452); g.stroke();
+  g.strokeStyle = 'rgba(230,150,90,0.3)'; g.lineWidth = 0.5; g.beginPath(); g.moveTo(66, 486); g.bezierCurveTo(30, 469, -60, 491, -120, 473); g.stroke();
+  g.fillStyle = 'rgba(190,170,130,0.5)'; g.fillRect(-60, 486, 14, 4);
+  // room floor: worn boards running at the stage, a dropped matchbook
+  g.strokeStyle = 'rgba(0,0,0,0.4)'; g.lineWidth = 1;
+  for (let i = -20; i <= 20; i++) { g.beginPath(); g.moveTo(i * 26, 528); g.lineTo(i * 26 * 2.6, 1000); g.stroke(); }
+  g.fillStyle = 'rgba(120,40,24,0.7)'; g.save(); g.translate(-30, 770); g.rotate(0.4); g.fillRect(0, 0, 10, 6); g.restore();
   // brush pass over everything static
   brushPass(c, {
     count: Wpx * Hpx / 22, seed: 11, len: [8 * S * 1.4, 24 * S * 1.4], width: [2.4 * S * 1.4, 6 * S * 1.4], alpha: 0.5, jitter: 0.36,
-    passes: [[1.5, 0.45], [1, 0.7], [0.55, 0.7]],
+    passes: [[1.5, 0.45], [1, 0.7], [0.55, 0.7], [0.3, 1.6]],
     dir: (px, py) => { const x = (px - CX) / S, y = py / S; return (x > -470 && x < 350 && y > 150 && y < 440) ? Noise.n2(x * 0.01, y * 0.01) * 0.3 : paintDir(x, y); },
     lenMul: (px, py) => { const x = (px - CX) / S, y = py / S; return (Math.abs(x) < 480 && y > 150 && y < 528) ? 0.5 : 1; }
   });
@@ -748,6 +889,13 @@ function paintBackground() {
   g.strokeStyle = 'rgba(255,190,120,0.8)'; g.lineWidth = 1.8; g.beginPath(); g.moveTo(-372, 337); g.lineTo(-178, 331); g.stroke();
   g.fillStyle = '#d8c09a'; g.fillRect(-180, 333, 30, 3);
   g.strokeStyle = 'rgba(230,140,70,0.6)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-98, 428); g.lineTo(146, 428); g.stroke();
+  // sheet music, dog-eared, on the piano's stand
+  fillRough(g, [[-205, 307], [-193, 306], [-187, 327], [-199, 329]], 'rgba(214,190,150,0.9)', 0.3, 2);
+  fillRough(g, [[-197, 308], [-185, 310], [-181, 329], [-191, 328]], 'rgba(190,166,128,0.85)', 0.3, 2);
+  g.strokeStyle = 'rgba(40,20,10,0.55)'; g.lineWidth = 0.35;
+  for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(-203 + i * 0.6, 311 + i * 3.4); g.lineTo(-195 + i * 0.6, 311 + i * 3.4); g.stroke(); }
+  // a dead glass on the piano lid
+  g.fillStyle = 'rgba(255,210,150,0.55)'; g.fillRect(-250, 322, 4, 8);
   // pendant lamps: cord + shade (after the brush pass so their bright rims stay put)
   worldT(g);
   for (const [x, y] of [[-560, 140], [530, 156]]) {
@@ -763,18 +911,15 @@ function paintMid() {
   // mid-room tables & patrons
   const mL = x => [clamp(-x / 500, -0.8, 0.8), -1];
   for (const m of MID) {
-    for (let i = 0; i < m.n; i++) {
-      const sc = 1.3 + R(0.35) + (m.y - 560) * 0.004, px = m.x + (m.n === 1 ? R(-20, 20) : lerp(-36, 36, i / (m.n - 1)) + R(-8, 8)), py = m.y + R(-10, 8);
-      const sp = patronSprite(sc, mL(px), { hat: R() < 0.35, woman: R() < 0.3, collar: R() < 0.4, sw: R(0.85, 1.15), ht: R(-0.3, 0.3), hx: R(-2, 2), smoke: R() < 0.25 });
-      const rot = R(-0.08, 0.08), fl = R() < 0.5 ? -1 : 1;
-      g.save(); g.translate(px, py); g.rotate(rot); drawSp(g, sp, 0, 0, sc, fl); g.restore();
-      if (sp.smoke) { const ex = fl * sc * 20.5, ey = sc * -37.5; MIDEMBERS.push([px + ex * Math.cos(rot) - ey * Math.sin(rot), py + ex * Math.sin(rot) + ey * Math.cos(rot)]); }
-    }
     // table
     ell(g, m.x, m.y, m.rx, m.rx * 0.18); g.fillStyle = '#c8a070'; g.fill();
     const gr = g.createRadialGradient(m.x + 6, m.y - 2, 2, m.x, m.y, m.rx); gr.addColorStop(0, 'rgba(255,220,160,0.6)'); gr.addColorStop(1, 'rgba(60,24,10,0.5)');
     g.fillStyle = gr; g.fill();
-    fillWob(g, [[m.x - m.rx, m.y], [m.x + m.rx, m.y], [m.x + m.rx * 0.95, m.y + 30], [m.x - m.rx * 0.95, m.y + 30]], '#2a120a', { sharp: true, amp: 1, step: 4 });
+    const msk = [[m.x - m.rx, m.y]]; for (let i = 0; i <= 6; i++) msk.push([m.x + m.rx * (i / 3 - 1) * 0.96, m.y + 24 + R(0, 10)]); msk.push([m.x + m.rx, m.y]);
+    fillWob(g, msk, '#2a120a', { amp: 1, step: 4 });
+    g.strokeStyle = 'rgba(0,0,0,0.35)'; g.lineWidth = 1.2; for (let i = -2; i <= 2; i++) { g.beginPath(); g.moveTo(m.x + i * m.rx * 0.35, m.y + 2); g.lineTo(m.x + i * m.rx * 0.38, m.y + 26); g.stroke(); }
+    for (const dx of [-0.45, 0.35]) { g.fillStyle = 'rgba(255,220,170,0.6)'; g.fillRect(m.x + dx * m.rx, m.y - 9, 1, 7); g.fillStyle = 'rgba(40,16,8,0.6)'; g.fillRect(m.x + dx * m.rx + 1, m.y - 9, 3, 7); }
+    ell(g, m.x - m.rx * 0.1, m.y + 1.5, 4.5, 1.3); g.fillStyle = '#140804'; g.fill();
     fillWob(g, [[m.x + 3, m.y - 2], [m.x + 9, m.y - 2], [m.x + 8, m.y - 12], [m.x + 4, m.y - 12]], 'rgba(200,90,30,0.85)', { sharp: true, amp: 0.4, step: 2 });
   }
   // bar counter (along right wall), stools, bar patron
@@ -786,6 +931,19 @@ function paintMid() {
   g.strokeStyle = 'rgba(0,0,0,0.45)'; g.lineWidth = 1.2;
   for (let x = 540; x < 790; x += 34) { g.beginPath(); g.moveTo(x, 377 + (x - 516) * 0.025); g.lineTo(x, 508 + (x - 516) * 0.3); g.stroke(); }
   g.strokeStyle = 'rgba(210,150,80,0.6)'; g.lineWidth = 2; g.beginPath(); g.moveTo(516, 490); g.lineTo(790, 565); g.stroke(); // brass foot rail
+  // counter grain, a towel over the edge, the cash register at the end
+  g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 0.6;
+  for (let i = 0; i < 40; i++) { const y0 = R(380, 560), x0 = R(520, 780); g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(x0 + R(-6, 6), y0 + 20, x0 + R(-3, 3), y0 + R(30, 70)); g.stroke(); }
+  fillRough(g, [[600, 370], [622, 371], [624, 398], [601, 396]], 'rgba(180,165,135,0.75)', 0.6, 3);
+  fillRough(g, [[520, 336], [556, 333], [558, 367], [519, 368]], '#140804', 0.5, 3);
+  fillRough(g, [[524, 327], [552, 324], [553, 336], [523, 338]], '#2a1408', 0.4, 3);
+  g.fillStyle = 'rgba(255,210,140,0.7)'; g.fillRect(529, 341, 22, 2); g.fillRect(529, 347, 22, 1.2);
+  g.fillStyle = 'rgba(255,190,110,0.8)'; for (let i = 0; i < 4; i++) g.fillRect(526 + i * 7, 352, 3, 3);
+  // coat rack heavy with hats and coats, by the door
+  g.strokeStyle = '#0a0503'; g.lineWidth = 3; g.beginPath(); g.moveTo(-660, 610); g.lineTo(-662, 400); g.stroke();
+  for (const [dx, dy, w, h, c] of [[-14, 410, 24, 120, '#160b07'], [6, 414, 22, 100, '#1e0e08'], [-4, 405, 16, 150, '#120806']]) fillWob(g, [[-662 + dx, dy], [-662 + dx + w, dy + 4], [-662 + dx + w + 3, dy + h], [-662 + dx - 3, dy + h - 4]], c, { amp: 1.4, step: 4 });
+  for (const [dx, dy] of [[-12, 396], [10, 400]]) { ell(g, -662 + dx, dy, 13, 3.5); g.fillStyle = '#0d0705'; g.fill(); ell(g, -662 + dx, dy - 5, 7, 6); g.fill(); }
+  g.strokeStyle = 'rgba(220,130,70,0.35)'; g.lineWidth = 1; g.beginPath(); g.moveTo(-650, 405); g.lineTo(-649, 600); g.stroke();
   // bar glasses
   for (const x of [560, 612, 700, 742]) { g.fillStyle = 'rgba(255,200,140,0.5)'; g.fillRect(x, 358 + (x - 516) * 0.02, 3, 8); }
   for (const [x, y] of [[566, 468], [690, 500]]) {
@@ -796,10 +954,6 @@ function paintMid() {
   drawSp(g, barP, 566, 468, 1.8, -1);
   drawSp(g, patronSprite(1.9, [-0.7, -1], { woman: true, ht: 0.2 }), 628, 482, 1.9, -1);
   drawSp(g, patronSprite(2.05, [-0.7, -1], { collar: true, sw: 1.15, ht: -0.15 }), 700, 504, 2.05, -1);
-  // people standing along the back-left wall and by the door, nowhere to sit
-  for (const [x, y, sc, o, fl] of [[-610, 580, 2.15, { coat: true }, 1], [-492, 568, 2.0, { waiter: true, jacket: '#1a120c' }, 1], [-690, 602, 2.3, { coat: true }, -1], [470, 560, 2.0, { coat: true }, -1]]) {
-    drawSp(g, standingSprite(sc, [fl * 0.8, -0.8], o), x, y, sc, fl);
-  }
   // a cast-iron column holding the building up, right in the way
   const px = -548;
   const colG = g.createLinearGradient(px - 16, 0, px + 16, 0); colG.addColorStop(0, '#060302'); colG.addColorStop(0.62, '#1a0c07'); colG.addColorStop(0.85, '#5a2a12'); colG.addColorStop(1, '#120705');
@@ -809,7 +963,7 @@ function paintMid() {
   g.strokeStyle = 'rgba(255,170,100,0.55)'; g.lineWidth = 2; g.beginPath(); g.moveTo(px + 11, 10); g.lineTo(px + 13, 655); g.stroke();
   g.fillStyle = 'rgba(200,180,140,0.35)'; g.fillRect(px - 9, 300, 18, 26); // a tacked-up bill
   brushPass(c, {
-    atop: true, count: Wpx * Hpx / 60, seed: 21, len: [4 * S * 1.4, 11 * S * 1.4], width: [1.4 * S * 1.4, 3.4 * S * 1.4], alpha: 0.5,
+    atop: true, count: Wpx * Hpx / 40, seed: 21, len: [4 * S * 1.4, 11 * S * 1.4], width: [1.4 * S * 1.4, 3.4 * S * 1.4], alpha: 0.5, passes: [[1, 1], [0.4, 1.5]],
     dir: (px, py) => { const x = (px - CX) / S; return x > 500 ? Math.atan2(py / S - VPY, x) : Noise.n2(px * 0.02, py * 0.02) * 0.6; }
   });
   return c;
@@ -841,12 +995,22 @@ function paintNear() {
     g.fillStyle = gr; ell(g, t.x, t.y, t.rx, ry); g.fill();
     g.strokeStyle = 'rgba(255,220,160,0.6)'; g.lineWidth = 1.2; g.beginPath(); g.ellipse(t.x, t.y, t.rx, ry, 0, Math.PI * 1.05, Math.PI * 1.95); g.stroke();
     }
-    // glasses
-    for (const dx of [-0.5, 0.45]) {
-      const gx = t.x + dx * t.rx, gy = t.y - 2;
-      g.fillStyle = 'rgba(40,16,8,0.8)'; g.fillRect(gx - 4, gy - 16, 8, 16);
-      g.fillStyle = 'rgba(255,220,170,0.75)'; g.fillRect(gx - 3.4, gy - 15, 1.4, 12);
-    }
+    // what's on the table: a tumbler, a cocktail glass, an ashtray with butts, a matchbook
+    const tr = mulberry32((t.x * 7) | 0);
+    { const gx = t.x - 0.5 * t.rx, gy = t.y - 1; // tumbler, half full
+      g.fillStyle = 'rgba(40,16,8,0.55)'; poly(g, [[gx - 5, gy - 15], [gx + 5, gy - 15], [gx + 4.4, gy], [gx - 4.4, gy]]); g.fill();
+      g.fillStyle = 'rgba(200,110,40,0.85)'; poly(g, [[gx - 4.7, gy - 7], [gx + 4.7, gy - 7], [gx + 4.4, gy - 1], [gx - 4.4, gy - 1]]); g.fill();
+      g.fillStyle = 'rgba(255,230,190,0.85)'; g.fillRect(gx - 4.2, gy - 14, 1.1, 12); ell(g, gx, gy - 15, 5, 1.2); g.strokeStyle = 'rgba(255,220,170,0.5)'; g.lineWidth = 0.6; g.stroke(); }
+    { const gx = t.x + 0.42 * t.rx, gy = t.y - 2; // martini glass
+      g.strokeStyle = 'rgba(255,225,180,0.75)'; g.lineWidth = 0.9; g.beginPath(); g.moveTo(gx - 6, gy - 16); g.lineTo(gx, gy - 7); g.lineTo(gx + 6, gy - 16); g.moveTo(gx, gy - 7); g.lineTo(gx, gy); g.moveTo(gx - 3, gy); g.lineTo(gx + 3, gy); g.stroke();
+      g.fillStyle = 'rgba(230,200,120,0.5)'; poly(g, [[gx - 4.5, gy - 14.5], [gx + 4.5, gy - 14.5], [gx, gy - 8.5]]); g.fill();
+      g.fillStyle = '#4a6a20'; g.beginPath(); g.arc(gx + 0.5, gy - 11.5, 1, 0, TAU); g.fill(); }
+    { const ax = t.x + (tr() - 0.3) * t.rx * 0.5, ay = t.y + 3; // ashtray
+      ell(g, ax, ay, 9, 2.6); g.fillStyle = '#1a0c06'; g.fill(); ell(g, ax, ay - 0.6, 6.5, 1.6); g.fillStyle = '#070302'; g.fill();
+      g.strokeStyle = 'rgba(255,210,160,0.5)'; g.lineWidth = 0.6; g.beginPath(); g.ellipse(ax, ay, 9, 2.6, 0, Math.PI * 1.1, Math.PI * 1.9); g.stroke();
+      g.strokeStyle = '#cfc2a8'; g.lineWidth = 1; g.lineCap = 'round'; for (let i = 0; i < 3; i++) { const bx = ax + (tr() - 0.5) * 8; g.beginPath(); g.moveTo(bx, ay - 0.5); g.lineTo(bx + 2.5 + tr() * 2, ay - 1.2 - tr()); g.stroke(); }
+      g.fillStyle = 'rgba(120,120,110,0.5)'; ell(g, ax + 1, ay - 0.8, 3, 0.8); g.fill(); }
+    g.fillStyle = 'rgba(140,40,24,0.85)'; g.save(); g.translate(t.x + t.rx * 0.15, t.y + 4); g.rotate(tr() - 0.5); g.fillRect(-3.5, -2, 7, 4); g.fillStyle = 'rgba(230,210,170,0.7)'; g.fillRect(-3.5, -2, 7, 1); g.restore();
     // lamp
     if (t.lamp === 'shade') {
       g.fillStyle = '#1a0a05'; g.fillRect(t.lx - 2, t.ly - 28, 4, 28); ell(g, t.lx, t.ly, 8, 2); g.fill();
@@ -855,11 +1019,16 @@ function paintNear() {
       for (let i = -3; i <= 3; i++) { g.beginPath(); g.moveTo(t.lx + i * 2.6, t.ly - 46); g.lineTo(t.lx + i * 4.4, t.ly - 26); g.stroke(); }
     } else {
       fillWob(g, [[t.lx - 6, t.ly], [t.lx + 6, t.ly], [t.lx + 5, t.ly - 14], [t.lx - 5, t.ly - 14]], 'rgba(190,80,25,0.9)', { sharp: true, amp: 0.4, step: 2 });
+      g.fillStyle = 'rgba(240,220,180,0.8)'; for (const [dx, h] of [[-4, 6], [1, 9], [3.5, 4]]) { g.fillRect(t.lx + dx, t.ly - 14, 1.2, h); g.beginPath(); g.arc(t.lx + dx + 0.6, t.ly - 14 + h, 0.9, 0, TAU); g.fill(); } // wax runs
+      g.fillStyle = 'rgba(255,190,110,0.5)'; g.fillRect(t.lx - 4.2, t.ly - 13, 1.2, 11);
     }
+    // cloth: creases radiating from the centre, a wine ring
+    if (!t.bare) { g.strokeStyle = 'rgba(120,60,30,0.35)'; g.lineWidth = 0.6; for (let i = 0; i < 5; i++) { const a = R(TAU); g.beginPath(); g.moveTo(t.x + Math.cos(a) * t.rx * 0.2, t.y + Math.sin(a) * ry * 0.2); g.lineTo(t.x + Math.cos(a) * t.rx * 0.85, t.y + Math.sin(a) * ry * 0.85); g.stroke(); }
+      g.strokeStyle = 'rgba(110,30,20,0.4)'; g.lineWidth = 0.8; g.beginPath(); g.ellipse(t.x + t.rx * 0.2, t.y + 2, 5, 1.4, 0, 0, TAU); g.stroke(); }
     g.restore();
   }
   brushPass(c, {
-    atop: true, count: Wpx * Hpx / 70, seed: 31, len: [4 * S * 1.4, 12 * S * 1.4], width: [1.4 * S * 1.4, 3.6 * S * 1.4], alpha: 0.5,
+    atop: true, count: Wpx * Hpx / 45, seed: 31, len: [4 * S * 1.4, 12 * S * 1.4], width: [1.4 * S * 1.4, 3.6 * S * 1.4], alpha: 0.5, passes: [[1, 1], [0.4, 1.5]],
     dir: (px, py) => Noise.n2(px * 0.01, py * 0.01) * 0.5
   });
   return c;
@@ -888,6 +1057,19 @@ function paintCurtains() {
       const r = 40 + 190 * lit, gg = 6 + 60 * lit * lit, b = 8 + 22 * lit * lit;
       g.strokeStyle = rgba(r, gg, b, 0.35 + rr() * 0.3); g.lineWidth = 3 + rr() * 7; g.lineCap = 'round';
       g.beginPath(); g.moveTo(x, y0); g.quadraticCurveTo(x + (rr() - 0.5) * 6, y0 + len / 2, x + (rr() - 0.5) * 4, y0 + len); g.stroke();
+    }
+    // crushed-velvet sheen: short bright flecks where the pile catches the light
+    for (let i = 0; i < 1600; i++) {
+      const y = rr() * 1040 - 20, u = rr(), x = lerp(s * (XW + 20), edge(y), u);
+      const lit = Math.pow(u, 2) * Math.exp(-(((y - 420) / 360) ** 2));
+      g.fillStyle = rgba(230, 90 + 60 * lit, 60, 0.08 + 0.3 * lit * rr()); g.fillRect(x, y, 1.2 + rr() * 2, 3 + rr() * 9);
+    }
+    if (s < 0) { // gold rope tie-back with a tassel
+      const ex = edge(600) - 6;
+      g.strokeStyle = '#6a4a1a'; g.lineWidth = 6; g.lineCap = 'round'; g.beginPath(); g.moveTo(-XW - 20, 585); g.quadraticCurveTo(ex - 40, 620, ex, 600); g.stroke();
+      g.strokeStyle = 'rgba(255,210,120,0.6)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(-XW - 20, 583); g.quadraticCurveTo(ex - 40, 617, ex, 597); g.stroke();
+      fillWob(g, [[ex - 7, 602], [ex + 7, 602], [ex + 10, 650], [ex - 10, 650]], '#5a3c12', { amp: 1.5, step: 2 });
+      g.strokeStyle = 'rgba(255,200,110,0.5)'; g.lineWidth = 0.8; for (let i = -4; i <= 4; i++) { g.beginPath(); g.moveTo(ex + i * 1.4, 610); g.lineTo(ex + i * 2.2, 650); g.stroke(); }
     }
     // a bright hard sliver on the innermost fold
     g.strokeStyle = 'rgba(255,150,80,0.45)'; g.lineWidth = 3;
@@ -1354,12 +1536,13 @@ function update(dt, t, beat) {
     if (T > 4.0) { door.t = -1; door.open = 0; door.next = t + 40 + Math.random() * 50; }
   }
   // waiter
+  const wm = st.wm || (st.wm = {});
   if (st.waiterPause > 0) st.waiterPause -= dt;
-  else {
-    st.waiterX += st.waiterDir * 34 * dt;
-    if (st.waiterX < -400 || st.waiterX > 420) { st.waiterDir *= -1; st.waiterPause = 3 + Math.random() * 5; }
-    else if (Math.random() < dt * 0.04) st.waiterPause = 2 + Math.random() * 3;
-  }
+  else if (st.waiterX < -400 && st.waiterDir < 0 || st.waiterX > 420 && st.waiterDir > 0) { st.waiterDir *= -1; st.waiterPause = 3 + Math.random() * 5; }
+  else if (Math.random() < dt * 0.04) st.waiterPause = 2 + Math.random() * 3;
+  const wv = spr(wm, 'v', st.waiterPause > 0 ? 0 : st.waiterDir * 38, dt, 3, 3.4);
+  st.waiterX += wv * dt; wm.step = (wm.step || 0) + Math.abs(wv) * dt * 0.19;
+  st.waiterBow = spr(wm, 'bow', st.waiterPause > 0.6 ? 0.09 : 0, dt, 5, 4);
   // neon flicker
   const nf = st.neon;
   if (t > nf.next) { nf.letter = (Math.random() * 11) | 0; nf.until = t + 0.4 + Math.random() * 1.2; nf.next = t + 14 + Math.random() * 30; }
@@ -1471,42 +1654,56 @@ function render(t, beat) {
   // ---- BAND
   const bp = beat;
   // bass: sway on 1 and 3, plucking arm on every note
-  const c = Math.cos(Math.PI * bp / 2), sway = Math.sign(c) * Math.pow(Math.abs(c), 0.7) * 0.022;
+  const bm = st.bm || (st.bm = {}), dt = FDT;
+  const c = Math.cos(Math.PI * bp / 2), sway = spr(bm, 'bs', Math.sign(c) * Math.pow(Math.abs(c), 0.7) * 0.024, dt, 22, 5);
   const [bl] = lastNext('bass', bp), pl = bl ? clamp((bp - bl.ab) * 3, 0, 1) : 1;
-  const B = BAND.bass, bx = [[0, 0, sway]];
+  const bdip = spr(bm, 'bd', 1.1 * Math.exp(-(bp % 2) * 5), dt, 40, 9);
+  const B = BAND.bass, bx = [[0, 0, sway, 0, bdip * 0.4]];
   drawSp(g, SP.bass, B.x, B.y, B.sc, 1, bx);
   drawSp(g, SP.bassArm, B.x, B.y, B.sc, 1, bx.concat([[-1, -80, -0.08 * (1 - pl)]]));
   // pianist: head bob on the beat, hands travel during solo
-  const P = BAND.pno, fb = bp % 1, bob = Math.pow(1 - fb, 3);
+  const P = BAND.pno, fb = bp % 1;
+  const bob = spr(bm, 'pb', Math.exp(-fb * 7), dt, 45, 10);
   const rh = sounding('pnoR', bp), [pnl] = lastNext(sec === 'pno' ? 'pnoR' : 'pno', bp), hit = pnl ? Math.exp(-(bp - pnl.ab) * 6) : 0;
-  st.pnoHand = approach(st.pnoHand, rh ? clamp((rh.m - 74) / 12, -1, 1) * 2.4 : 0, 6, 1 / 60);
-  drawSp(g, SP.pnoBody, P.x, P.y, P.sc, -1, [[0, 0, 0, 0, bob * 0.5]]);
-  drawSp(g, SP.pnoArms, P.x, P.y, P.sc, -1, [[3, -59, -0.05 * hit, st.pnoHand, bob * 0.5 + hit * 0.6]]);
-  drawSp(g, SP.pnoHead, P.x, P.y, P.sc, -1, [[5, -63, 0.12 * bob, 0, bob * 0.9]]);
+  st.pnoHand = spr(bm, 'ph', rh ? clamp((rh.m - 74) / 12, -1, 1) * 2.6 : Noise.n2(t * 0.3, 4) * 0.8, dt, 18, 7);
+  const prock = spr(bm, 'pr', (sec === 'pno' ? 0.05 : 0.02) * (0.5 + 0.5 * Math.sin(t * 0.55)) + hit * 0.015, dt, 8, 4);
+  const pbx = [[-2, -29, prock, 0, bob * 0.4]];
+  drawSp(g, SP.pnoBody, P.x, P.y, P.sc, -1, pbx);
+  drawSp(g, SP.pnoArms, P.x, P.y, P.sc, -1, pbx.concat([[3, -59, -0.05 * hit - prock, st.pnoHand, hit * 0.6]]));
+  drawSp(g, SP.pnoHead, P.x, P.y, P.sc, -1, pbx.concat([[5, -63, 0.1 * bob + Noise.n2(t * 0.25, 8) * 0.06, 0, bob * 0.5]]));
   // drummer
   const D = BAND.drm, [rl, rn] = lastNext('ride', bp), ph = rl && rn ? clamp((bp - rl.ab) / (rn.ab - rl.ab), 0, 1) : 0;
   const lift = Math.pow(Math.sin(Math.PI * ph), 0.8);
   const [sl] = lastNext('snare', bp), sh = sl ? clamp((bp - sl.ab) * 2.5, 0, 1) : 1;
   const [cl] = lastNext('crash', bp), crashE = cl ? Math.exp(-(bp - cl.ab) * 1.6) * cl.e.v : 0;
   const rideE = rl ? Math.exp(-(bp - rl.ab) * 5) * rl.e.v : 0;
-  drawSp(g, SP.drmBody, D.x, D.y, D.sc, 1, [[0, -30, 0, 0, -bob * 0.4]]);
-  drawSp(g, SP.drmArmR, D.x, D.y, D.sc, 1, [[-10, -57, 0.22 * lift - 0.05]]);
-  drawSp(g, SP.drmArmL, D.x, D.y, D.sc, 1, [[10, -57, -0.18 * Math.sin(Math.PI * sh)]]);
+  const dsw = spr(bm, 'ds', 0.022 * Math.sin(Math.PI * bp) + crashE * 0.03, dt, 20, 6), dbob = spr(bm, 'db', Math.exp(-fb * 6) * 0.9, dt, 40, 9);
+  const dbx = [[0, -20, dsw, 0, dbob * 0.5]];
+  drawSp(g, SP.drmBody, D.x, D.y, D.sc, 1, dbx);
+  drawSp(g, SP.drmArmR, D.x, D.y, D.sc, 1, dbx.concat([[-10, -57, 0.22 * lift - 0.05]]));
+  drawSp(g, SP.drmArmL, D.x, D.y, D.sc, 1, dbx.concat([[10, -57, -0.18 * Math.sin(Math.PI * sh)]]));
   drawSp(g, SP.kit, 0, 0, 1, 1);
   drawCymbal(g, fxg, -64, 316, 40, -0.14, rideE * 0.9, t, 0.6);
   drawCymbal(g, fxg, 100, 300, 33, 0.2, crashE * 1.4, t, 1.0);
   drawCymbal(g, fxg, 104, 356, 17, 0.05, 0, t, 0.3);
   // trumpet
-  const Tp = BAND.tpt, raise = st.tptRaise;
-  drawSp(g, SP.tptLegs, Tp.x, Tp.y, Tp.sc, -1);
-  drawSp(g, SP.tptUpper, Tp.x, Tp.y, Tp.sc, -1, [[-1, -46, -0.03 * raise]]);
-  const tx = [[-1, -46, -0.03 * raise], [-1, -79, lerp(1.0, -0.06, raise)]];
+  const Tp = BAND.tpt, raise = st.tptRaise, tN = sounding('tpt', bp);
+  const tsw = spr(bm, 'ts', 0.012 * Math.sin(t * 0.6 + 1) + (tN ? -0.012 : 0), dt, 6, 4);
+  const tpitch = spr(bm, 'tp', tN ? -(tN.m - 72) * 0.007 : 0, dt, 16, 6);
+  const tdip = spr(bm, 'tdp', tN ? Math.exp(-fb * 5) * 0.8 : 0, dt, 35, 8);
+  drawSp(g, SP.tptLegs, Tp.x, Tp.y, Tp.sc, -1, [[0, 0, tsw]]);
+  drawSp(g, SP.tptUpper, Tp.x, Tp.y, Tp.sc, -1, [[0, 0, tsw, 0, tdip], [-1, -46, -0.03 * raise]]);
+  const tx = [[0, 0, tsw, 0, tdip], [-1, -46, -0.03 * raise], [-1, -79, lerp(1.0, -0.06, raise) + tpitch * raise]];
   drawSp(g, SP.tptHorn, Tp.x, Tp.y, Tp.sc, -1, tx);
   // sax: front centre, leans back & lifts the horn in his solo, steps back otherwise
   const Sx = BAND.sax, sx = Sx.x + st.saxBack * 26, sy = Sx.y - st.saxBack * 6, ssc = Sx.sc * (1 - st.saxBack * 0.03);
-  const leanA = -0.11 * st.lean, horn = -0.17 * st.saxLift;
-  const xfU = [[-1, -46, leanA]], xfH = [[-1, -46, leanA], [6, -89, horn]];
-  drawSp(g, SP.saxLegs, sx, sy, ssc, -1);
+  const sN = sounding('sax', bp);
+  const ssw = spr(bm, 'ss', 0.014 * Math.sin(t * 0.7) + (sN ? -0.01 : 0.004), dt, 6, 4);
+  const sdip = spr(bm, 'sd', sN ? Math.exp(-fb * 4.5) * 1.1 : 0, dt, 32, 7);
+  const spitch = spr(bm, 'sp', sN ? -(sN.m - 63) * 0.006 : 0, dt, 14, 6);
+  const leanA = -0.11 * st.lean, horn = -0.17 * st.saxLift + spitch;
+  const xfU = [[0, 0, ssw, 0, sdip], [-1, -46, leanA]], xfH = [[0, 0, ssw, 0, sdip], [-1, -46, leanA], [6, -89, horn]];
+  drawSp(g, SP.saxLegs, sx, sy, ssc, -1, [[0, 0, ssw]]);
   drawSp(g, SP.saxUpper, sx, sy, ssc, -1, xfU);
   drawSp(g, SP.saxHorn, sx, sy, ssc, -1, xfH);
 
@@ -1561,7 +1758,14 @@ function render(t, beat) {
   drawSp(g, SP.bartender, 655, 444, 1.95, -1, [[0, -46, btA * 0.15]]);
   fxg.globalCompositeOperation = 'destination-out'; drawSp(fxg, SP.bartender, 655, 444, 1.95, -1, [[0, -46, btA * 0.15]]); fxg.globalCompositeOperation = 'lighter';
 
-  // ---- middle room
+  // ---- middle room: the standing crowd, then everyone seated, then the tables in front of them
+  STAND.forEach((p, i) => {
+    const a = p.a || (p.a = { ph: Math.random() * 99 });
+    const sway = spr(a, 'sw', Noise.n2(t * 0.15, a.ph) * 0.03 + (Noise.n2(t * 0.04, a.ph + 3) > 0.3 ? 0.02 : -0.01), FDT, 6, 4);
+    const xf = [[0, 0, sway], [0, -84, Noise.n2(t * 0.2, a.ph + 9) * 0.12]];
+    for (const ctx of [g, fxg]) { if (ctx === fxg) fxg.globalCompositeOperation = 'destination-out'; drawSp(ctx, p.r.body, p.x, p.y, p.sc, p.flip, xf); if (ctx === fxg) fxg.globalCompositeOperation = 'lighter'; }
+  });
+  for (const p of MIDP) { animateRig(p, t, FDT, bp); drawRig(g, fxg, p, t); }
   g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midC, 0, 0); worldT(g);
   fxg.setTransform(1, 0, 0, 1, 0, 0); fxg.globalCompositeOperation = 'destination-out'; fxg.drawImage(midC, 0, 0); fxg.globalCompositeOperation = 'lighter'; worldT(fxg);
   for (const m of MID) { glowAt(fxg, m.x + 6, m.y - 12, 16, [255, 160, 70], 0.55 * m.light.f); glowAt(fxg, m.x + 6, m.y - 8, 50, [255, 120, 40], 0.12 * m.light.f); }
@@ -1572,9 +1776,10 @@ function render(t, beat) {
   drawPool(g, -540, 600, 140, 30, [255, 170, 90], 0.08, 0.6);
   g.globalCompositeOperation = 'source-over';
   // waiter in a white jacket, drifting between tables
-  const wb = Math.abs(Math.sin(t * 5.2)) * (st.waiterPause > 0 ? 0 : 1.6);
-  drawSp(g, SP.waiter, st.waiterX, 606 - wb, 2.0, st.waiterDir, null);
-  fxg.globalCompositeOperation = 'destination-out'; drawSp(fxg, SP.waiter, st.waiterX, 606 - wb, 2.0, st.waiterDir, null); fxg.globalCompositeOperation = 'lighter';
+  const wsp = Math.min(1, Math.abs(st.wm.v || 0) / 38), wph = st.wm.step || 0;
+  const wb = Math.abs(Math.sin(wph * Math.PI)) * 1.8 * wsp, wxf = [[0, 0, Math.sin(wph * Math.PI) * 0.02 * wsp + 0.035 * wsp], [0, -46, st.waiterBow || 0]];
+  drawSp(g, SP.waiter, st.waiterX, 606 - wb, 2.0, st.waiterDir, wxf);
+  fxg.globalCompositeOperation = 'destination-out'; drawSp(fxg, SP.waiter, st.waiterX, 606 - wb, 2.0, st.waiterDir, wxf); fxg.globalCompositeOperation = 'lighter';
   gr = g.createLinearGradient(0, 250, 0, 700); gr.addColorStop(0, 'rgba(160,80,40,0.035)'); gr.addColorStop(1, 'rgba(60,25,12,0.03)');
   g.fillStyle = gr; g.fillRect(-XW, 0, WW, 1000);
 
@@ -1594,20 +1799,8 @@ function render(t, beat) {
   }
   g.globalCompositeOperation = 'source-over';
   for (const f of FARP) if (f.ember) { const e = 0.6 + 0.4 * Noise.n2(t * 0.7, 3); glowAt(fxg, f.ember[0], f.ember[1], 9, [255, 110, 40], e); }
-  MIDEMBERS.forEach((m, i) => glowAt(fxg, m[0], m[1], 6, [255, 110, 40], 0.5 + 0.4 * Noise.n2(t * 0.6, i * 7)));
   // near-side patrons (one nods to the beat)
-  for (const p of PATRONS) {
-    const nod = p.nod ? Math.pow(1 - (bp % 1), 4) * 0.012 * p.nod : 0, br = Math.sin(t * 0.9 + p.x) * 0.004;
-    const xf = [[0, 0, br + nod]];
-    xf[0][2] += p.rot || 0;
-    drawSp(g, p.sp, p.x, p.y, p.sc, 1, xf);
-    fxg.globalCompositeOperation = 'destination-out'; drawSp(fxg, p.sp, p.x, p.y, p.sc, 1, xf); fxg.globalCompositeOperation = 'lighter';
-    if (p.ember) {
-      const drag = Math.max(0, Math.sin(t * 0.33 + 1.2)) ** 6, e = loc2w(p.x, p.y, p.sc, 1, xf, p.ember[0], p.ember[1]);
-      glowAt(fxg, e[0], e[1], 8, [255, 120, 40], 0.7 + 0.3 * drag); glowAt(fxg, e[0], e[1], 26, [255, 80, 20], 0.15 + 0.25 * drag);
-      p.rib.x = e[0]; p.rib.y = e[1] - 2;
-    }
-  }
+  for (const p of PATRONS) { animateRig(p, t, FDT, bp); drawRig(g, fxg, p, t); }
 
   // a faint veil of the same smoke in front of the near tables
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'screen'; g.globalAlpha = 0.32; g.drawImage(hz, 0, 0, Wpx, Hpx); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
@@ -1705,7 +1898,8 @@ void main(){
  vec2 px=gl_FragCoord.xy;
  float weave=sin(px.x*1.15+sin(px.y*0.13)*1.2)*sin(px.y*1.15+sin(px.x*0.11)*1.2);
  float tooth=h(floor(px/1.7))-0.5;
- col*=1.0+0.04*weave+0.035*tooth;
+ float fib=h(floor(px*vec2(0.5,2.2)))-0.5;
+ col*=1.0+0.06*weave+0.05*tooth+0.035*fib;
  vec3 kn=step(vec3(0.78),col); col=mix(col,0.78+(1.0-exp(-(col-0.78)*4.5))*0.22,kn);
  float l=dot(col,vec3(0.299,0.587,0.114));
  col=mix(col,col*vec3(1.07,0.95,0.80),0.6);
@@ -1788,7 +1982,7 @@ function build() {
   const tb0 = performance.now();
   rnd = mulberry32(1947);
   const va = innerWidth / innerHeight, sa = clamp(va, 1.3, 2.4);
-  Hpx = Math.round(clamp(innerHeight * Math.min(devicePixelRatio || 1, 1.5), 480, 720) * quality);
+  Hpx = Math.round(clamp(innerHeight * Math.min(devicePixelRatio || 1, 1.5), 540, 900) * quality);
   Wpx = Math.round(Hpx * sa); S = Hpx / 1000; WW = 1000 * sa; XW = WW / 2; CX = Wpx / 2;
   scene = mk(Wpx, Hpx); sg = scene.getContext('2d');
   fx = mk(Wpx, Hpx); fg = fx.getContext('2d');
@@ -1804,20 +1998,33 @@ function build() {
   SP.bartender = standingSprite(1.95, [0.6, -0.6], { waiter: true, jacket: '#3a2a20', rim: '#ffb050' });
   SP.waiter = standingSprite(2.0, [0.2, -1], { waiter: true, jacket: '#30271f' });
   SP.coatMan = standingSprite(3.0, [-1, -0.3], { coat: true, rim: '#6fd0dc', rim2: '#c8f4f8' });
-  for (const p of PATRONS) p.sp = patronSprite(p.sc, [clamp(-p.x / 600, -0.85, 0.85), -1], p.o);
+  for (const p of PATRONS) { p.r = buildRig(p.sc, [clamp(-p.x / 600, -0.85, 0.85), -1], p.o); p.smoke = !!p.o.smoke; }
+  PATRONS.forEach((p, i) => { const nb = PATRONS.filter(q => q !== p).sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x))[0]; p.talkDir = nb && nb.x < p.x ? -1 : 1; });
+  // the middle room: live people too, built deterministically
+  STAND.length = 0;
+  for (const [x, y, sc, o, flip] of [[-610, 580, 2.15, { coat: true }, 1], [-492, 568, 2.0, { waiter: true, jacket: '#1a120c' }, 1], [-690, 602, 2.3, { coat: true }, -1], [470, 560, 2.0, { coat: true }, -1]])
+    STAND.push({ x, y, sc, flip, r: { body: standingSprite(sc, [flip * 0.8, -0.8], o) } });
+  MIDP.length = 0;
+  const mL = x => [clamp(-x / 500, -0.8, 0.8), -1];
+  for (const m of MID) for (let i = 0; i < m.n; i++) {
+    const sc = 1.3 + R(0.35) + (m.y - 560) * 0.004, px = m.x + (m.n === 1 ? R(-20, 20) : lerp(-36, 36, i / (m.n - 1)) + R(-8, 8)), py = m.y + R(-10, 8);
+    const o = { hat: R() < 0.35, woman: R() < 0.3, collar: R() < 0.4, sw: R(0.85, 1.15), ht: R(-0.3, 0.3), hx: R(-2, 2), smoke: R() < 0.3 };
+    const flip = R() < 0.5 ? -1 : 1;
+    MIDP.push({ x: px, y: py, sc, rot: R(-0.08, 0.08), flip, o, smoke: o.smoke, nod: R() < 0.25 ? 0.7 : 0, talkDir: (i < m.n / 2 ? 1 : -1) * flip, r: buildRig(sc, mL(px), o) });
+  }
   impC = makeImpasto(); bgC = paintBackground(); MIDEMBERS.length = 0; midC = paintMid(); nearC = paintNear(); curC = paintCurtains(); fgC = paintForeground();
   neonPaths = buildNeon();
   if (!SM.N) initSmoke(quality < 1 ? 2400 : 4200);
   initMotes();
   ribbons = [new Ribbon(-36, 900, 1.25, 1.1)];
-  for (const p of PATRONS) if (p.ember) { const e = loc2w(p.x, p.y, p.sc, 1, [[0, 0, p.rot || 0]], p.ember[0], p.ember[1]); p.rib = new Ribbon(e[0], e[1] - 2, 0.9, 0.8); ribbons.push(p.rib); }
+  for (const p of PATRONS) if (p.smoke) { p.rib = new Ribbon(p.x, p.y - 120, 0.9, 0.8); ribbons.push(p.rib); }
+  for (const p of MIDP) if (p.smoke) { p.rib = new Ribbon(p.x, p.y - 60, 0.55, 0.5); ribbons.push(p.rib); }
   for (const f of FARP) if (f.ember) ribbons.push(new Ribbon(f.ember[0], f.ember[1] - 3, 0.75, 0.6));
-  for (const e of MIDEMBERS) ribbons.push(new Ribbon(e[0], e[1] - 2, 0.55, 0.5));
   CPU_CANVAS = false;
   // finished paint goes to GPU-backed canvases so per-frame drawing never re-uploads it
   bgC = toGPU(bgC); midC = toGPU(midC); nearC = toGPU(nearC); curC = toGPU(curC); fgC = toGPU(fgC); bottleGlowC = toGPU(bottleGlowC);
   for (const k in SP) SP[k].cv = toGPU(SP[k].cv);
-  for (const p of PATRONS) p.sp.cv = toGPU(p.sp.cv);
+  for (const p of PATRONS.concat(MIDP, STAND)) for (const k of ['body', 'head', 'arm']) if (p.r[k]) p.r[k].cv = toGPU(p.r[k].cv);
   const dpr = Math.min(devicePixelRatio || 1, 2);
   view.width = Math.round(innerWidth * dpr); view.height = Math.round(innerHeight * dpr);
   glResize();
@@ -1825,10 +2032,10 @@ function build() {
 }
 
 // ---------------------------------------------------------------- main loop
-let last = performance.now() / 1000, slow = 0;
+let last = performance.now() / 1000, slow = 0, FDT = 1 / 60;
 function frame(now) {
   requestAnimationFrame(frame);
-  const t = now / 1000, dt = clamp(t - last, 0, 0.1); last = t;
+  const t = now / 1000, dt = clamp(t - last, 0, 0.1); last = t; FDT = dt;
   const beat = songTime() * BPM / 60;
   const p0 = performance.now(); update(dt, t, beat); const p1 = performance.now(); render(t, beat); const p2 = performance.now(); post(); const p3 = performance.now();
   const pf = window.__perf || (window.__perf = { u: 0, r: 0, p: 0, n: 0 }); pf.u += p1 - p0; pf.r += p2 - p1; pf.p += p3 - p2; pf.n++;
