@@ -1,0 +1,465 @@
+<title>Hindsight History</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: an archive ledger. A masthead and a to-scale timeline of the four
+   topics, then catalogue cards; each topic page is a numbered register of
+   aspects. Vellum and iron-gall ink, with one dye colour per topic. */
+:root {
+  --paper: #efe8da;
+  --surface: #f7f2e7;
+  --ink: #231b13;
+  --muted: #6a5c4a;
+  --rule: #c9bba2;
+  --tudor: #8e1b1b;
+  --stuart: #1f3f66;
+  --russia: #7a5a10;
+  --civil: #2b5c4e;
+  --accent: var(--ink);
+  --display: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --caps: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --body: "Libre Caslon Text", "Iowan Old Style", Georgia, serif;
+  --lane: 34px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #17130e; --surface: #211b14; --ink: #ece3d0; --muted: #a89a84; --rule: #3d3328;
+    --tudor: #e3877b; --stuart: #93b3da; --russia: #d9b65c; --civil: #82c2ac;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #17130e; --surface: #211b14; --ink: #ece3d0; --muted: #a89a84; --rule: #3d3328;
+  --tudor: #e3877b; --stuart: #93b3da; --russia: #d9b65c; --civil: #82c2ac;
+  color-scheme: dark;
+}
+.t-tudors { --accent: var(--tudor); }
+.t-stuarts { --accent: var(--stuart); }
+.t-russia { --accent: var(--russia); }
+.t-civil-rights { --accent: var(--civil); }
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.wrap { max-width: 980px; margin: 0 auto; }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; text-wrap: balance; line-height: 1.15; margin: 0; }
+
+/* Masthead */
+.masthead { padding-block: 40px 20px; border-bottom: 3px double var(--rule); display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+.masthead a { text-decoration: none; }
+.mark { font-family: var(--display); font-size: clamp(2.6rem, 7vw, 4rem); line-height: 1; letter-spacing: -0.01em; }
+.mark i { color: var(--muted); }
+.strap { font-family: var(--caps); color: var(--muted); letter-spacing: 0.06em; font-size: 1rem; }
+
+/* Home */
+.intro { max-width: 62ch; margin-block: 28px 8px; font-size: 1.1rem; }
+.timeline { margin-block: 28px 36px; }
+.bands { position: relative; height: calc(var(--lanes) * var(--lane)); }
+.band {
+  position: absolute; height: calc(var(--lane) - 6px);
+  background: var(--accent); color: var(--paper);
+  font-family: var(--caps); font-size: 0.85rem; letter-spacing: 0.04em;
+  display: flex; align-items: center; padding-inline: 8px;
+  white-space: nowrap; overflow: hidden; text-decoration: none;
+  border-radius: 2px;
+}
+.band:hover { filter: brightness(1.1); }
+.ticks { position: relative; height: 24px; border-top: 1px solid var(--rule); margin-top: 4px; }
+.tick { position: absolute; top: 0; transform: translateX(-50%); font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 4px; }
+.tick::before { content: ""; position: absolute; left: 50%; top: -5px; height: 5px; border-left: 1px solid var(--rule); }
+.tick:first-child { transform: none; }
+
+.section-label { font-family: var(--caps); color: var(--muted); letter-spacing: 0.08em; font-size: 0.95rem; margin: 0 0 12px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; }
+.card {
+  display: grid; gap: 6px; padding: 22px 24px 20px;
+  background: var(--surface); border: 1px solid var(--rule); border-top: 6px solid var(--accent);
+  text-decoration: none; transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -10px var(--ink); }
+.card-dates { font-family: var(--display); font-size: 2.1rem; line-height: 1; color: var(--accent); display: flex; gap: 6px; font-variant-numeric: lining-nums; }
+.card-dates .dash { color: var(--muted); }
+.card-name { font-family: var(--display); font-size: 1.5rem; line-height: 1.2; }
+.card-blurb { color: var(--muted); }
+.card-status { font-family: var(--caps); font-size: 0.9rem; letter-spacing: 0.05em; margin-top: 6px; }
+
+/* Topic and page views */
+.crumbs { display: flex; gap: 8px; flex-wrap: wrap; font-family: var(--caps); letter-spacing: 0.05em; margin-top: 24px; color: var(--muted); }
+.crumbs a { text-decoration: none; border-bottom: 1px solid var(--rule); }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.topic-head { padding-block: 16px 24px; border-bottom: 1px solid var(--rule); margin-bottom: 8px; }
+.topic-dates { font-family: var(--display); font-size: 1.5rem; color: var(--accent); margin: 0; }
+.topic-head h1 { font-size: clamp(2.1rem, 6vw, 3.2rem); }
+.lede { color: var(--muted); max-width: 62ch; margin: 10px 0 0; font-size: 1.05rem; }
+
+.aspects { list-style: none; padding: 0; margin: 0; counter-reset: aspect; }
+.aspect { counter-increment: aspect; padding-block: 22px; border-bottom: 1px solid var(--rule); display: grid; gap: 6px; }
+.aspect-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.aspect-head h3 { font-size: 1.45rem; flex: 1 1 260px; min-width: 0; }
+.aspect-head h3::before { content: counter(aspect, upper-roman) ". "; color: var(--accent); }
+.aspect-dates { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.9rem; flex-basis: 100%; }
+.pill { font-family: var(--caps); font-size: 0.8rem; letter-spacing: 0.06em; padding: 2px 10px; border: 1px solid var(--rule); color: var(--muted); border-radius: 999px; }
+.pill-ready { border-color: var(--accent); color: var(--accent); }
+.label { font-family: var(--caps); color: var(--muted); letter-spacing: 0.06em; font-size: 0.85rem; margin: 6px 0 0; }
+.questions { margin: 0; padding-left: 1.4em; font-style: italic; max-width: 70ch; }
+.questions li + li { margin-top: 4px; }
+.aspect-link { justify-self: start; margin-top: 8px; font-family: var(--caps); letter-spacing: 0.05em; text-decoration: none; color: var(--accent); border-bottom: 1px solid currentColor; }
+.aspect-link::after { content: " →"; }
+
+/* Rendered Markdown */
+.prose { max-width: 72ch; }
+.prose .anchor { display: none; }
+.prose h2 { font-size: 2rem; margin-top: 44px; padding-top: 18px; border-top: 3px double var(--rule); }
+.prose h3 { font-size: 1.4rem; margin-top: 18px; color: var(--accent); }
+.prose h3 em { font-style: italic; }
+.prose h4 { font-size: 1.3rem; margin-top: 28px; }
+.prose p, .prose li { max-width: 70ch; }
+.prose ul, .prose ol { padding-left: 1.3em; }
+.prose li + li { margin-top: 3px; }
+.prose strong { font-weight: 700; }
+.prose hr { display: none; }
+.prose blockquote { margin: 20px 0; padding: 14px 18px; background: var(--surface); border-left: 4px solid var(--accent); }
+.prose blockquote p { margin: 0; }
+.table-wrap { overflow-x: auto; margin: 16px 0; }
+.prose table { border-collapse: collapse; width: 100%; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+.prose th { font-family: var(--caps); font-weight: 400; letter-spacing: 0.04em; text-align: left; border-bottom: 2px solid var(--ink); padding: 6px 10px; }
+.prose td { border-bottom: 1px solid var(--rule); padding: 6px 10px; vertical-align: top; }
+.prose td:first-child { white-space: nowrap; }
+.prose code { font-size: 0.9em; }
+
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <a href="#home"><span class="mark">Hindsight <i>History</i></span></a>
+    <span class="strap">A-Level revision: notes, questions and essay plans</span>
+  </header>
+
+  <section class="view" data-view="home">
+    <p class="intro">Four periods of study, from the Tudors to Obama. Pick a topic to see its aspects and practice questions. Topics fill in as they get written.</p>
+    <div class="timeline" style="--lanes:2" aria-label="The four topics on one timeline"><div class="bands"><a class="band t-tudors" href="#tudors" style="left:0.00%;width:22.52%;top:calc(0 * var(--lane))" title="The Tudors, 1485–1603">Tudors</a><a class="band t-stuarts" href="#stuarts" style="left:22.52%;width:18.89%;top:calc(0 * var(--lane))" title="The Stuarts, 1603–1702">Stuarts</a><a class="band t-russia" href="#russia" style="left:70.61%;width:20.80%;top:calc(0 * var(--lane))" title="Tsarist and Communist Russia, 1855–1964">Russia</a><a class="band t-civil-rights" href="#civil-rights" style="left:72.52%;width:27.48%;top:calc(1 * var(--lane))" title="Civil Rights in the USA, 1865–2009">Civil Rights</a></div><div class="ticks"><span class="tick" style="left:2.86%">1500</span><span class="tick" style="left:21.95%">1600</span><span class="tick" style="left:41.03%">1700</span><span class="tick" style="left:60.11%">1800</span><span class="tick" style="left:79.20%">1900</span><span class="tick" style="left:98.28%">2000</span></div></div>
+    <p class="section-label">The four topics</p>
+    <div class="cards">
+<a class="card t-tudors" href="#tudors">
+  <span class="card-dates"><span>1485</span><span class="dash">–</span><span>1603</span></span>
+  <span class="card-name">The Tudors</span>
+  <span class="card-blurb">Henry VII&#x27;s seizure of the throne to the death of Elizabeth I: royal power, the Reformation and the mid-Tudor crisis.</span>
+  <span class="card-status">Not started</span>
+</a>
+<a class="card t-stuarts" href="#stuarts">
+  <span class="card-dates"><span>1603</span><span class="dash">–</span><span>1702</span></span>
+  <span class="card-name">The Stuarts</span>
+  <span class="card-blurb">James I to the end of William III: Crown against Parliament, civil war, republic, Restoration and the Glorious Revolution.</span>
+  <span class="card-status">Not started</span>
+</a>
+<a class="card t-russia" href="#russia">
+  <span class="card-dates"><span>1855</span><span class="dash">–</span><span>1964</span></span>
+  <span class="card-name">Tsarist and Communist Russia</span>
+  <span class="card-blurb">Alexander II&#x27;s reforms to the fall of Khrushchev: autocracy, revolution and the Soviet state.</span>
+  <span class="card-status">1 of 7 aspects written</span>
+</a>
+<a class="card t-civil-rights" href="#civil-rights">
+  <span class="card-dates"><span>1865</span><span class="dash">–</span><span>2009</span></span>
+  <span class="card-name">Civil Rights in the USA</span>
+  <span class="card-blurb">Reconstruction to the election of Obama: Jim Crow, the courts, the movement and Black Power.</span>
+  <span class="card-status">Not started</span>
+</a></div>
+  </section>
+
+  
+<section class="view t-tudors" data-view="tudors" hidden>
+  <nav class="crumbs"><a href="#home">All topics</a></nav>
+  <header class="topic-head">
+    <p class="topic-dates">1485–1603</p>
+    <h1>The Tudors</h1>
+    <p class="lede">Henry VII&#x27;s seizure of the throne to the death of Elizabeth I: royal power, the Reformation and the mid-Tudor crisis.</p>
+  </header>
+  <ul class="aspects">
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1485–1509</span>
+    <h3>Henry VII: securing the dynasty</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far had Henry VII secured his throne by 1509?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1509–1547</span>
+    <h3>Henry VIII, Wolsey and Cromwell</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>To what extent did Henry VIII rely on his ministers in government?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1529–1547</span>
+    <h3>The Reformation</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far was the break with Rome driven by the king&#x27;s marriage?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1547–1558</span>
+    <h3>The mid-Tudor crisis</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>&quot;England faced a genuine crisis in the years 1547–1558.&quot; Assess the validity of this view.</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1558–1603</span>
+    <h3>Elizabeth I: religion and government</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How successful was Elizabeth I&#x27;s religious settlement?</li></ol>
+  
+</li></ul>
+</section>
+<section class="view t-stuarts" data-view="stuarts" hidden>
+  <nav class="crumbs"><a href="#home">All topics</a></nav>
+  <header class="topic-head">
+    <p class="topic-dates">1603–1702</p>
+    <h1>The Stuarts</h1>
+    <p class="lede">James I to the end of William III: Crown against Parliament, civil war, republic, Restoration and the Glorious Revolution.</p>
+  </header>
+  <ul class="aspects">
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1603–1625</span>
+    <h3>James I and Parliament</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far did relations between Crown and Parliament break down under James I?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1625–1640</span>
+    <h3>Charles I and the Personal Rule</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>To what extent was the Personal Rule a success for Charles I?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1642–1649</span>
+    <h3>The Civil Wars</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far was Charles I responsible for his own execution?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1649–1660</span>
+    <h3>The Interregnum</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>Why did the republic fail to find a lasting settlement?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1660–1702</span>
+    <h3>Restoration and Glorious Revolution</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far did the Glorious Revolution change the power of the monarchy?</li></ol>
+  
+</li></ul>
+</section>
+<section class="view t-russia" data-view="russia" hidden>
+  <nav class="crumbs"><a href="#home">All topics</a></nav>
+  <header class="topic-head">
+    <p class="topic-dates">1855–1964</p>
+    <h1>Tsarist and Communist Russia</h1>
+    <p class="lede">Alexander II&#x27;s reforms to the fall of Khrushchev: autocracy, revolution and the Soviet state.</p>
+  </header>
+  <ul class="aspects">
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1855–1881</span>
+    <h3>Alexander II and reform</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far did Alexander II&#x27;s reforms change Russia?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1881–1894</span>
+    <h3>Alexander III and reaction</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>To what extent was Alexander III&#x27;s reign one of reaction?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1894–1914</span>
+    <h3>The Russian economy</h3>
+    <span class="pill pill-ready">Plans ready</span>
+  </div>
+  <p class="label">Questions</p>
+  <ol class="questions"><li>&quot;The Russian economy was transformed in the years 1894–1914.&quot; Assess the validity of this view.</li><li>How far was state policy the main reason for Russian economic growth in the years 1894–1914?</li><li>&quot;Russia&#x27;s economic modernisation in the years 1894–1914 was fundamentally limited by the backwardness of agriculture.&quot; Assess the validity of this view.</li></ol>
+  <a class="aspect-link" href="#russia-economy">Open the essay plans</a>
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1905–1914</span>
+    <h3>1905 and the Dumas</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far did the October Manifesto change the way Russia was governed?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1914–1917</span>
+    <h3>War and revolution</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>To what extent was the First World War responsible for the fall of the Tsar?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1917–1953</span>
+    <h3>Lenin and Stalin</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far did Stalin&#x27;s rule continue Lenin&#x27;s?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1953–1964</span>
+    <h3>Khrushchev</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far did Khrushchev break with Stalinism?</li></ol>
+  
+</li></ul>
+</section>
+<section class="view t-civil-rights" data-view="civil-rights" hidden>
+  <nav class="crumbs"><a href="#home">All topics</a></nav>
+  <header class="topic-head">
+    <p class="topic-dates">1865–2009</p>
+    <h1>Civil Rights in the USA</h1>
+    <p class="lede">Reconstruction to the election of Obama: Jim Crow, the courts, the movement and Black Power.</p>
+  </header>
+  <ul class="aspects">
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1865–1896</span>
+    <h3>Reconstruction and Jim Crow</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far did Reconstruction improve the position of African Americans?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1896–1941</span>
+    <h3>Washington, Du Bois and the NAACP</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How effective were African American leaders in the years 1896–1941?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1941–1955</span>
+    <h3>War, the courts and Brown</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>To what extent was the Supreme Court the main driver of change in 1941–1955?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1955–1968</span>
+    <h3>The movement at its height</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>How far was Martin Luther King responsible for the gains of 1955–1968?</li></ol>
+  
+</li>
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">1965–2009</span>
+    <h3>Black Power and after</h3>
+    <span class="pill">To write</span>
+  </div>
+  <p class="label">Practice question</p>
+  <ol class="questions"><li>&quot;The election of Obama in 2008 marked the fulfilment of the civil rights movement.&quot; Assess the validity of this view.</li></ol>
+  
+</li></ul>
+</section>
+<section class="view t-russia" data-view="russia-economy" hidden>
+  <nav class="crumbs"><a href="#home">All topics</a><span>/</span><a href="#russia">Tsarist and Communist Russia</a></nav>
+  <header class="topic-head">
+    <p class="topic-dates">1894–1914</p>
+    <h1>The Russian Economy, 1894–1914</h1>
+    <p class="lede">Three full essay plans, a timeline, a statistics bank and historians.</p>
+  </header>
+  <article class="prose"><p>Three plans on three different questions. Each takes its own line of argument, so don't merge them into one essay. Every plan uses the same shape:</p><ul><li><strong>Introduction</strong>: define the key terms, set the context and state your judgement up front.</li><li><strong>Three paragraphs</strong>: each one opens with a point that answers the question, gives specific evidence, explains how the evidence proves the point, deals with the counter-argument, and ends with a mini-judgement tied back to the question.</li><li><strong>Conclusion</strong>: weigh the factors against each other and give your final judgement. Don't summarise.</li></ul><blockquote><p><strong>About the numbers.</strong> Russian statistics from this period are disputed, and textbooks give slightly different figures (coal output in 1913 appears as anything from 35 to 36 million tonnes, for example). The figures below are the ones most often used in A-level textbooks. Before an exam, check them against <strong>your own textbook</strong> and use its versions. Examiners reward accurate, confident use of evidence, and they mark down figures that look invented.</p></blockquote><hr><h2 id="core-timeline">Core timeline<a class="anchor" href="#core-timeline" aria-label="Link to this section">#</a></h2><div class="table-wrap"><table><thead><tr><th>Date</th><th>Event</th></tr></thead><tbody><tr><td>1891</td><td>Mendeleev tariff (heavy protection for Russian industry). Trans-Siberian Railway begun.</td></tr><tr><td>1891–92</td><td>Famine in the Volga region, with roughly 400,000 deaths</td></tr><tr><td>1892–1903</td><td>Sergei Witte is Minister of Finance</td></tr><tr><td>1894</td><td>Nicholas II succeeds Alexander III. State vodka monopoly begins its rollout.</td></tr><tr><td>1897</td><td>Rouble put on the gold standard. Factory Act limits the working day to 11.5 hours. First census: about 125m people, about 80% of them peasants, literacy about 21%.</td></tr><tr><td>1899–1903</td><td>Industrial recession after the European credit crisis</td></tr><tr><td>1902</td><td>Peasant risings in Poltava and Kharkov. Prodamet metallurgy syndicate formed.</td></tr><tr><td>1903</td><td>Witte moved out of the Finance Ministry</td></tr><tr><td>1904–05</td><td>Russo-Japanese War</td></tr><tr><td>1905</td><td>Revolution. October Manifesto. November: redemption payments to be halved in 1906 and abolished from 1 January 1907.</td></tr><tr><td>1906–11</td><td>Pyotr Stolypin is Prime Minister</td></tr><tr><td>1906</td><td>Decree of 9 November: peasants may leave the commune and consolidate their strips</td></tr><tr><td>1904–14</td><td>Kokovtsov at the Finance Ministry (Prime Minister 1911–14). Balanced budgets, building up gold reserves.</td></tr><tr><td>1908–13</td><td>Industrial boom, about 6% a year</td></tr><tr><td>1912</td><td>Lena Goldfields massacre, with roughly 150–270 killed (sources disagree). Strike wave begins.</td></tr><tr><td>1913</td><td>Record harvest. Russia is roughly the world's fifth-largest industrial economy.</td></tr><tr><td>1914</td><td>Strike wave peaks: about 1.3 million strikers in the first half of the year</td></tr></tbody></table></div><h2 id="key-statistics-bank">Key statistics bank<a class="anchor" href="#key-statistics-bank" aria-label="Link to this section">#</a></h2><div class="table-wrap"><table><thead><tr><th>Indicator</th><th>1890</th><th>1900</th><th>1913</th></tr></thead><tbody><tr><td>Coal (million tonnes)</td><td>5.9</td><td>16.1</td><td>35.4</td></tr><tr><td>Pig iron (million tonnes)</td><td>0.9</td><td>2.7</td><td>4.6</td></tr><tr><td>Oil (million tonnes)</td><td>3.9</td><td>10.2</td><td>9.2</td></tr><tr><td>Railway track (km)</td><td>c.30,600</td><td>c.53,200</td><td>c.70,200</td></tr><tr><td>Foreign investment (million roubles)</td><td>c.200 (1890)</td><td>c.900</td><td>c.2,000 (1914)</td></tr></tbody></table></div><p>Other figures you can use:</p><ul><li>Industrial growth averaged about <strong>8% a year in the 1890s</strong>, among the fastest in the world.</li><li>Oil: around 1900 Russia (mainly Baku) was the <strong>world's largest oil producer</strong>. Output then fell after the 1905 unrest in Baku, which shows how fragile the gains were.</li><li>Factory workforce: about <strong>1.4m in 1890</strong> and about <strong>3m by 1914</strong>, in a population of <strong>c.170m</strong>. More than 80% of people were still peasants.</li><li>Concentration: by 1914 over <strong>40% of factory workers were in plants of 1,000+ workers</strong>, a higher share than in the USA. Think of the Putilov works in St Petersburg.</li><li>Stolypin: by 1914 about <strong>2–2.5 million households</strong> (roughly 20–25%) had applied to leave the commune, but only around <strong>10% of peasant households</strong> farmed fully consolidated holdings. About <strong>3 million peasants</strong> resettled in Siberia between 1906 and 1914. A significant minority came back.</li><li>Grain: Russia was one of the world's largest grain exporters. Grain made up roughly <strong>half of export earnings</strong>.</li><li>Debt: by 1914 Russia carried one of the <strong>largest foreign debts in the world</strong>, most of it owed to France.</li><li>Strikes: about <strong>725,000 strikers in 1912</strong>, about <strong>887,000 in 1913</strong>, and about <strong>1.3 million in January–July 1914</strong>.</li></ul><h2 id="historians-to-name-drop-one-line-each-is-enough">Historians to name-drop (one line each is enough)<a class="anchor" href="#historians-to-name-drop-one-line-each-is-enough" aria-label="Link to this section">#</a></h2><ul><li><strong>Alexander Gerschenkron</strong>: the "relative backwardness" thesis. In a backward economy without a strong middle class or private capital, the state has to act as the engine of industrialisation. This supports the state-led argument.</li><li><strong>Paul Gregory</strong>: an optimist. He argues national income and agricultural output grew faster than population (agriculture about 2% a year) and that the economy was healthier in 1914 than pessimists claim.</li><li><strong>Orlando Figes</strong>: a pessimist. Stolypin's reforms were too little, too late, and the peasantry stayed alienated.</li><li><strong>Theodore Von Laue</strong>: Witte's industrialisation was forced from above and came at the peasants' expense.</li></ul><hr><h2 id="essay-1-the-extent-of-change">Essay 1: The extent of change<a class="anchor" href="#essay-1-the-extent-of-change" aria-label="Link to this section">#</a></h2><h3 id="question-the-russian-economy-was-transformed-in-the-years-1894-1914-assess-the-validity-of-this-view">Question: <em>"The Russian economy was transformed in the years 1894–1914." Assess the validity of this view.</em><a class="anchor" href="#question-the-russian-economy-was-transformed-in-the-years-1894-1914-assess-the-validity-of-this-view" aria-label="Link to this section">#</a></h3><p><strong>Line of argument:</strong> Russia's <strong>industrial</strong> economy was transformed in scale. The <strong>structure</strong> of the economy as a whole was not: it stayed mostly agrarian, mostly peasant, and dependent on the state and foreign money. So "transformed" is valid for industry and invalid for the economy as a whole.</p><h4 id="introduction">Introduction<a class="anchor" href="#introduction" aria-label="Link to this section">#</a></h4><ul><li><strong>Define "transformed":</strong> a fundamental change in the structure of the economy, meaning what most people did for a living, where wealth came from and how production was organised. Rapid growth alone doesn't count.</li><li><strong>Context:</strong> in 1894 Russia was a great power with a backward economy. The 1891–92 famine had just shown how vulnerable it was. Witte (Finance Minister 1892–1903) and later Stolypin (1906–11) tried to modernise it from above.</li><li><strong>Judgement:</strong> heavy industry and transport changed dramatically. The economy as a whole was not transformed, because agriculture, the sector that employed more than 80% of the population, barely changed, and industrial growth depended on the state, foreign capital and peace. The best word for 1894–1914 is <em>uneven</em> rather than <em>transformed</em>.</li></ul><h4 id="paragraph-1-industry-and-infrastructure-were-transformed-for-the-view">Paragraph 1: Industry and infrastructure were transformed (for the view)<a class="anchor" href="#paragraph-1-industry-and-infrastructure-were-transformed-for-the-view" aria-label="Link to this section">#</a></h4><ul><li><strong>Point:</strong> in heavy industry and transport the change was large enough to call a transformation.</li><li><strong>Evidence:</strong><ul><li>Coal rose from 5.9m tonnes (1890) to 35.4m (1913), roughly six times over. Pig iron rose about fivefold, from 0.9m to 4.6m tonnes.</li><li>Industrial growth averaged about 8% a year in the 1890s and about 6% in 1908–13.</li><li>Track grew from about 30,600 km to about 70,200 km. The Trans-Siberian, begun in 1891, linked European Russia to the Pacific.</li><li>New industrial regions appeared: the Donbass for coal and iron, Baku for oil (the world's largest producer around 1900), and St Petersburg and Moscow for engineering and textiles.</li><li>Russia was roughly the fifth-largest industrial power by 1913.</li></ul></li><li><strong>Analysis:</strong> this was qualitative change as well as more output. Russia built a modern capital goods sector (coal, iron, steel, rail) almost from nothing in a single generation. Railways tied the national market together and opened up Siberian grain and Donbass coal. That is structural change in industry.</li><li><strong>Counter:</strong> growth started from a very low base, so high percentages flatter the story. Per head, Russia still produced far less coal and iron than Britain, Germany or the USA.</li><li><strong>Mini-judgement:</strong> within industry the view holds. Industry, though, was the smaller part of the economy.</li></ul><h4 id="paragraph-2-agriculture-the-core-of-the-economy-was-not-transformed-against-the-view">Paragraph 2: Agriculture, the core of the economy, was not transformed (against the view)<a class="anchor" href="#paragraph-2-agriculture-the-core-of-the-economy-was-not-transformed-against-the-view" aria-label="Link to this section">#</a></h4><ul><li><strong>Point:</strong> the sector that employed most Russians changed only at the margins, which undermines the claim that "the Russian economy" was transformed.</li><li><strong>Evidence:</strong><ul><li>More than 80% of the population were peasants (1897 census). The factory workforce was only about 3m out of about 170m by 1914.</li><li>Strip farming, the three-field system and the <em>mir</em> (commune) dominated. Yields stayed well below Western European levels.</li><li>Stolypin's 1906 decree: about 2–2.5m households applied to leave the commune, but only around 10% farmed consolidated holdings by 1914. Stolypin himself said he needed "twenty years of peace". He got about five before he was assassinated in 1911.</li><li>Population grew from about 125m to about 170m, so land hunger got worse.</li></ul></li><li><strong>Analysis:</strong> this is the strongest case against "transformed". Most Russians lived much as their parents had in 1894. Industry had been bolted onto a peasant economy without changing it. Witte's model actually depended on agriculture <em>not</em> changing: grain exports (about half of export earnings) and indirect taxes on peasant goods such as vodka, sugar and kerosene paid for industrialisation. Vyshnegradsky's line "we may go hungry, but we will export" sums it up.</li><li><strong>Counter (Gregory):</strong> agricultural output grew about 2% a year, faster than population. The record harvest of 1913 and the end of redemption payments (1907) left better-off peasants (the <em>kulaks</em>) more prosperous.</li><li><strong>Mini-judgement:</strong> there was real but limited improvement, and nothing like a transformation of the economy's foundations.</li></ul><h4 id="paragraph-3-the-way-the-economy-worked-stayed-dependent-mostly-against-with-a-caveat">Paragraph 3: The way the economy worked stayed dependent (mostly against, with a caveat)<a class="anchor" href="#paragraph-3-the-way-the-economy-worked-stayed-dependent-mostly-against-with-a-caveat" aria-label="Link to this section">#</a></h4><ul><li><strong>Point:</strong> even where output changed, the <em>motor</em> of the economy didn't. Growth relied on the state and foreign capital rather than a self-sustaining domestic market. That is a sign of incomplete transformation.</li><li><strong>Evidence:</strong><ul><li>Foreign investment rose from about 200m roubles (1890) to about 900m (1900) and about 2,000m (1914). The gold standard (1897) was adopted largely to attract it, mostly French loans.</li><li>The state was the main customer for rail and iron. When state orders and foreign credit dried up in the 1899–1903 recession, many firms collapsed.</li><li>Cartels and syndicates (Prodamet 1902, Produgol 1906) controlled prices rather than competing.</li><li>The caveat: after 1908 the boom was driven more by private Russian banks and domestic demand, for example consumer goods and agricultural machinery for richer peasants.</li></ul></li><li><strong>Analysis:</strong> an economy whose growth switches off when the state stops spending or Paris stops lending hasn't been transformed into a modern market economy. It has been artificially accelerated. The 1908–13 boom is the best evidence that it was <em>starting</em> to change, but six years isn't long enough to call it complete.</li><li><strong>Mini-judgement:</strong> the 1908–13 shift shows transformation beginning, not finished.</li></ul><h4 id="conclusion">Conclusion<a class="anchor" href="#conclusion" aria-label="Link to this section">#</a></h4><ul><li>Weigh it up: the transformation of industry (P1) is real, but it was concentrated in a small modern sector employing a few million people. Agriculture (P2) carries more weight in the judgement because it was most of the economy and most of the people.</li><li><strong>Final judgement:</strong> the view is valid for <strong>industry and infrastructure</strong> and invalid for <strong>the economy as a whole</strong>. Russia in 1914 had a modern industrial sector inside a traditional peasant economy. That is a <em>dual economy</em>, and dual economies are by definition not transformed. The social strain this produced (the 1912–14 strike wave and continuing land hunger) shows the change was destabilising rather than complete.</li></ul><hr><h2 id="essay-2-the-fundamental-cause-of-economic-development">Essay 2: The fundamental cause of economic development<a class="anchor" href="#essay-2-the-fundamental-cause-of-economic-development" aria-label="Link to this section">#</a></h2><h3 id="question-how-far-was-state-policy-the-main-reason-for-russian-economic-growth-in-the-years-1894-1914">Question: <em>How far was state policy the main reason for Russian economic growth in the years 1894–1914?</em><a class="anchor" href="#question-how-far-was-state-policy-the-main-reason-for-russian-economic-growth-in-the-years-1894-1914" aria-label="Link to this section">#</a></h3><p><strong>Line of argument:</strong> state policy was the <strong>main</strong> driver in 1894–1903, as Gerschenkron's model predicts. After 1905 its role <strong>shrank</strong>: foreign capital, private enterprise and better harvests did more of the work. The state stayed the most important single factor across the whole period because it created the conditions the other factors relied on, but it became less dominant over time.</p><h4 id="introduction">Introduction<a class="anchor" href="#introduction" aria-label="Link to this section">#</a></h4><ul><li><strong>Define:</strong> "state policy" means government action: tariffs, railway building, state orders, currency and tax policy, and the Stolypin land reforms. "Economic growth" means rising output in industry and agriculture.</li><li><strong>Context:</strong> Russia had little private capital, a small middle class and a mostly illiterate peasantry (about 21% literacy in 1897). Gerschenkron argues that in that situation the state must replace the missing entrepreneurs.</li><li><strong>Judgement:</strong> state policy was the main reason overall, but its importance changed over the period. It dominated under Witte. After 1905 its direct role faded, and growth came more from foreign capital, private banks and agriculture, all of which still relied on conditions the state had created.</li></ul><h4 id="paragraph-1-state-policy-under-witte-1894-1903-main-factor">Paragraph 1: State policy under Witte, 1894–1903 (main factor)<a class="anchor" href="#paragraph-1-state-policy-under-witte-1894-1903-main-factor" aria-label="Link to this section">#</a></h4><ul><li><strong>Point:</strong> the 1890s boom was deliberately engineered by the state.</li><li><strong>Evidence:</strong><ul><li>The 1891 Mendeleev tariff kept out foreign manufactures and made foreign firms build factories inside Russia.</li><li>State railway building: the Trans-Siberian, and track up from about 30,600 km to about 53,200 km by 1900. The state ordered the rails, locomotives and coal.</li><li>The 1897 gold standard stabilised the rouble.</li><li>Indirect taxes and the vodka monopoly (from 1894) funded investment. The vodka monopoly became one of the state's largest single sources of revenue.</li><li>Result: about 8% annual industrial growth. Coal went from 5.9m tonnes (1890) to 16.1m (1900).</li></ul></li><li><strong>Analysis:</strong> the state did more than help growth. It <em>created demand</em> (rail orders), <em>protected supply</em> (tariffs), and <em>financed</em> it (taxes and loans). Without that, private actors would not have invested in a country this risky. Witte's 1899 memorandum to Nicholas II explicitly argued industrialisation was needed so Russia would not become a "colony" of the West.</li><li><strong>Counter:</strong> state-led growth was fragile. The 1899–1903 recession showed it could not sustain itself, and it squeezed the peasantry (the 1902 Poltava and Kharkov risings).</li><li><strong>Mini-judgement:</strong> for the first decade, state policy was clearly the main reason.</li></ul><h4 id="paragraph-2-foreign-capital-strong-rival-factor-but-dependent-on-the-state">Paragraph 2: Foreign capital (strong rival factor, but dependent on the state)<a class="anchor" href="#paragraph-2-foreign-capital-strong-rival-factor-but-dependent-on-the-state" aria-label="Link to this section">#</a></h4><ul><li><strong>Point:</strong> the money that actually built Russian industry was largely foreign, which challenges the idea that the state was the "main" reason.</li><li><strong>Evidence:</strong><ul><li>Foreign investment went from about 200m to about 900m roubles in 1890–1900, and about 2,000m by 1914.</li><li>Foreign capital is often estimated at around a third or more of all industrial investment, and far higher in mining and metallurgy. French and Belgian capital dominated the Donbass, and the Nobels and Rothschilds were in Baku oil.</li><li>French state loans after the Franco-Russian alliance (1894) also funded the railways.</li></ul></li><li><strong>Analysis:</strong> foreign capital was a <em>necessary</em> condition, since Russia did not have the savings to fund growth on this scale. But it followed <strong>state policy</strong>. Investors came because of the gold standard, the tariff walls and the guaranteed state contracts. So this factor partly supports the state's case: the state was the reason the foreign money arrived.</li><li><strong>Mini-judgement:</strong> this is the most important <em>source</em> of growth, but it was dependent on state policy rather than independent of it.</li></ul><h4 id="paragraph-3-after-1905-private-enterprise-agriculture-and-the-market-state-role-declining">Paragraph 3: After 1905, private enterprise, agriculture and the market (state role declining)<a class="anchor" href="#paragraph-3-after-1905-private-enterprise-agriculture-and-the-market-state-role-declining" aria-label="Link to this section">#</a></h4><ul><li><strong>Point:</strong> the 1908–13 boom had a different engine. Private and market forces mattered more and direct state spending mattered less.</li><li><strong>Evidence:</strong><ul><li>Industrial growth was about 6% a year in 1908–13, led by Russian joint-stock banks, consumer goods and agricultural machinery rather than state rail orders.</li><li>Agriculture: good harvests (a record in 1913), the end of redemption payments (1907), and the Peasant Land Bank helping richer peasants buy land. These raised rural demand for manufactured goods.</li><li>Kokovtsov balanced budgets and built up gold reserves. That was a more cautious state that stabilised the economy rather than driving it.</li><li>Stolypin's reforms <em>were</em> state policy, but their effect was limited (around 10% consolidated holdings by 1914). Good harvests probably did more than the reforms did.</li></ul></li><li><strong>Analysis:</strong> this is the strongest case against "main reason". By 1914 the economy was starting to grow from domestic demand, which is what Gregory emphasises. Even so, the state still set the framework: tariffs, the currency, railways already built, and the Land Bank.</li><li><strong>Mini-judgement:</strong> after 1905 the state was an enabler more than an engine.</li></ul><h4 id="conclusion">Conclusion<a class="anchor" href="#conclusion" aria-label="Link to this section">#</a></h4><ul><li>Rank the factors: <strong>state policy</strong> &gt; <strong>foreign capital</strong> &gt; <strong>private and agricultural demand</strong>. Foreign capital was arguably as large in pure money terms, but it was a <em>consequence</em> of state policy, so it can't be the main reason on its own.</li><li><strong>Final judgement:</strong> state policy was the main reason for growth across 1894–1914, decisively so before 1903 and less so after 1905. Change over time is the key point. By 1914 Russia was beginning to move from state-driven to market-driven growth, which suggests Gerschenkron's model describes the start of the period better than the end.</li></ul><hr><h2 id="essay-3-the-limits-of-economic-modernisation">Essay 3: The limits of economic modernisation<a class="anchor" href="#essay-3-the-limits-of-economic-modernisation" aria-label="Link to this section">#</a></h2><h3 id="question-russia-s-economic-modernisation-in-the-years-1894-1914-was-fundamentally-limited-by-the-backwardness-of-agriculture-assess-the-validity-of-this-view">Question: <em>"Russia's economic modernisation in the years 1894–1914 was fundamentally limited by the backwardness of agriculture." Assess the validity of this view.</em><a class="anchor" href="#question-russia-s-economic-modernisation-in-the-years-1894-1914-was-fundamentally-limited-by-the-backwardness-of-agriculture-assess-the-validity-of-this-view" aria-label="Link to this section">#</a></h3><p><strong>Line of argument:</strong> agricultural backwardness was the <strong>fundamental</strong> limit because it held back everything else: the domestic market, the tax base, labour and social stability. Dependence on foreign finance and the autocracy's political choices were also serious limits, but they were partly <em>consequences</em> of a poor peasant economy, or made worse by one.</p><h4 id="introduction">Introduction<a class="anchor" href="#introduction" aria-label="Link to this section">#</a></h4><ul><li><strong>Define:</strong> "fundamentally limited" means the root constraint that the other weaknesses grew out of. "Agricultural backwardness" means the commune, strip farming, low yields, land hunger and peasant poverty.</li><li><strong>Context:</strong> Witte's model paid for industry with grain exports and taxes on peasants. Stolypin admitted the countryside was the problem when he called his reforms a "wager on the strong".</li><li><strong>Judgement:</strong> the view is largely valid. Backward agriculture was the fundamental limit because it capped domestic demand, forced dependence on foreign capital and fed the social unrest of 1902–07. Financial dependence and political instability are serious secondary limits that should be weighed against it.</li></ul><h4 id="paragraph-1-agricultural-backwardness-the-fundamental-limit">Paragraph 1: Agricultural backwardness (the fundamental limit)<a class="anchor" href="#paragraph-1-agricultural-backwardness-the-fundamental-limit" aria-label="Link to this section">#</a></h4><ul><li><strong>Point:</strong> a poor, unproductive peasantry restricted modernisation at its root.</li><li><strong>Evidence:</strong><ul><li>More than 80% of people were peasants. The commune, strip farming and periodic redistribution of land discouraged investment.</li><li>Population rose from about 125m to about 170m, so land hunger grew and holdings were subdivided.</li><li>The 1891–92 famine, and redemption payments until 1907.</li><li>Stolypin: about 2–2.5m households applied to leave the commune, but only around 10% farmed consolidated holdings by 1914. Around 3m peasants resettled in Siberia, and a significant minority returned.</li></ul></li><li><strong>Analysis:</strong> spell out the chain of consequences, because that is what makes this factor <em>fundamental</em>:<ol><li><strong>Demand:</strong> poor peasants couldn't buy manufactured goods, so industry relied on state orders instead of a mass consumer market.</li><li><strong>Revenue:</strong> the state taxed peasant consumption (vodka, sugar, kerosene) and exported grain to pay for industry, which kept peasants poor.</li><li><strong>Labour:</strong> many workers were peasants who still belonged to their commune and moved between village and factory, so the workforce stayed semi-skilled and unsettled.</li><li><strong>Stability:</strong> peasant risings in 1902 and 1905–07 disrupted the economy and frightened off investors.</li></ol></li><li><strong>Counter (Gregory):</strong> agriculture grew about 2% a year, faster than population. The record 1913 harvest and the rise of the kulaks show it was improving.</li><li><strong>Mini-judgement:</strong> improvement was too slow and too narrow to remove the limit. That makes it the fundamental constraint.</li></ul><h4 id="paragraph-2-dependence-on-foreign-capital-and-state-finance-a-serious-limit">Paragraph 2: Dependence on foreign capital and state finance (a serious limit)<a class="anchor" href="#paragraph-2-dependence-on-foreign-capital-and-state-finance-a-serious-limit" aria-label="Link to this section">#</a></h4><ul><li><strong>Point:</strong> modernisation was limited by how it was funded. It relied on foreign loans and investment that Russia didn't control.</li><li><strong>Evidence:</strong><ul><li>Foreign investment rose to about 2,000m roubles by 1914. Russia carried one of the world's largest foreign debts, mostly owed to France.</li><li>Large amounts of revenue went on debt interest.</li><li>The 1899–1903 recession began when European credit tightened, and Russian industry contracted.</li><li>Profits flowed abroad to French and Belgian shareholders.</li></ul></li><li><strong>Analysis:</strong> this left the economy exposed to forces outside Russia: a European credit crunch hit Russian factories directly. Link it back to the main argument, though. Russia borrowed abroad <em>because</em> a poor peasant economy produced too little domestic savings. So this limit is partly a <strong>symptom</strong> of agricultural backwardness, which supports the view in the question.</li><li><strong>Mini-judgement:</strong> a major limit, but a secondary one, because it comes from the first.</li></ul><h4 id="paragraph-3-political-and-social-instability-under-the-autocracy-a-serious-limit">Paragraph 3: Political and social instability under the autocracy (a serious limit)<a class="anchor" href="#paragraph-3-political-and-social-instability-under-the-autocracy-a-serious-limit" aria-label="Link to this section">#</a></h4><ul><li><strong>Point:</strong> the tsarist system limited modernisation by blocking the political and social changes a modern economy needs. This is the strongest <em>alternative</em> to the view.</li><li><strong>Evidence:</strong><ul><li>Nicholas II distrusted industrialisation and moved Witte out in 1903. Witte's own memoirs complain the Tsar didn't understand economics.</li><li>War with Japan (1904–05) and the 1905 revolution interrupted growth, and Baku oil output fell after the unrest there.</li><li>Industrial workers: harsh conditions and an 11.5-hour legal day (1897). Huge factories concentrated workers together (over 40% in plants of 1,000+), which made them easy to organise.</li><li>Zubatov's police-run unions (1901–03) backfired. The Lena Goldfields massacre (1912) set off strikes: about 725,000 strikers in 1912 and about 1.3m in the first half of 1914.</li></ul></li><li><strong>Analysis:</strong> modernisation created an urban working class the autocracy couldn't absorb, so the more the economy grew, the more unstable the regime became. This limit was <em>political</em> rather than agricultural. But much of the unrest was rural (1902, 1905–07), and many workers came straight from the villages, bringing peasant grievances with them.</li><li><strong>Mini-judgement:</strong> the most serious challenge to the view. Political choices mattered in their own right, especially the decisions to go to war in 1904 and 1914.</li></ul><h4 id="conclusion">Conclusion<a class="anchor" href="#conclusion" aria-label="Link to this section">#</a></h4><ul><li>Weigh it up: financial dependence (P2) is best explained as a <em>result</em> of agricultural backwardness. Political instability (P3) is a real, separate limit. It was still made far more dangerous by an impoverished, land-hungry peasant majority.</li><li><strong>Final judgement:</strong> the view is largely valid. Agricultural backwardness was the fundamental limit because it was the root cause behind the other weaknesses: a narrow market, foreign dependence and social unrest. The autocracy's political failures were the main <em>aggravating</em> factor. Stolypin's "twenty years of peace" shows both points: he knew agriculture was the foundation, and he knew politics would decide whether the reforms had time to work. In 1914 they did not.</li></ul><hr><h2 id="how-to-turn-a-plan-into-a-top-band-essay">How to turn a plan into a top-band essay<a class="anchor" href="#how-to-turn-a-plan-into-a-top-band-essay" aria-label="Link to this section">#</a></h2><ol><li><strong>Answer the question in the first sentence of every paragraph.</strong> "Witte built railways" is narrative. "State railway building was the main driver of growth in the 1890s because…" is argument.</li><li><strong>Every statistic needs a "so what".</strong> Don't just write "coal output rose sixfold". Say what it <em>proves</em> about the question.</li><li><strong>Use change over time.</strong> All three questions cover 20 years. Contrasting 1894–1903 with 1906–14 is the quickest way to show the period-wide understanding examiners want.</li><li><strong>Link your paragraphs to each other.</strong> The strongest essays show how factors connect, for example "foreign capital came <em>because</em> of the gold standard" or "foreign borrowing was <em>caused by</em> low domestic savings". That is what makes a judgement substantiated rather than asserted.</li><li><strong>Write the judgement in the introduction and keep to it.</strong> Don't save your argument for the conclusion.</li></ol></article>
+</section>
+</div>
+
+<script>
+(function () {
+  var views = document.querySelectorAll(".view");
+  function show() {
+    var id = location.hash.slice(1) || "home";
+    var target = document.querySelector('.view[data-view="' + id + '"]');
+    if (!target) {
+      var el = document.getElementById(id);
+      target = el ? el.closest(".view") : null;
+      if (!target) target = document.querySelector('.view[data-view="home"]');
+    }
+    views.forEach(function (v) { v.hidden = v !== target; });
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", show);
+  show();
+})();
+</script>

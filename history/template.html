@@ -1,0 +1,176 @@
+<title>Hindsight History</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: an archive ledger. A masthead and a to-scale timeline of the four
+   topics, then catalogue cards; each topic page is a numbered register of
+   aspects. Vellum and iron-gall ink, with one dye colour per topic. */
+:root {
+  --paper: #efe8da;
+  --surface: #f7f2e7;
+  --ink: #231b13;
+  --muted: #6a5c4a;
+  --rule: #c9bba2;
+  --tudor: #8e1b1b;
+  --stuart: #1f3f66;
+  --russia: #7a5a10;
+  --civil: #2b5c4e;
+  --accent: var(--ink);
+  --display: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --caps: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --body: "Libre Caslon Text", "Iowan Old Style", Georgia, serif;
+  --lane: 34px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #17130e; --surface: #211b14; --ink: #ece3d0; --muted: #a89a84; --rule: #3d3328;
+    --tudor: #e3877b; --stuart: #93b3da; --russia: #d9b65c; --civil: #82c2ac;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #17130e; --surface: #211b14; --ink: #ece3d0; --muted: #a89a84; --rule: #3d3328;
+  --tudor: #e3877b; --stuart: #93b3da; --russia: #d9b65c; --civil: #82c2ac;
+  color-scheme: dark;
+}
+.t-tudors { --accent: var(--tudor); }
+.t-stuarts { --accent: var(--stuart); }
+.t-russia { --accent: var(--russia); }
+.t-civil-rights { --accent: var(--civil); }
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.wrap { max-width: 980px; margin: 0 auto; }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; text-wrap: balance; line-height: 1.15; margin: 0; }
+
+/* Masthead */
+.masthead { padding-block: 40px 20px; border-bottom: 3px double var(--rule); display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+.masthead a { text-decoration: none; }
+.mark { font-family: var(--display); font-size: clamp(2.6rem, 7vw, 4rem); line-height: 1; letter-spacing: -0.01em; }
+.mark i { color: var(--muted); }
+.strap { font-family: var(--caps); color: var(--muted); letter-spacing: 0.06em; font-size: 1rem; }
+
+/* Home */
+.intro { max-width: 62ch; margin-block: 28px 8px; font-size: 1.1rem; }
+.timeline { margin-block: 28px 36px; }
+.bands { position: relative; height: calc(var(--lanes) * var(--lane)); }
+.band {
+  position: absolute; height: calc(var(--lane) - 6px);
+  background: var(--accent); color: var(--paper);
+  font-family: var(--caps); font-size: 0.85rem; letter-spacing: 0.04em;
+  display: flex; align-items: center; padding-inline: 8px;
+  white-space: nowrap; overflow: hidden; text-decoration: none;
+  border-radius: 2px;
+}
+.band:hover { filter: brightness(1.1); }
+.ticks { position: relative; height: 24px; border-top: 1px solid var(--rule); margin-top: 4px; }
+.tick { position: absolute; top: 0; transform: translateX(-50%); font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 4px; }
+.tick::before { content: ""; position: absolute; left: 50%; top: -5px; height: 5px; border-left: 1px solid var(--rule); }
+.tick:first-child { transform: none; }
+
+.section-label { font-family: var(--caps); color: var(--muted); letter-spacing: 0.08em; font-size: 0.95rem; margin: 0 0 12px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; }
+.card {
+  display: grid; gap: 6px; padding: 22px 24px 20px;
+  background: var(--surface); border: 1px solid var(--rule); border-top: 6px solid var(--accent);
+  text-decoration: none; transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -10px var(--ink); }
+.card-dates { font-family: var(--display); font-size: 2.1rem; line-height: 1; color: var(--accent); display: flex; gap: 6px; font-variant-numeric: lining-nums; }
+.card-dates .dash { color: var(--muted); }
+.card-name { font-family: var(--display); font-size: 1.5rem; line-height: 1.2; }
+.card-blurb { color: var(--muted); }
+.card-status { font-family: var(--caps); font-size: 0.9rem; letter-spacing: 0.05em; margin-top: 6px; }
+
+/* Topic and page views */
+.crumbs { display: flex; gap: 8px; flex-wrap: wrap; font-family: var(--caps); letter-spacing: 0.05em; margin-top: 24px; color: var(--muted); }
+.crumbs a { text-decoration: none; border-bottom: 1px solid var(--rule); }
+.crumbs a:hover { color: var(--accent); border-color: var(--accent); }
+.topic-head { padding-block: 16px 24px; border-bottom: 1px solid var(--rule); margin-bottom: 8px; }
+.topic-dates { font-family: var(--display); font-size: 1.5rem; color: var(--accent); margin: 0; }
+.topic-head h1 { font-size: clamp(2.1rem, 6vw, 3.2rem); }
+.lede { color: var(--muted); max-width: 62ch; margin: 10px 0 0; font-size: 1.05rem; }
+
+.aspects { list-style: none; padding: 0; margin: 0; counter-reset: aspect; }
+.aspect { counter-increment: aspect; padding-block: 22px; border-bottom: 1px solid var(--rule); display: grid; gap: 6px; }
+.aspect-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.aspect-head h3 { font-size: 1.45rem; flex: 1 1 260px; min-width: 0; }
+.aspect-head h3::before { content: counter(aspect, upper-roman) ". "; color: var(--accent); }
+.aspect-dates { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.9rem; flex-basis: 100%; }
+.pill { font-family: var(--caps); font-size: 0.8rem; letter-spacing: 0.06em; padding: 2px 10px; border: 1px solid var(--rule); color: var(--muted); border-radius: 999px; }
+.pill-ready { border-color: var(--accent); color: var(--accent); }
+.label { font-family: var(--caps); color: var(--muted); letter-spacing: 0.06em; font-size: 0.85rem; margin: 6px 0 0; }
+.questions { margin: 0; padding-left: 1.4em; font-style: italic; max-width: 70ch; }
+.questions li + li { margin-top: 4px; }
+.aspect-link { justify-self: start; margin-top: 8px; font-family: var(--caps); letter-spacing: 0.05em; text-decoration: none; color: var(--accent); border-bottom: 1px solid currentColor; }
+.aspect-link::after { content: " →"; }
+
+/* Rendered Markdown */
+.prose { max-width: 72ch; }
+.prose .anchor { display: none; }
+.prose h2 { font-size: 2rem; margin-top: 44px; padding-top: 18px; border-top: 3px double var(--rule); }
+.prose h3 { font-size: 1.4rem; margin-top: 18px; color: var(--accent); }
+.prose h3 em { font-style: italic; }
+.prose h4 { font-size: 1.3rem; margin-top: 28px; }
+.prose p, .prose li { max-width: 70ch; }
+.prose ul, .prose ol { padding-left: 1.3em; }
+.prose li + li { margin-top: 3px; }
+.prose strong { font-weight: 700; }
+.prose hr { display: none; }
+.prose blockquote { margin: 20px 0; padding: 14px 18px; background: var(--surface); border-left: 4px solid var(--accent); }
+.prose blockquote p { margin: 0; }
+.table-wrap { overflow-x: auto; margin: 16px 0; }
+.prose table { border-collapse: collapse; width: 100%; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+.prose th { font-family: var(--caps); font-weight: 400; letter-spacing: 0.04em; text-align: left; border-bottom: 2px solid var(--ink); padding: 6px 10px; }
+.prose td { border-bottom: 1px solid var(--rule); padding: 6px 10px; vertical-align: top; }
+.prose td:first-child { white-space: nowrap; }
+.prose code { font-size: 0.9em; }
+
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <a href="#home"><span class="mark">Hindsight <i>History</i></span></a>
+    <span class="strap">A-Level revision: notes, questions and essay plans</span>
+  </header>
+
+  <section class="view" data-view="home">
+    <p class="intro">Four periods of study, from the Tudors to Obama. Pick a topic to see its aspects and practice questions. Topics fill in as they get written.</p>
+    {{timeline}}
+    <p class="section-label">The four topics</p>
+    <div class="cards">{{cards}}</div>
+  </section>
+
+  {{views}}
+</div>
+
+<script>
+(function () {
+  var views = document.querySelectorAll(".view");
+  function show() {
+    var id = location.hash.slice(1) || "home";
+    var target = document.querySelector('.view[data-view="' + id + '"]');
+    if (!target) {
+      var el = document.getElementById(id);
+      target = el ? el.closest(".view") : null;
+      if (!target) target = document.querySelector('.view[data-view="home"]');
+    }
+    views.forEach(function (v) { v.hidden = v !== target; });
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", show);
+  show();
+})();
+</script>
