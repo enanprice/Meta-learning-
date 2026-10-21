@@ -22,6 +22,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 from md import render_markdown  # noqa: E402
+from art import ART  # noqa: E402
 
 CONTENT = HERE / "content"
 OUT = HERE / "site" / "index.html"
@@ -67,15 +68,13 @@ TOPICS = [
     },
     {
         "id": "russia",
-        "name": "Tsarist and Communist Russia",
-        "dates": "1855–1964",
-        "blurb": "Alexander II's reforms to the fall of Khrushchev: autocracy, "
-                 "revolution and the Soviet state.",
+        "name": "Revolutionary Russia",
+        "dates": "1894–1924",
+        "blurb": "Nicholas II's accession to the death of Lenin: a failing "
+                 "autocracy, war, two revolutions and the Bolshevik state.",
         "aspects": [
-            {"name": "Alexander II and reform", "dates": "1855–1881",
-             "questions": ["How far did Alexander II's reforms change Russia?"]},
-            {"name": "Alexander III and reaction", "dates": "1881–1894",
-             "questions": ["To what extent was Alexander III's reign one of reaction?"]},
+            {"name": "Nicholas II and the autocracy", "dates": "1894–1905",
+             "questions": ["How far did Nicholas II continue the policies of Alexander III in the years 1894–1905?"]},
             {"name": "The Russian economy", "dates": "1894–1914",
              "page": {"id": "russia-economy", "file": "russia/economy-1894-1914.md",
                       "title": "The Russian Economy, 1894–1914",
@@ -86,13 +85,15 @@ TOPICS = [
                  "\"Russia's economic modernisation in the years 1894–1914 was fundamentally limited by the backwardness of agriculture.\" Assess the validity of this view.",
              ]},
             {"name": "1905 and the Dumas", "dates": "1905–1914",
-             "questions": ["How far did the October Manifesto change the way Russia was governed?"]},
-            {"name": "War and revolution", "dates": "1914–1917",
-             "questions": ["To what extent was the First World War responsible for the fall of the Tsar?"]},
-            {"name": "Lenin and Stalin", "dates": "1917–1953",
-             "questions": ["How far did Stalin's rule continue Lenin's?"]},
-            {"name": "Khrushchev", "dates": "1953–1964",
-             "questions": ["How far did Khrushchev break with Stalinism?"]},
+             "questions": ["To what extent did the October Manifesto change the way Russia was governed in the years 1905–1914?"]},
+            {"name": "War and the February Revolution", "dates": "1914–1917",
+             "questions": ["How far was the First World War the main reason for the fall of the Tsar in February 1917?"]},
+            {"name": "The Provisional Government and October", "dates": "1917",
+             "questions": ["\"The Bolsheviks took power in October 1917 because of the weakness of the Provisional Government.\" Assess the validity of this view."]},
+            {"name": "Civil War and War Communism", "dates": "1918–1921",
+             "questions": ["How far was Trotsky's leadership the main reason for Bolshevik victory in the Civil War?"]},
+            {"name": "NEP and Lenin's legacy", "dates": "1921–1924",
+             "questions": ["To what extent had Lenin created a one-party dictatorship by 1924?"]},
         ],
     },
     {
@@ -125,10 +126,13 @@ def topic_card(t: dict) -> str:
     start, end = t["dates"].split("–")
     return f"""
 <a class="card t-{t['id']}" href="#{t['id']}">
+  <span class="art card-art">{ART[t['id']]("-card-" + t["id"])}</span>
+  <span class="card-body">
   <span class="card-dates"><span>{start}</span><span class="dash">–</span><span>{end}</span></span>
   <span class="card-name">{esc(t['name'])}</span>
   <span class="card-blurb">{esc(t['blurb'])}</span>
   <span class="card-status">{status}</span>
+  </span>
 </a>"""
 
 
@@ -159,11 +163,14 @@ def topic_view(t: dict) -> str:
     return f"""
 <section class="view t-{t['id']}" data-view="{t['id']}" hidden>
   <nav class="crumbs"><a href="#home">All topics</a></nav>
-  <header class="topic-head">
-    <p class="topic-dates">{t['dates']}</p>
-    <h1>{esc(t['name'])}</h1>
-    <p class="lede">{esc(t['blurb'])}</p>
-  </header>
+  <div class="topic-top">
+    <div class="art hero-art">{ART[t['id']]("-hero-" + t["id"])}</div>
+    <header class="topic-head">
+      <p class="topic-dates">{t['dates']}</p>
+      <h1>{esc(t['name'])}</h1>
+      <p class="lede">{esc(t['blurb'])}</p>
+    </header>
+  </div>
   <ul class="aspects">{rows}</ul>
 </section>"""
 
@@ -174,11 +181,14 @@ def page_view(t: dict, a: dict) -> str:
     return f"""
 <section class="view t-{t['id']}" data-view="{p['id']}" hidden>
   <nav class="crumbs"><a href="#home">All topics</a><span>/</span><a href="#{t['id']}">{esc(t['name'])}</a></nav>
-  <header class="topic-head">
-    <p class="topic-dates">{a['dates']}</p>
-    <h1>{esc(p['title'])}</h1>
-    <p class="lede">{esc(p['summary'])}</p>
-  </header>
+  <div class="topic-top">
+    <div class="art hero-art">{ART[t['id']]("-page-" + p["id"])}</div>
+    <header class="topic-head">
+      <p class="topic-dates">{a['dates']}</p>
+      <h1>{esc(p['title'])}</h1>
+      <p class="lede">{esc(p['summary'])}</p>
+    </header>
+  </div>
   <article class="prose">{body}</article>
 </section>"""
 
