@@ -2,208 +2,135 @@
 """
 Build the history revision site into history/site/index.html.
 
-The whole site is one HTML file. Each view (home, a topic, an essay page) is a
-<section> shown or hidden by the hash in the URL, so the file can be opened
-straight from disk or published as a single page.
+The whole site is one HTML file. Each view (home, a topic's overview, notes
+and essays, a fact file, an essay page) is a <section> shown or hidden by the
+hash in the URL, so the file can be opened from disk or published as one page.
 
     python3 history/build.py
 
-Topics and their aspects live in TOPICS below. To add a page of notes or
-essay plans, write it as Markdown under history/content/ and point an
-aspect's "page" at it.
+Each topic lives in its own module under history/topics/: the topic's aspects
+and essay pages (TOPIC), a timeline (TIMELINE) and its fact files (ENTRIES).
+Essay pages are Markdown files under history/content/.
 """
 
 from __future__ import annotations
 
 import html
+import importlib
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
-from md import render_markdown  # noqa: E402
+sys.path.insert(0, str(HERE))
+from md import inline, render_markdown  # noqa: E402
 from art import ART  # noqa: E402
 
 CONTENT = HERE / "content"
 OUT = HERE / "site" / "index.html"
-
-TOPICS = [
-    {
-        "id": "tudors",
-        "name": "The Tudors",
-        "dates": "1485–1603",
-        "blurb": "Henry VII's seizure of the throne to the death of Elizabeth I: "
-                 "royal power, the Reformation and the mid-Tudor crisis.",
-        "aspects": [
-            {"name": "Henry VII: securing the dynasty", "dates": "1485–1509",
-             "questions": ["How far had Henry VII secured his throne by 1509?"]},
-            {"name": "Henry VIII, Wolsey and Cromwell", "dates": "1509–1547",
-             "questions": ["To what extent did Henry VIII rely on his ministers in government?"]},
-            {"name": "The Reformation", "dates": "1529–1547",
-             "questions": ["How far was the break with Rome driven by the king's marriage?"]},
-            {"name": "The mid-Tudor crisis", "dates": "1547–1558",
-             "questions": ["\"England faced a genuine crisis in the years 1547–1558.\" Assess the validity of this view."]},
-            {"name": "Elizabeth I: religion and government", "dates": "1558–1603",
-             "questions": ["How successful was Elizabeth I's religious settlement?"]},
-        ],
-    },
-    {
-        "id": "stuarts",
-        "name": "The Stuarts",
-        "dates": "1603–1702",
-        "blurb": "James I to the end of William III: Crown against Parliament, "
-                 "civil war, republic, Restoration and the Glorious Revolution.",
-        "aspects": [
-            {"name": "James I and Parliament", "dates": "1603–1625",
-             "questions": ["How far did relations between Crown and Parliament break down under James I?"]},
-            {"name": "Charles I and the Personal Rule", "dates": "1625–1640",
-             "questions": ["To what extent was the Personal Rule a success for Charles I?"]},
-            {"name": "The Civil Wars", "dates": "1642–1649",
-             "questions": ["How far was Charles I responsible for his own execution?"]},
-            {"name": "The Interregnum", "dates": "1649–1660",
-             "questions": ["Why did the republic fail to find a lasting settlement?"]},
-            {"name": "Restoration and Glorious Revolution", "dates": "1660–1702",
-             "questions": ["How far did the Glorious Revolution change the power of the monarchy?"]},
-        ],
-    },
-    {
-        "id": "russia",
-        "name": "Revolutionary Russia",
-        "dates": "1894–1924",
-        "blurb": "Nicholas II's accession to the death of Lenin: a failing "
-                 "autocracy, war, two revolutions and the Bolshevik state.",
-        "aspects": [
-            {"name": "Nicholas II and the autocracy", "dates": "1894–1905",
-             "questions": ["How far did Nicholas II continue the policies of Alexander III in the years 1894–1905?"]},
-            {"name": "The Russian economy", "dates": "1894–1914",
-             "page": {"id": "russia-economy", "file": "russia/economy-1894-1914.md",
-                      "title": "The Russian Economy, 1894–1914",
-                      "summary": "Three full essay plans, a timeline, a statistics bank and historians."},
-             "questions": [
-                 "\"The Russian economy was transformed in the years 1894–1914.\" Assess the validity of this view.",
-                 "How far was state policy the main reason for Russian economic growth in the years 1894–1914?",
-                 "\"Russia's economic modernisation in the years 1894–1914 was fundamentally limited by the backwardness of agriculture.\" Assess the validity of this view.",
-             ]},
-            {"name": "1905 and the Dumas", "dates": "1905–1914",
-             "questions": ["To what extent did the October Manifesto change the way Russia was governed in the years 1905–1914?"]},
-            {"name": "War and the February Revolution", "dates": "1914–1917",
-             "questions": ["How far was the First World War the main reason for the fall of the Tsar in February 1917?"]},
-            {"name": "The Provisional Government and October", "dates": "1917",
-             "questions": ["\"The Bolsheviks took power in October 1917 because of the weakness of the Provisional Government.\" Assess the validity of this view."]},
-            {"name": "Civil War and War Communism", "dates": "1918–1921",
-             "questions": ["How far was Trotsky's leadership the main reason for Bolshevik victory in the Civil War?"]},
-            {"name": "NEP and Lenin's legacy", "dates": "1921–1924",
-             "questions": ["To what extent had Lenin created a one-party dictatorship by 1924?"]},
-        ],
-    },
-    {
-        "id": "civil-rights",
-        "name": "Civil Rights in the USA",
-        "dates": "1865–2009",
-        "blurb": "Reconstruction to the election of Obama: Jim Crow, the "
-                 "courts, the movement and Black Power.",
-        "aspects": [
-            {"name": "Reconstruction and Jim Crow", "dates": "1865–1896",
-             "questions": ["How far did Reconstruction improve the position of African Americans?"]},
-            {"name": "Washington, Du Bois and the NAACP", "dates": "1896–1941",
-             "questions": ["How effective were African American leaders in the years 1896–1941?"]},
-            {"name": "War, the courts and Brown", "dates": "1941–1955",
-             "questions": ["To what extent was the Supreme Court the main driver of change in 1941–1955?"]},
-            {"name": "The movement at its height", "dates": "1955–1968",
-             "questions": ["How far was Martin Luther King responsible for the gains of 1955–1968?"]},
-            {"name": "Black Power and after", "dates": "1965–2009",
-             "questions": ["\"The election of Obama in 2008 marked the fulfilment of the civil rights movement.\" Assess the validity of this view."]},
-        ],
-    },
-]
+MODULES = ["tudors", "stuarts", "russia", "civil_rights"]
 
 esc = html.escape
 
 
+def load_topics() -> list[dict]:
+    topics = []
+    for name in MODULES:
+        mod = importlib.import_module(f"topics.{name}")
+        t = dict(mod.TOPIC)
+        t["timeline"] = mod.TIMELINE
+        t["entries"] = mod.ENTRIES
+        t["by_id"] = {e["id"]: e for e in mod.ENTRIES}
+        check(t)
+        topics.append(t)
+    return topics
+
+
+def check(t: dict) -> None:
+    """Fail the build on a broken cross-reference rather than shipping a dead link."""
+    keys = {a["key"] for a in t["aspects"]}
+    for e in t["entries"]:
+        for k in e["aspects"]:
+            assert k in keys, f"{t['id']}/{e['id']}: unknown aspect {k!r}"
+        for link in e.get("links", []):
+            assert link in t["by_id"], f"{t['id']}/{e['id']}: unknown link {link!r}"
+    for row in t["timeline"]:
+        if len(row) > 2:
+            assert row[2] in t["by_id"], f"{t['id']} timeline: unknown entry {row[2]!r}"
+    for p in t.get("essays", []):
+        assert p["aspect"] in keys, f"{t['id']}/{p['id']}: unknown aspect {p['aspect']!r}"
+
+
+def entry_href(t: dict, e: dict) -> str:
+    return f"#{t['id']}-f-{e['id']}"
+
+
+def chip(t: dict, e: dict) -> str:
+    return f'<a class="chip chip-{e["kind"]}" href="{entry_href(t, e)}">{esc(e["name"])}</a>'
+
+
+def paras(text: str) -> str:
+    return "".join(f"<p>{inline(p.strip())}</p>" for p in text.strip().split("\n\n"))
+
+
+# ------------------------------------------------------------------ shared parts
+
+def crumbs(t: dict | None = None, *extra: tuple[str, str]) -> str:
+    parts = ['<a href="#home">All topics</a>']
+    if t:
+        parts.append(f'<a href="#{t["id"]}">{esc(t["name"])}</a>')
+    parts += [f'<a href="{href}">{esc(label)}</a>' for href, label in extra]
+    return '<nav class="crumbs">' + "<span>/</span>".join(parts) + "</nav>"
+
+
+def tabs(t: dict, current: str) -> str:
+    items = [("overview", f"#{t['id']}", "Overview"),
+             ("notes", f"#{t['id']}-notes", "Notes"),
+             ("essays", f"#{t['id']}-essays", "Essays")]
+    links = "".join(f'<a href="{href}"{" aria-current=\"page\"" if key == current else ""}>{label}</a>'
+                    for key, href, label in items)
+    return f'<nav class="tabs" aria-label="{esc(t["name"])} sections">{links}</nav>'
+
+
+def strip(t: dict, suffix: str) -> str:
+    return f'<div class="art strip-art" aria-hidden="true">{ART[t["id"]](suffix)}</div>'
+
+
+def view(t: dict | None, view_id: str, body: str) -> str:
+    cls = f' t-{t["id"]}' if t else ""
+    return f'<section class="view{cls}" data-view="{view_id}" hidden>{body}</section>'
+
+
+# ------------------------------------------------------------------------- home
+
 def topic_card(t: dict) -> str:
-    ready = sum(1 for a in t["aspects"] if "page" in a)
-    status = f"{ready} of {len(t['aspects'])} aspects written" if ready else "Not started"
+    people = sum(1 for e in t["entries"] if e["kind"] == "person")
+    events = len(t["entries"]) - people
+    plans = len(t.get("essays", []))
+    status = f"{people} people · {events} events · {plans} essay page{'s' if plans != 1 else ''}"
     start, end = t["dates"].split("–")
     return f"""
 <a class="card t-{t['id']}" href="#{t['id']}">
   <span class="art card-art">{ART[t['id']]("-card-" + t["id"])}</span>
   <span class="card-body">
-  <span class="card-dates"><span>{start}</span><span class="dash">–</span><span>{end}</span></span>
-  <span class="card-name">{esc(t['name'])}</span>
-  <span class="card-blurb">{esc(t['blurb'])}</span>
-  <span class="card-status">{status}</span>
+    <span class="card-dates"><span>{start}</span><span class="dash">–</span><span>{end}</span></span>
+    <span class="card-name">{esc(t['name'])}</span>
+    <span class="card-blurb">{esc(t['blurb'])}</span>
+    <span class="card-status">{status}</span>
   </span>
 </a>"""
 
 
-def aspect_row(a: dict) -> str:
-    qs = "".join(f"<li>{esc(q)}</li>" for q in a["questions"])
-    if "page" in a:
-        p = a["page"]
-        link = f'<a class="aspect-link" href="#{p["id"]}">Open the essay plans</a>'
-        state = '<span class="pill pill-ready">Plans ready</span>'
-    else:
-        link = ""
-        state = '<span class="pill">To write</span>'
-    return f"""
-<li class="aspect">
-  <div class="aspect-head">
-    <span class="aspect-dates">{a['dates']}</span>
-    <h3>{esc(a['name'])}</h3>
-    {state}
-  </div>
-  <p class="label">{"Questions" if len(a["questions"]) > 1 else "Practice question"}</p>
-  <ol class="questions">{qs}</ol>
-  {link}
-</li>"""
-
-
-def topic_view(t: dict) -> str:
-    rows = "".join(aspect_row(a) for a in t["aspects"])
-    return f"""
-<section class="view t-{t['id']}" data-view="{t['id']}" hidden>
-  <nav class="crumbs"><a href="#home">All topics</a></nav>
-  <div class="topic-top">
-    <div class="art hero-art">{ART[t['id']]("-hero-" + t["id"])}</div>
-    <header class="topic-head">
-      <p class="topic-dates">{t['dates']}</p>
-      <h1>{esc(t['name'])}</h1>
-      <p class="lede">{esc(t['blurb'])}</p>
-    </header>
-  </div>
-  <ul class="aspects">{rows}</ul>
-</section>"""
-
-
-def page_view(t: dict, a: dict) -> str:
-    p = a["page"]
-    body, _ = render_markdown((CONTENT / p["file"]).read_text(encoding="utf-8"))
-    return f"""
-<section class="view t-{t['id']}" data-view="{p['id']}" hidden>
-  <nav class="crumbs"><a href="#home">All topics</a><span>/</span><a href="#{t['id']}">{esc(t['name'])}</a></nav>
-  <div class="topic-top">
-    <div class="art hero-art">{ART[t['id']]("-page-" + p["id"])}</div>
-    <header class="topic-head">
-      <p class="topic-dates">{a['dates']}</p>
-      <h1>{esc(p['title'])}</h1>
-      <p class="lede">{esc(p['summary'])}</p>
-    </header>
-  </div>
-  <article class="prose">{body}</article>
-</section>"""
-
-
 SPAN = (1485, 2009)
-SHORT = {"tudors": "Tudors", "stuarts": "Stuarts", "russia": "Russia", "civil-rights": "Civil Rights"}
 
 
-def timeline() -> str:
+def timeline_strip(topics: list[dict]) -> str:
     """A to-scale strip of the four topics. Topics that overlap go on a second lane."""
     lo, hi = SPAN
     pct = lambda y: (y - lo) / (hi - lo) * 100  # noqa: E731
     lanes: list[int] = []  # end year of the last band on each lane
     bands = []
-    for t in TOPICS:
+    for t in topics:
         start, end = (int(y) for y in t["dates"].split("–"))
         lane = next((i for i, e in enumerate(lanes) if e <= start), len(lanes))
         if lane == len(lanes):
@@ -211,24 +138,217 @@ def timeline() -> str:
         lanes[lane] = end
         bands.append(f'<a class="band t-{t["id"]}" href="#{t["id"]}" '
                      f'style="left:{pct(start):.2f}%;width:{pct(end) - pct(start):.2f}%;top:calc({lane} * var(--lane))" '
-                     f'title="{esc(t["name"])}, {t["dates"]}">{SHORT[t["id"]]}</a>')
+                     f'title="{esc(t["name"])}, {t["dates"]}">{esc(t["short"])}</a>')
     ticks = "".join(f'<span class="tick" style="left:{pct(y):.2f}%">{y}</span>'
                     for y in range(1500, hi + 1, 100))
     return (f'<div class="timeline" style="--lanes:{len(lanes)}" aria-label="The four topics on one timeline">'
             f'<div class="bands">{"".join(bands)}</div><div class="ticks">{ticks}</div></div>')
 
 
+# --------------------------------------------------------------------- overview
+
+def overview_view(t: dict) -> str:
+    rows = []
+    for a in t["aspects"]:
+        entries = [e for e in t["entries"] if a["key"] in e["aspects"]]
+        essays = [p for p in t.get("essays", []) if p["aspect"] == a["key"]]
+        qs = "".join(f"<li>{inline(q)}</li>" for q in a["questions"])
+        chips = "".join(chip(t, e) for e in entries)
+        essay_links = "".join(f'<a class="aspect-link" href="#{p["id"]}">{esc(p["title"])}</a>' for p in essays)
+        rows.append(f"""
+<li class="aspect">
+  <div class="aspect-head">
+    <span class="aspect-dates">{a['dates']}</span>
+    <h3>{esc(a['name'])}</h3>
+    {'<span class="pill pill-ready">Essay plans</span>' if essays else ''}
+  </div>
+  {f'<p class="aspect-sum">{inline(a["summary"])}</p>' if a.get("summary") else ''}
+  {f'<p class="label">Fact files</p><div class="chips">{chips}</div>' if chips else ''}
+  <p class="label">Possible questions</p>
+  <ol class="questions">{qs}</ol>
+  {essay_links}
+</li>""")
+    body = f"""
+{crumbs()}
+<div class="topic-top">
+  <div class="art hero-art">{ART[t['id']]("-hero-" + t["id"])}</div>
+  <header class="topic-head">
+    <p class="topic-dates">{t['dates']}</p>
+    <h1>{esc(t['name'])}</h1>
+    <p class="lede">{esc(t['blurb'])}</p>
+  </header>
+</div>
+{tabs(t, "overview")}
+<p class="section-intro">The course in {len(t['aspects'])} aspects. Each lists the fact files that belong to it and the questions it could produce.</p>
+<ul class="aspects">{''.join(rows)}</ul>"""
+    return view(t, t["id"], body)
+
+
+# ------------------------------------------------------------------------ notes
+
+def entry_card(t: dict, e: dict) -> str:
+    return f"""
+<a class="entry-card" href="{entry_href(t, e)}">
+  <span class="entry-dates">{esc(e['dates'])}</span>
+  <span class="entry-name">{esc(e['name'])}</span>
+  <span class="entry-role">{inline(e['role'])}</span>
+</a>"""
+
+
+def notes_view(t: dict) -> str:
+    rows = []
+    for row in t["timeline"]:
+        date, text = row[0], row[1]
+        link = row[2] if len(row) > 2 else None
+        target = f' <a class="tl-link" href="{entry_href(t, t["by_id"][link])}">Fact file</a>' if link else ""
+        rows.append(f'<li><span class="tl-date">{esc(date)}</span><span class="tl-text">{inline(text)}{target}</span></li>')
+    people = "".join(entry_card(t, e) for e in t["entries"] if e["kind"] == "person")
+    events = "".join(entry_card(t, e) for e in t["entries"] if e["kind"] == "event")
+    body = f"""
+{crumbs(t)}
+{strip(t, "-notes-" + t["id"])}
+<header class="page-head">
+  <p class="topic-dates">{t['dates']}</p>
+  <h1>{esc(t['short'])}: Notes</h1>
+  <p class="lede">A timeline of the whole topic, then a fact file for every key person and event. Each fact file covers what happened, the key facts, what it signifies, and the questions it could come up in.</p>
+</header>
+{tabs(t, "notes")}
+<div class="notes-grid">
+  <section class="notes-col">
+    <h2 class="block-title">Timeline</h2>
+    {f'<p class="note">{inline(t["timeline_note"])}</p>' if t.get("timeline_note") else ''}
+    <ol class="tl">{''.join(rows)}</ol>
+  </section>
+  <section class="notes-col">
+    <h2 class="block-title">People</h2>
+    <div class="entry-grid">{people}</div>
+    <h2 class="block-title">Events</h2>
+    <div class="entry-grid">{events}</div>
+  </section>
+</div>"""
+    return view(t, f"{t['id']}-notes", body)
+
+
+def entry_view(t: dict, e: dict) -> str:
+    aspects = [a for a in t["aspects"] if a["key"] in e["aspects"]]
+    facts = "".join(f"<li>{inline(f)}</li>" for f in e["facts"])
+    tl = "".join(f'<li><span class="tl-date">{esc(d)}</span><span class="tl-text">{inline(x)}</span></li>'
+                 for d, x in e["timeline"])
+    sig = "".join(f"<li>{inline(s)}</li>" for s in e["significance"])
+    links = "".join(chip(t, t["by_id"][i]) for i in e.get("links", []))
+    asp = "".join(f'<a class="chip chip-aspect" href="#{t["id"]}">{esc(a["name"])} <span>{a["dates"]}</span></a>'
+                  for a in aspects)
+    qs = "".join(f'<li><p class="q">{inline(q)}</p><p class="q-use">{inline(use)}</p></li>'
+                 for q, use in e["questions"])
+    kind = "Person" if e["kind"] == "person" else "Event"
+    body = f"""
+{crumbs(t, (f"#{t['id']}-notes", "Notes"))}
+{strip(t, "-f-" + e["id"])}
+<header class="page-head">
+  <p class="kind">{kind} · {esc(e['dates'])}</p>
+  <h1>{esc(e['name'])}</h1>
+  <p class="lede">{inline(e['role'])}</p>
+</header>
+<article class="fact-file">
+  <section class="ff-summary">
+    <h2 class="block-title">{"Who they were" if e["kind"] == "person" else "What happened"}</h2>
+    {paras(e['summary'])}
+  </section>
+  <div class="ff-pair">
+    <section>
+      <h2 class="block-title">Fact file</h2>
+      <ul class="facts">{facts}</ul>
+    </section>
+    <section>
+      <h2 class="block-title">Timeline</h2>
+      <ol class="tl tl-tight">{tl}</ol>
+    </section>
+  </div>
+  <section class="ff-sig">
+    <h2 class="block-title">Significance and connotations</h2>
+    <p class="note">What mentioning this in an essay signals, and the arguments it supports.</p>
+    <ul class="sig">{sig}</ul>
+  </section>
+  <section>
+    <h2 class="block-title">Where it fits</h2>
+    <div class="chips">{asp}</div>
+    {f'<p class="label">Linked fact files</p><div class="chips">{links}</div>' if links else ''}
+  </section>
+  <section>
+    <h2 class="block-title">Questions it could come up in</h2>
+    <ol class="qlist">{qs}</ol>
+  </section>
+</article>"""
+    return view(t, f"{t['id']}-f-{e['id']}", body)
+
+
+# ----------------------------------------------------------------------- essays
+
+def essays_view(t: dict) -> str:
+    pages = "".join(f"""
+<a class="essay-card" href="#{p['id']}">
+  <span class="entry-dates">{esc(next(a['dates'] for a in t['aspects'] if a['key'] == p['aspect']))}</span>
+  <span class="entry-name">{esc(p['title'])}</span>
+  <span class="entry-role">{esc(p['summary'])}</span>
+</a>""" for p in t.get("essays", []))
+    if not pages:
+        pages = '<p class="empty">No essay plans written for this topic yet. Pick a question below and ask for a plan.</p>'
+    by_aspect = "".join(f"""
+<li>
+  <p class="label">{esc(a['name'])} · {a['dates']}</p>
+  <ol class="questions">{''.join(f'<li>{inline(q)}</li>' for q in a['questions'])}</ol>
+</li>""" for a in t["aspects"])
+    body = f"""
+{crumbs(t)}
+{strip(t, "-essays-" + t["id"])}
+<header class="page-head">
+  <p class="topic-dates">{t['dates']}</p>
+  <h1>{esc(t['short'])}: Essays</h1>
+  <p class="lede">Full essay plans, then every practice question on the site grouped by aspect.</p>
+</header>
+{tabs(t, "essays")}
+<h2 class="block-title">Essay plans</h2>
+<div class="entry-grid">{pages}</div>
+<h2 class="block-title">Practice questions by aspect</h2>
+<ul class="by-aspect">{by_aspect}</ul>"""
+    return view(t, f"{t['id']}-essays", body)
+
+
+def essay_page_view(t: dict, p: dict) -> str:
+    md, _ = render_markdown((CONTENT / p["file"]).read_text(encoding="utf-8"))
+    a = next(a for a in t["aspects"] if a["key"] == p["aspect"])
+    body = f"""
+{crumbs(t, (f"#{t['id']}-essays", "Essays"))}
+{strip(t, "-page-" + p["id"])}
+<header class="page-head">
+  <p class="topic-dates">{a['dates']}</p>
+  <h1>{esc(p['title'])}</h1>
+  <p class="lede">{esc(p['summary'])}</p>
+</header>
+{tabs(t, "essays")}
+<article class="prose">{md}</article>"""
+    return view(t, p["id"], body)
+
+
+# ------------------------------------------------------------------------ build
+
 def build() -> None:
-    cards = "".join(topic_card(t) for t in TOPICS)
-    views = "".join(topic_view(t) for t in TOPICS)
-    pages = "".join(page_view(t, a) for t in TOPICS for a in t["aspects"] if "page" in a)
+    topics = load_topics()
+    views = []
+    for t in topics:
+        views.append(overview_view(t))
+        views.append(notes_view(t))
+        views.append(essays_view(t))
+        views += [entry_view(t, e) for e in t["entries"]]
+        views += [essay_page_view(t, p) for p in t.get("essays", [])]
     template = (HERE / "template.html").read_text(encoding="utf-8")
-    out = (template.replace("{{timeline}}", timeline())
-           .replace("{{cards}}", cards)
-           .replace("{{views}}", views + pages))
+    out = (template.replace("{{timeline}}", timeline_strip(topics))
+           .replace("{{cards}}", "".join(topic_card(t) for t in topics))
+           .replace("{{views}}", "".join(views)))
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(out, encoding="utf-8")
-    print(f"Wrote {OUT.relative_to(HERE.parent)}")
+    n = sum(len(t["entries"]) for t in topics)
+    print(f"Wrote {OUT.relative_to(HERE.parent)}: {len(topics)} topics, {n} fact files")
 
 
 if __name__ == "__main__":

@@ -135,6 +135,63 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; text-wrap: balan
 .aspect-link { justify-self: start; margin-top: 8px; font-family: var(--tlabel); letter-spacing: 0.05em; text-decoration: none; color: var(--accent); border-bottom: 1px solid currentColor; }
 .aspect-link::after { content: " →"; }
 
+
+/* Topic sections */
+.tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--ink); margin-block: 8px 20px; overflow-x: auto; }
+.tabs a { padding: 10px 16px 8px; font-family: var(--tlabel); letter-spacing: 0.05em; text-decoration: none; color: var(--muted); border: 1px solid transparent; border-bottom: 0; white-space: nowrap; }
+.tabs a:hover { color: var(--accent); }
+.tabs a[aria-current="page"] { color: var(--paper); background: var(--accent); }
+.strip-art { height: 72px; margin-top: 16px; border: 1px solid var(--rule); }
+.page-head { padding-block: 18px 6px; }
+.page-head h1 { font-family: var(--tface); text-transform: var(--tcase); letter-spacing: var(--tspace); font-size: clamp(2rem, 5.5vw, 3rem); }
+.t-russia .page-head h1 { font-weight: 600; }
+.kind { font-family: var(--tlabel); color: var(--accent); letter-spacing: 0.06em; margin: 0 0 4px; }
+.section-intro, .note { color: var(--muted); max-width: 66ch; margin: 0 0 8px; }
+.note { font-size: 0.92rem; font-style: italic; }
+.block-title { font-family: var(--tface); text-transform: var(--tcase); letter-spacing: var(--tspace); font-size: 1.5rem; margin: 28px 0 12px; color: var(--accent); }
+.t-russia .block-title { font-weight: 600; }
+.aspect-sum { margin: 0; max-width: 70ch; }
+.empty { color: var(--muted); font-style: italic; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.chip { font-size: 0.9rem; text-decoration: none; padding: 3px 10px; border: 1px solid var(--rule); background: var(--surface); border-radius: 2px; }
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip-person::before { content: "\25CF  "; color: var(--accent); font-size: 0.7em; vertical-align: 1px; }
+.chip-event::before { content: "\25C6  "; color: var(--accent); font-size: 0.7em; vertical-align: 1px; }
+.chip-aspect span { color: var(--muted); font-size: 0.85em; }
+
+.notes-grid { display: grid; gap: 0 40px; }
+.notes-grid > * { min-width: 0; }
+@media (min-width: 860px) { .notes-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); } }
+.tl { list-style: none; margin: 0; padding: 0 0 0 18px; border-left: 2px solid var(--accent); }
+.tl li { position: relative; display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 12px; padding: 7px 0; border-bottom: 1px dotted var(--rule); }
+.tl li::before { content: ""; position: absolute; left: -24px; top: 15px; width: 10px; height: 10px; background: var(--paper); border: 2px solid var(--accent); border-radius: 50%; }
+.tl-date { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 0.92rem; }
+.tl-link { font-family: var(--tlabel); font-size: 0.82rem; letter-spacing: 0.04em; color: var(--accent); white-space: nowrap; }
+.tl-tight li { grid-template-columns: 6em minmax(0, 1fr); padding: 5px 0; }
+
+.entry-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 10px; }
+.entry-card, .essay-card { display: grid; gap: 2px; align-content: start; padding: 12px 14px; background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--accent); text-decoration: none; }
+.entry-card:hover, .essay-card:hover { border-color: var(--accent); }
+.entry-dates { font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.entry-name { font-family: var(--display); font-size: 1.2rem; line-height: 1.2; }
+.entry-role { font-size: 0.9rem; color: var(--muted); }
+
+.fact-file { max-width: 900px; }
+.fact-file p { max-width: 70ch; }
+.ff-pair { display: grid; gap: 0 36px; }
+.ff-pair > * { min-width: 0; }
+@media (min-width: 760px) { .ff-pair { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
+.facts { margin: 0; padding-left: 1.2em; }
+.facts li + li { margin-top: 5px; }
+.sig { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.sig li { padding: 12px 16px; background: var(--surface); border-left: 4px solid var(--accent); max-width: 75ch; }
+.qlist { margin: 0; padding-left: 1.4em; display: grid; gap: 12px; }
+.qlist .q { margin: 0; font-style: italic; }
+.qlist .q-use { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
+.qlist .q-use::before { content: "How to use it: "; font-family: var(--tlabel); color: var(--accent); font-size: 0.85rem; letter-spacing: 0.04em; font-style: normal; }
+.by-aspect { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+
 /* Rendered Markdown */
 .prose { max-width: 72ch; }
 .prose .anchor { display: none; }
@@ -166,7 +223,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; text-wrap: balan
   </header>
 
   <section class="view" data-view="home">
-    <p class="intro">Four periods of study, from the Tudors to Obama. Pick a topic to see its aspects and practice questions. Topics fill in as they get written.</p>
+    <p class="intro">Four periods of study, from the Tudors to Obama. Each topic has an overview of its aspects, notes with a fact file for every key person and event, and essay plans.</p>
     {{timeline}}
     <p class="section-label">The four topics</p>
     <div class="cards">{{cards}}</div>

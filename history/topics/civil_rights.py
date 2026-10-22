@@ -1,0 +1,513 @@
+"""Civil Rights in the USA, 1865–2009."""
+
+TOPIC = {
+    "id": "civil-rights",
+    "name": "Civil Rights in the USA",
+    "short": "Civil Rights",
+    "dates": "1865–2009",
+    "blurb": "Reconstruction to the election of Obama: Jim Crow, the "
+             "courts, the movement and Black Power.",
+    "aspects": [
+        {"key": "reconstruction", "name": "Reconstruction and Jim Crow", "dates": "1865–1896",
+         "summary": "Freedom and constitutional rights, then their reversal across the South.",
+         "questions": ["How far did Reconstruction improve the position of African Americans?",
+                       "To what extent was the Supreme Court responsible for the spread of segregation in 1865–1896?"]},
+        {"key": "leaders", "name": "Washington, Du Bois and Garvey", "dates": "1896–1941",
+         "summary": "Rival strategies for advancement under Jim Crow, and the NAACP's long legal campaign.",
+         "questions": ["How effective were African American leaders in the years 1896–1941?",
+                       "To what extent did the position of African Americans improve in the years 1896–1941?"]},
+        {"key": "courts", "name": "War, the courts and Brown", "dates": "1941–1955",
+         "summary": "The Second World War, presidential action and the NAACP's assault on segregation in the courts.",
+         "questions": ["To what extent was the Supreme Court the main driver of change in 1941–1955?",
+                       "How far did the Second World War change the position of African Americans?"]},
+        {"key": "movement", "name": "The movement at its height", "dates": "1955–1968",
+         "summary": "Mass nonviolent protest wins the Civil Rights Act and the Voting Rights Act.",
+         "questions": ["How far was Martin Luther King responsible for the gains of 1955–1968?",
+                       "To what extent was federal government the main driver of civil rights progress in the years 1955–1968?"]},
+        {"key": "blackpower", "name": "Black Power and after", "dates": "1965–2009",
+         "summary": "Radical challenges, urban unrest, backlash, and the long road to 2008.",
+         "questions": ["\"The election of Obama in 2008 marked the fulfilment of the civil rights movement.\" Assess the validity of this view.",
+                       "How far did Black Power help or harm the civil rights cause?"]},
+    ],
+    "essays": [],
+}
+
+TIMELINE = [
+    ("1865", "Civil War ends. Thirteenth Amendment abolishes slavery.", "reconstruction"),
+    ("1868", "Fourteenth Amendment: citizenship and equal protection.", "reconstruction"),
+    ("1870", "Fifteenth Amendment: no denial of the vote on grounds of race.", "reconstruction"),
+    ("1877", "Compromise of 1877 ends Reconstruction.", "reconstruction"),
+    ("1881", "Booker T. Washington founds the Tuskegee Institute.", "washington"),
+    ("1895", "Washington's Atlanta Compromise speech.", "washington"),
+    ("1896", "Plessy v Ferguson: \"separate but equal\".", "plessy"),
+    ("1903", "Du Bois publishes The Souls of Black Folk.", "du-bois"),
+    ("1909", "NAACP founded.", "du-bois"),
+    ("1916", "Garvey moves the UNIA to New York. The Great Migration gathers pace.", "garvey"),
+    ("1941", "Executive Order 8802 bans discrimination in defence industries.", "randolph"),
+    ("1944", "Smith v Allwright outlaws the white primary.", "marshall"),
+    ("1948", "Truman desegregates the armed forces.", "randolph"),
+    ("17 May 1954", "Brown v Board of Education.", "brown"),
+    ("Aug 1955", "Emmett Till murdered in Mississippi."),
+    ("Dec 1955", "Montgomery Bus Boycott begins.", "montgomery"),
+    ("Sep 1957", "Little Rock: federal troops escort nine students into Central High.", "little-rock"),
+    ("Feb 1960", "Greensboro sit-ins; SNCC founded in April."),
+    ("1961", "Freedom Rides."),
+    ("1963", "Birmingham campaign. March on Washington.", "birmingham-washington"),
+    ("2 Jul 1964", "Civil Rights Act.", "civil-rights-acts"),
+    ("Feb 1965", "Malcolm X assassinated.", "malcolm-x"),
+    ("Mar 1965", "Selma: Bloody Sunday on the Edmund Pettus Bridge.", "civil-rights-acts"),
+    ("6 Aug 1965", "Voting Rights Act.", "civil-rights-acts"),
+    ("Aug 1965", "Watts riot in Los Angeles.", "black-power"),
+    ("1966", "Carmichael's \"Black Power\" speech. Black Panthers founded.", "black-power"),
+    ("4 Apr 1968", "King assassinated in Memphis. Fair Housing Act follows.", "king"),
+    ("1978", "Regents v Bakke limits affirmative action."),
+    ("1992", "Los Angeles riots after the Rodney King verdict."),
+    ("4 Nov 2008", "Barack Obama elected President.", "obama"),
+]
+
+ENTRIES = [
+    # ------------------------------------------------------------------ people
+    {
+        "id": "washington", "kind": "person", "name": "Booker T. Washington",
+        "dates": "1856–1915", "role": "Educator and the most powerful Black leader of his day; preached self-help.",
+        "aspects": ["leaders"],
+        "summary": """Born enslaved in Virginia, Washington founded the Tuskegee Institute in Alabama in 1881 to teach practical and vocational skills. In his Atlanta Compromise speech (1895) he told white Southerners that Black Americans would accept segregation for now in exchange for education and economic opportunity: \"In all things that are purely social we can be as separate as the fingers, yet one as the hand.\" He had huge influence with white politicians and donors. Privately he funded legal challenges to segregation.""",
+        "facts": [
+            "Tuskegee Institute founded in 1881.",
+            "Atlanta Compromise speech: 1895.",
+            "Autobiography Up from Slavery (1901).",
+            "Dined at the White House with Theodore Roosevelt in 1901, provoking Southern outrage.",
+        ],
+        "timeline": [
+            ("1881", "Tuskegee."),
+            ("1895", "Atlanta Compromise."),
+            ("1901", "Up from Slavery; White House dinner."),
+            ("1915", "Dies."),
+        ],
+        "significance": [
+            "**Accommodation vs protest.** He is one side of the central debate about strategy under Jim Crow, set against Du Bois.",
+        ],
+        "links": ["du-bois", "plessy"],
+        "questions": [
+            ("How effective were African American leaders in the years 1896–1941?",
+             "Compare his methods and results with Du Bois and Garvey."),
+        ],
+    },
+    {
+        "id": "du-bois", "kind": "person", "name": "W.E.B. Du Bois",
+        "dates": "1868–1963", "role": "Scholar, NAACP founder, and leading critic of accommodation.",
+        "aspects": ["leaders"],
+        "summary": """The first African American to earn a Harvard PhD (1895), Du Bois attacked Washington's approach in The Souls of Black Folk (1903). He demanded full civil and political rights now, led by an educated \"talented tenth\". He organised the Niagara Movement (1905), co-founded the NAACP (1909) and edited its magazine The Crisis for over twenty years. He later turned to Pan-Africanism and socialism, and died in Ghana on the eve of the 1963 March on Washington.""",
+        "facts": [
+            "Niagara Movement: 1905.",
+            "NAACP: 1909. The Crisis editor 1910–34.",
+            "The Crisis reached around 100,000 readers by 1919.",
+            "Died 27 August 1963, the day before the March on Washington.",
+        ],
+        "timeline": [
+            ("1895", "Harvard PhD."),
+            ("1903", "The Souls of Black Folk."),
+            ("1905", "Niagara Movement."),
+            ("1909", "NAACP."),
+            ("1963", "Dies in Ghana."),
+        ],
+        "significance": [
+            "**Protest and rights.** He represents the strategy that eventually won: legal challenges and agitation for full equality.",
+        ],
+        "links": ["washington", "garvey", "marshall"],
+        "questions": [
+            ("How effective were African American leaders in the years 1896–1941?",
+             "The NAACP's long-term legal strategy is his legacy."),
+        ],
+    },
+    {
+        "id": "garvey", "kind": "person", "name": "Marcus Garvey",
+        "dates": "1887–1940", "role": "Jamaican-born leader of a mass Black nationalist movement.",
+        "aspects": ["leaders", "blackpower"],
+        "summary": """Garvey founded the Universal Negro Improvement Association (UNIA) in Jamaica in 1914 and moved it to New York in 1916. He preached Black pride, economic independence and a return to Africa, and built the largest mass Black movement in American history, with parades, newspapers and the Black Star Line shipping company. Convicted of mail fraud in 1923, he was jailed and deported in 1927.""",
+        "facts": [
+            "UNIA claimed millions of members; historians suggest hundreds of thousands were active.",
+            "Black Star Line (1919) failed financially.",
+            "Deported in 1927; died in London in 1940.",
+        ],
+        "timeline": [
+            ("1914", "UNIA founded."),
+            ("1916", "Moves to New York."),
+            ("1919", "Black Star Line."),
+            ("1923", "Convicted."),
+            ("1927", "Deported."),
+        ],
+        "significance": [
+            "**Ancestor of Black Power.** His emphasis on pride and separation influenced Malcolm X, whose parents were Garveyites.",
+        ],
+        "links": ["du-bois", "malcolm-x"],
+        "questions": [
+            ("How effective were African American leaders in the years 1896–1941?",
+             "Huge popular appeal, few lasting gains."),
+        ],
+    },
+    {
+        "id": "randolph", "kind": "person", "name": "A. Philip Randolph",
+        "dates": "1889–1979", "role": "Labour leader who used the threat of mass protest to win federal action.",
+        "aspects": ["courts", "movement"],
+        "summary": """Randolph founded the Brotherhood of Sleeping Car Porters in 1925, the first major Black trade union. In 1941 he threatened a march on Washington of 100,000 people unless defence industries were opened to Black workers. Roosevelt responded with Executive Order 8802. Randolph's pressure also helped push Truman to desegregate the armed forces in 1948. He was the director of the 1963 March on Washington.""",
+        "facts": [
+            "Executive Order 8802 (June 1941) created the Fair Employment Practices Committee.",
+            "Executive Order 9981 (1948) desegregated the armed forces.",
+        ],
+        "timeline": [
+            ("1925", "Sleeping Car Porters union."),
+            ("1941", "March threat; Executive Order 8802."),
+            ("1948", "Executive Order 9981."),
+            ("1963", "March on Washington."),
+        ],
+        "significance": [
+            "**The power of direct action.** The threat of mass protest won federal action decades before the 1960s.",
+        ],
+        "links": ["birmingham-washington"],
+        "questions": [
+            ("How far did the Second World War change the position of African Americans?",
+             "Executive Order 8802 is the key early federal gain."),
+        ],
+    },
+    {
+        "id": "marshall", "kind": "person", "name": "Thurgood Marshall",
+        "dates": "1908–1993", "role": "NAACP lawyer who won Brown; first Black Supreme Court justice.",
+        "aspects": ["courts"],
+        "summary": """As chief counsel of the NAACP Legal Defense Fund from 1940, Marshall led the legal campaign against segregation. He won Smith v Allwright (1944), which ended the white primary, and a series of cases on graduate schools, then argued and won Brown v Board of Education (1954). Lyndon Johnson appointed him to the Supreme Court in 1967.""",
+        "facts": [
+            "Won 29 of the 32 cases he argued before the Supreme Court.",
+            "Sweatt v Painter (1950): a separate law school was not equal.",
+            "Supreme Court Justice 1967–91.",
+        ],
+        "timeline": [
+            ("1940", "Leads the Legal Defense Fund."),
+            ("1944", "Smith v Allwright."),
+            ("1954", "Brown."),
+            ("1967", "Supreme Court."),
+        ],
+        "significance": [
+            "**Change through the courts.** The strongest case that legal strategy, not mass protest, began the destruction of segregation.",
+        ],
+        "links": ["brown", "du-bois", "johnson"],
+        "questions": [
+            ("To what extent was the Supreme Court the main driver of change in 1941–1955?",
+             "Central evidence."),
+        ],
+    },
+    {
+        "id": "king", "kind": "person", "name": "Martin Luther King Jr.",
+        "dates": "1929–1968", "role": "Baptist minister and the leading voice of nonviolent protest.",
+        "aspects": ["movement"],
+        "summary": """King became leader of the Montgomery Bus Boycott at 26 and co-founded the Southern Christian Leadership Conference (SCLC) in 1957. His strategy was nonviolent direct action designed to provoke a violent response that would be filmed and seen nationally, forcing federal action. It worked at Birmingham (1963) and Selma (1965). He failed in Chicago (1966), turned against the Vietnam War, and was assassinated in Memphis on 4 April 1968, where he had gone to support striking sanitation workers.""",
+        "facts": [
+            "Letter from Birmingham Jail (April 1963).",
+            "\"I Have a Dream\" speech, 28 August 1963.",
+            "Nobel Peace Prize 1964.",
+            "Chicago Freedom Movement (1966): failed against Northern housing segregation.",
+            "Killed by James Earl Ray.",
+        ],
+        "timeline": [
+            ("1955", "Montgomery."),
+            ("1957", "SCLC."),
+            ("1963", "Birmingham; March on Washington."),
+            ("1964", "Nobel Prize."),
+            ("1965", "Selma."),
+            ("1966", "Chicago."),
+            ("1968", "Assassinated in Memphis."),
+        ],
+        "significance": [
+            "**The great man question.** The movement was led by many local activists, students (SNCC) and organisations. King's prominence is real but can be overstated.",
+            "**Nonviolence as strategy.** It aimed to win federal intervention by exposing Southern violence to national TV.",
+        ],
+        "links": ["montgomery", "birmingham-washington", "civil-rights-acts", "malcolm-x"],
+        "questions": [
+            ("How far was Martin Luther King responsible for the gains of 1955–1968?",
+             "Central. Weigh him against grassroots activists, the federal government and the courts."),
+        ],
+    },
+    {
+        "id": "malcolm-x", "kind": "person", "name": "Malcolm X",
+        "dates": "1925–1965", "role": "Nation of Islam spokesman and critic of integration and nonviolence.",
+        "aspects": ["movement", "blackpower"],
+        "summary": """Born Malcolm Little, he converted to the Nation of Islam in prison and became its most famous preacher. He rejected integration and nonviolence, and called for Black self-defence and separation \"by any means necessary\". He broke with the Nation in 1964, made the pilgrimage to Mecca, and began moving toward a broader view of human rights. Nation of Islam members shot him dead in New York in February 1965.""",
+        "facts": [
+            "Joined the Nation of Islam in prison (1946–52).",
+            "Left the Nation in March 1964.",
+            "Founded the Organization of Afro-American Unity (1964).",
+            "Assassinated on 21 February 1965 at the Audubon Ballroom.",
+        ],
+        "timeline": [
+            ("1952", "Released; Nation of Islam minister."),
+            ("1964", "Leaves the Nation; visits Mecca."),
+            ("1965", "Assassinated."),
+        ],
+        "significance": [
+            "**The alternative to King.** He spoke to Northern urban Black Americans whom the Southern movement did not reach.",
+            "**Inspiration for Black Power.** His Autobiography (1965) shaped a generation of activists.",
+        ],
+        "links": ["king", "garvey", "black-power"],
+        "questions": [
+            ("How far did Black Power help or harm the civil rights cause?",
+             "His ideas are the root."),
+        ],
+    },
+    {
+        "id": "johnson", "kind": "person", "name": "Lyndon B. Johnson",
+        "dates": "1908–1973", "role": "President 1963–1969; signed the great civil rights laws.",
+        "aspects": ["movement"],
+        "summary": """A Texan and master of the Senate, Johnson became President after Kennedy's assassination in November 1963. He used Kennedy's memory and his own political skill to break the Southern filibuster and pass the Civil Rights Act (1964). He then pushed the Voting Rights Act through after Selma (1965) and the Fair Housing Act after King's death (1968). His Great Society programmes attacked poverty. The Vietnam War drained money and support.""",
+        "facts": [
+            "As Senate Majority Leader, he steered through the weak Civil Rights Act of 1957.",
+            "Executive Order 11246 (1965) required federal contractors to take affirmative action.",
+            "Appointed Thurgood Marshall to the Supreme Court in 1967.",
+        ],
+        "timeline": [
+            ("1957", "Civil Rights Act passes the Senate."),
+            ("1963", "President."),
+            ("1964", "Civil Rights Act."),
+            ("1965", "Voting Rights Act."),
+            ("1968", "Fair Housing Act."),
+        ],
+        "significance": [
+            "**The federal factor.** He is the best evidence that presidential leadership turned protest into law.",
+        ],
+        "links": ["civil-rights-acts", "king", "marshall"],
+        "questions": [
+            ("To what extent was federal government the main driver of civil rights progress in the years 1955–1968?",
+             "Central evidence."),
+        ],
+    },
+    {
+        "id": "obama", "kind": "person", "name": "Barack Obama",
+        "dates": "b. 1961", "role": "First African American President, elected 2008.",
+        "aspects": ["blackpower"],
+        "summary": """Born in Hawaii to a Kenyan father and a white American mother, Obama worked as a community organiser in Chicago and then as a law lecturer, and became a US Senator for Illinois in 2005. He won the 2008 election against John McCain with about 53% of the popular vote and 365 electoral votes. He took office in January 2009.""",
+        "facts": [
+            "Won about 95% of the Black vote in 2008.",
+            "Earlier pioneers: Shirley Chisholm's 1972 run, Jesse Jackson's 1984 and 1988 campaigns, and Douglas Wilder, the first elected Black governor (Virginia, 1989).",
+            "Elected while big gaps in Black wealth, income, imprisonment and school segregation remained.",
+        ],
+        "timeline": [
+            ("2004", "Keynote speech at the Democratic convention."),
+            ("2005", "US Senator."),
+            ("Nov 2008", "Elected President."),
+            ("Jan 2009", "Inaugurated."),
+        ],
+        "significance": [
+            "**Symbol vs substance.** His election shows huge political change since 1965; the socio-economic gaps show how much had not changed.",
+        ],
+        "links": ["civil-rights-acts", "king"],
+        "questions": [
+            ("\"The election of Obama in 2008 marked the fulfilment of the civil rights movement.\" Assess the validity of this view.",
+             "Central. Political gains vs continuing economic and social inequality."),
+        ],
+    },
+    # ------------------------------------------------------------------ events
+    {
+        "id": "reconstruction", "kind": "event", "name": "Reconstruction and the Civil War Amendments",
+        "dates": "1865–1877", "role": "Freedom, citizenship and the vote, then retreat.",
+        "aspects": ["reconstruction"],
+        "summary": """After the Civil War, three amendments abolished slavery (Thirteenth, 1865), made freed people citizens with equal protection of the law (Fourteenth, 1868), and banned denying the vote on grounds of race (Fifteenth, 1870). The Freedmen's Bureau set up schools. Under federal protection, hundreds of Black men held office, including Hiram Revels, the first Black US Senator (1870).
+
+White Southerners fought back with Black Codes and the violence of the Ku Klux Klan. Northern interest faded, and the Compromise of 1877 withdrew federal troops from the South. Reconstruction was over.""",
+        "facts": [
+            "Freedmen's Bureau: 1865.",
+            "Ku Klux Klan founded in Tennessee in 1865–66.",
+            "The Civil Rights Act of 1875 was struck down by the Supreme Court in 1883.",
+            "Around 2,000 Black men held public office during Reconstruction.",
+        ],
+        "timeline": [
+            ("1865", "Thirteenth Amendment; Freedmen's Bureau."),
+            ("1868", "Fourteenth Amendment."),
+            ("1870", "Fifteenth Amendment; Revels in the Senate."),
+            ("1877", "Federal troops withdrawn."),
+        ],
+        "significance": [
+            "**Rights on paper.** The amendments became the legal basis for the 20th-century movement, especially the Fourteenth in Brown.",
+            "**False dawn.** Reconstruction shows how quickly rights could be lost without federal will to enforce them.",
+        ],
+        "links": ["plessy"],
+        "questions": [
+            ("How far did Reconstruction improve the position of African Americans?",
+             "Central. Constitutional gains vs the 1877 retreat."),
+        ],
+    },
+    {
+        "id": "plessy", "kind": "event", "name": "Plessy v Ferguson and Jim Crow",
+        "dates": "1896", "role": "The Supreme Court approves \"separate but equal\".",
+        "aspects": ["reconstruction", "leaders"],
+        "summary": """Homer Plessy, who was one-eighth Black, deliberately sat in a whites-only railway carriage in Louisiana to test the state's Separate Car Act. The Supreme Court ruled 7–1 that segregation was legal as long as facilities were equal. Justice Harlan dissented: \"Our Constitution is color-blind.\" Jim Crow segregation spread across the South. Literacy tests, poll taxes and violence stripped Black men of the vote.""",
+        "facts": [
+            "Registered Black voters in Louisiana fell from about 130,000 in 1896 to about 1,300 in 1904.",
+            "Mississippi's 1890 constitution led the way in disenfranchisement.",
+            "Over 3,400 African Americans were lynched between 1882 and 1968.",
+        ],
+        "timeline": [
+            ("1890", "Louisiana Separate Car Act; Mississippi constitution."),
+            ("1892", "Plessy arrested."),
+            ("1896", "Supreme Court ruling."),
+        ],
+        "significance": [
+            "**The courts as obstacle.** Before 1938 the Supreme Court did more to entrench segregation than end it, which matters for questions about the courts as a driver of change.",
+        ],
+        "links": ["reconstruction", "brown", "washington"],
+        "questions": [
+            ("To what extent was the Supreme Court responsible for the spread of segregation in 1865–1896?",
+             "Central evidence."),
+        ],
+    },
+    {
+        "id": "brown", "kind": "event", "name": "Brown v Board of Education",
+        "dates": "17 May 1954", "role": "The Supreme Court rules school segregation unconstitutional.",
+        "aspects": ["courts", "movement"],
+        "summary": """Combining five cases, including that of Linda Brown in Topeka, Kansas, the Supreme Court under Chief Justice Earl Warren ruled unanimously that \"separate educational facilities are inherently unequal\", overturning Plessy for schools. Brown II (1955) ordered desegregation \"with all deliberate speed\", a phrase the South used to delay. Southern states launched \"massive resistance\".""",
+        "facts": [
+            "Unanimous 9–0 decision.",
+            "Southern Manifesto (1956): 101 members of Congress pledged to resist.",
+            "By 1964 only about 1–2% of Black children in the Deep South attended integrated schools.",
+        ],
+        "timeline": [
+            ("1954", "Brown."),
+            ("1955", "Brown II."),
+            ("1956", "Southern Manifesto."),
+            ("1957", "Little Rock."),
+        ],
+        "significance": [
+            "**Landmark vs limits.** A huge legal and symbolic victory, but little change on the ground for a decade. It inspired protest and also provoked white backlash.",
+        ],
+        "links": ["marshall", "plessy", "little-rock"],
+        "questions": [
+            ("To what extent was the Supreme Court the main driver of change in 1941–1955?",
+             "Central evidence on both sides."),
+        ],
+    },
+    {
+        "id": "montgomery", "kind": "event", "name": "The Montgomery Bus Boycott",
+        "dates": "December 1955 – December 1956", "role": "A year-long boycott ends bus segregation and launches King.",
+        "aspects": ["movement"],
+        "summary": """On 1 December 1955 Rosa Parks, an experienced NAACP activist, refused to give up her seat to a white passenger and was arrested. Local leaders, led by E.D. Nixon and Jo Ann Robinson's Women's Political Council, organised a boycott, and the new Montgomery Improvement Association chose King as its president. Black residents walked or used car pools for 381 days. The courts (Browder v Gayle) ruled bus segregation unconstitutional, and the buses were integrated in December 1956.""",
+        "facts": [
+            "Lasted 381 days.",
+            "Browder v Gayle: ruled in June 1956 and upheld by the Supreme Court in November 1956.",
+            "Led to the founding of the SCLC in 1957.",
+        ],
+        "timeline": [
+            ("1 Dec 1955", "Parks arrested."),
+            ("5 Dec 1955", "Boycott begins."),
+            ("Nov 1956", "Supreme Court upholds Browder."),
+            ("Dec 1956", "Buses integrated."),
+        ],
+        "significance": [
+            "**Local activism.** Parks was not just a tired seamstress; she was a trained activist. Grassroots organisation made the boycott work.",
+            "**Protest plus courts.** The boycott kept up pressure, but the legal ruling won it.",
+        ],
+        "links": ["king", "brown"],
+        "questions": [
+            ("How far was Martin Luther King responsible for the gains of 1955–1968?",
+             "Shows local organisers led before King did."),
+        ],
+    },
+    {
+        "id": "little-rock", "kind": "event", "name": "Little Rock",
+        "dates": "September 1957", "role": "The President sends troops to enforce school integration.",
+        "aspects": ["movement", "courts"],
+        "summary": """Arkansas Governor Orval Faubus used the National Guard to stop nine Black students entering Little Rock Central High School. After a violent white mob gathered, President Eisenhower, who was privately unenthusiastic about Brown, sent the 101st Airborne Division to escort them in. Faubus closed the city's high schools in 1958–59 rather than integrate.""",
+        "facts": [
+            "The \"Little Rock Nine\".",
+            "About 1,000 paratroopers deployed; the Arkansas Guard was put under federal control.",
+            "The Civil Rights Act of 1957 was passed in the same month, the first since Reconstruction.",
+        ],
+        "timeline": [
+            ("Sep 1957", "Faubus blocks entry; troops sent."),
+            ("1958–59", "Schools closed."),
+        ],
+        "significance": [
+            "**Federal reluctance, federal power.** Even an unwilling president would enforce the law when states openly defied it.",
+        ],
+        "links": ["brown"],
+        "questions": [
+            ("To what extent was federal government the main driver of civil rights progress in the years 1955–1968?",
+             "An early example of federal force."),
+        ],
+    },
+    {
+        "id": "birmingham-washington", "kind": "event", "name": "Birmingham and the March on Washington",
+        "dates": "April – August 1963", "role": "Televised brutality and a mass march push Kennedy to act.",
+        "aspects": ["movement"],
+        "summary": """In Birmingham, Alabama, King and the SCLC launched \"Project C\" to confront segregation in America's most segregated city. When adults were jailed, children marched in the \"Children's Crusade\" in May. Police chief Bull Connor turned dogs and fire hoses on them, in front of TV cameras. On 11 June Kennedy announced a civil rights bill. On 28 August around 250,000 people joined the March on Washington, where King gave his \"I Have a Dream\" speech. Weeks later a bomb at the 16th Street Baptist Church killed four girls.""",
+        "facts": [
+            "Letter from Birmingham Jail: April 1963.",
+            "Kennedy's televised civil rights address: 11 June 1963.",
+            "March organised by Randolph and Bayard Rustin.",
+            "Church bombing: 15 September 1963.",
+        ],
+        "timeline": [
+            ("Apr 1963", "Birmingham campaign; King jailed."),
+            ("May 1963", "Children's Crusade."),
+            ("Jun 1963", "Kennedy's address."),
+            ("Aug 1963", "March on Washington."),
+            ("Sep 1963", "Church bombing."),
+        ],
+        "significance": [
+            "**The media strategy.** Birmingham is the clearest example of nonviolence provoking violence to win national sympathy and federal action.",
+        ],
+        "links": ["king", "randolph", "civil-rights-acts"],
+        "questions": [
+            ("How far was Martin Luther King responsible for the gains of 1955–1968?",
+             "His strategy at its most effective."),
+        ],
+    },
+    {
+        "id": "civil-rights-acts", "kind": "event", "name": "The Civil Rights Act and the Voting Rights Act",
+        "dates": "1964–1965", "role": "Federal law ends legal segregation and protects the vote.",
+        "aspects": ["movement"],
+        "summary": """The Civil Rights Act (2 July 1964) banned segregation in public places and discrimination in employment, and created the Equal Employment Opportunity Commission. It passed after the longest filibuster in Senate history was broken. Voting remained the gap. After Freedom Summer (1964) and Selma's \"Bloody Sunday\" (7 March 1965), when marchers were beaten on the Edmund Pettus Bridge, the Voting Rights Act (6 August 1965) suspended literacy tests and sent federal examiners to register voters.""",
+        "facts": [
+            "The Senate filibuster lasted about two months before it was broken.",
+            "Twenty-fourth Amendment (1964) banned poll taxes in federal elections.",
+            "Black voter registration in Mississippi rose from about 7% in 1964 to about 60% in 1967.",
+        ],
+        "timeline": [
+            ("Jul 1964", "Civil Rights Act."),
+            ("Summer 1964", "Freedom Summer; three activists murdered."),
+            ("Mar 1965", "Selma."),
+            ("Aug 1965", "Voting Rights Act."),
+        ],
+        "significance": [
+            "**The legal end of Jim Crow.** The high point of the movement, which makes it the obvious endpoint for questions on 1955–68.",
+            "**Protest, President and Congress together.** The best case for arguing several factors worked in combination.",
+        ],
+        "links": ["johnson", "king", "birmingham-washington"],
+        "questions": [
+            ("To what extent was federal government the main driver of civil rights progress in the years 1955–1968?",
+             "Central."),
+        ],
+    },
+    {
+        "id": "black-power", "kind": "event", "name": "Black Power and the Black Panthers",
+        "dates": "1965–1970s", "role": "A turn to pride, self-defence and community control.",
+        "aspects": ["blackpower"],
+        "summary": """The Watts riot in Los Angeles (August 1965) showed that Northern and Western cities faced problems the Southern movement had not solved: poverty, housing and police brutality. In June 1966 Stokely Carmichael of SNCC called for \"Black Power\". SNCC expelled its white members. In Oakland, Huey Newton and Bobby Seale founded the Black Panther Party (1966), which combined armed patrols of the police with community programmes such as free breakfasts. The FBI's COINTELPRO set out to destroy it.""",
+        "facts": [
+            "Watts: 34 dead. Detroit (1967): 43 dead.",
+            "The Kerner Commission (1968) warned the nation was \"moving toward two societies, one black, one white\".",
+            "Tommie Smith and John Carlos gave the Black Power salute at the 1968 Olympics.",
+            "Panther leader Fred Hampton was killed in a police raid in Chicago in 1969.",
+        ],
+        "timeline": [
+            ("1965", "Watts."),
+            ("1966", "Black Power slogan; Panthers founded."),
+            ("1967", "Detroit."),
+            ("1968", "Kerner Report."),
+        ],
+        "significance": [
+            "**Help or harm?** It built pride and community institutions, but its rhetoric fed white backlash and Nixon's \"law and order\" politics.",
+        ],
+        "links": ["malcolm-x", "garvey", "king"],
+        "questions": [
+            ("How far did Black Power help or harm the civil rights cause?",
+             "Central."),
+        ],
+    },
+]

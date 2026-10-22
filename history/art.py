@@ -33,7 +33,7 @@ def tudors(s: str) -> str:
   <g transform="translate(200 80)">{sepals}{outer}{inner}
     <circle r="11" fill="#d4a63a" stroke="#7a5410" stroke-width="1.2"/>{seeds}
   </g>
-  <rect x="110" y="149" width="180" height="21" fill="#1f4a2f" stroke="#d4a63a" stroke-width="1"/>
+  <rect x="86" y="149" width="228" height="21" fill="#1f4a2f" stroke="#d4a63a" stroke-width="1"/>
   <text x="200" y="164" text-anchor="middle" font-family="'IM Fell English SC', Georgia, serif" font-size="13" letter-spacing="5" fill="#d4a63a">DIEV ET MON DROIT</text>
 </svg>"""
 
