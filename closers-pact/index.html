@@ -1,0 +1,862 @@
+<title>The Closer's Pact</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a bound ledger — sigil masthead, sticky folio tabs, one working pane per section; tables scroll inside their own frame */
+:root{
+  --bg:#0d0908; --panel:#161010; --panel2:#1e1614; --line:#3a2a22; --line2:#2a1e19;
+  --fg:#ebdfca; --muted:#a28e78; --faint:#6f5f50;
+  --gold:#c9a44c; --gold-dim:#7d6531; --blood:#8c2124; --ember:#d0612f;
+  --good:#8aa564; --bad:#cf4d42; --warn:#d6a53b;
+  --display:"IM Fell English SC","Iowan Old Style",Georgia,serif;
+  --italic:"IM Fell English",Georgia,serif;
+  --body:"Spectral",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;
+  background-image:radial-gradient(1200px 500px at 50% -180px,rgba(208,97,47,.13),transparent 70%),radial-gradient(800px 600px at 100% 110%,rgba(140,33,36,.10),transparent 70%);
+  background-attachment:fixed;min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+a{color:var(--gold)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;letter-spacing:.01em;margin:0}
+h2{font-size:clamp(1.7rem,3.4vw,2.3rem);line-height:1.1}
+h3{font-size:1.25rem;color:var(--gold)}
+p{margin:0}
+.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.lbl{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.it{font-family:var(--italic);font-style:italic}
+
+/* masthead */
+.mast{padding-block:28px 18px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.sigil{width:58px;height:58px;flex:none}
+.mast h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1}
+.mast .sub{font-family:var(--italic);font-style:italic;color:var(--muted);font-size:1.05rem;margin-top:4px}
+.mast .grow{flex:1;min-width:220px}
+.savestate{font-family:var(--mono);font-size:.72rem;color:var(--muted);border:1px solid var(--line);padding:6px 10px;border-radius:2px;white-space:nowrap}
+.savestate b{color:var(--gold);font-weight:500}
+
+/* tabs */
+.tabsbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:linear-gradient(var(--bg) 82%,rgba(13,9,8,0));padding-block:6px 10px}
+.tabs{display:flex;gap:2px;overflow-x:auto;border-top:1px solid var(--gold-dim);border-bottom:1px solid var(--gold-dim);box-shadow:0 3px 0 -2px var(--line),0 -3px 0 -2px var(--line);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{font-family:var(--display);font-size:1.05rem;color:var(--muted);text-decoration:none;padding:10px 14px;white-space:nowrap;border-bottom:2px solid transparent}
+.tabs a:hover{color:var(--fg)}
+.tabs a[aria-current="page"]{color:var(--gold);border-bottom-color:var(--ember)}
+.tabs a:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
+
+.pane{padding-block:18px 80px;display:grid;gap:26px}
+.panehead{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
+.panehead .desc{color:var(--muted);max-width:62ch;margin-top:6px}
+
+/* surfaces */
+.box{background:var(--panel);border:1px solid var(--line);padding:18px;border-radius:2px;min-width:0}
+.box.tight{padding:14px}
+.rule{height:0;border-top:1px solid var(--line);margin:4px 0}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
+.stack{display:grid;gap:12px;align-content:start}
+.pane[hidden]{display:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* controls */
+.btn{font-family:var(--body);font-size:.95rem;color:var(--fg);background:var(--panel2);border:1px solid var(--line);padding:8px 14px;border-radius:2px;cursor:pointer;line-height:1.2}
+.btn:hover{border-color:var(--gold-dim)}
+.btn.gold{background:var(--gold);color:#1a120c;border-color:var(--gold);font-weight:600}
+.btn.gold:hover{background:#d8b45a}
+.btn.blood{background:var(--blood);border-color:var(--blood);color:#f3e6d2}
+.btn.ghost{background:transparent}
+.btn.sm{padding:5px 10px;font-size:.85rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+label.f{display:grid;gap:5px;min-width:0}
+label.f>span{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+label.f>span i{font-family:var(--body);text-transform:none;letter-spacing:0;font-style:italic;color:var(--faint)}
+input,select,textarea{font-family:var(--body);font-size:16px;color:var(--fg);background:#0f0b0a;border:1px solid var(--line);border-radius:2px;padding:8px 10px;width:100%;min-width:0}
+input[type=number]{font-family:var(--mono);font-variant-numeric:tabular-nums}
+textarea{min-height:84px;resize:vertical;line-height:1.5}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--mono);font-size:.75rem;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);background:rgba(201,164,76,.08)}
+
+/* states */
+.pill{display:inline-block;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.ok{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+
+/* stat tiles */
+.tile{display:grid;gap:6px}
+.tile .v{font-family:var(--mono);font-size:1.7rem;line-height:1.1}
+.tile .of{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.bar{height:5px;background:var(--line2);position:relative;overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--gold)}
+.bar i.behind{background:var(--bad)}
+.bar b{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--fg);opacity:.55}
+
+/* tables */
+.tblwrap{overflow-x:auto;border:1px solid var(--line);background:var(--panel)}
+table.tbl{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;min-width:820px}
+.tbl th,.tbl td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line2);white-space:nowrap}
+.tbl thead th{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400;background:var(--panel2)}
+.tbl tbody th{text-align:left;font-weight:400}
+.tbl td{font-family:var(--mono);font-size:.88rem}
+.tbl tr.today th a{color:var(--ember)}
+.tbl tr.empty td{color:var(--bad);opacity:.7}
+.tbl tr.future td,.tbl tr.future th{color:var(--faint)}
+.tbl tr.total td,.tbl tr.total th{border-top:1px solid var(--gold-dim);color:var(--gold)}
+.tbl tr.pct td{font-size:.78rem}
+.tbl th a{color:inherit;text-decoration:none;border-bottom:1px dotted var(--faint)}
+
+/* judgement list */
+.judg{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.judg li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline}
+.judg li .mk{font-family:var(--mono);font-size:.8rem}
+
+/* calendar */
+.calwrap{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:980px){.calwrap{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:start}}
+.calhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.calhead h3{color:var(--fg);font-size:1.4rem}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.cal .dow{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:center;padding-bottom:4px}
+.cell{aspect-ratio:1/1;max-width:100%;border:1px solid var(--line2);background:var(--panel);padding:5px;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;color:var(--fg);font-family:var(--mono);font-size:.72rem;position:relative;min-width:0;overflow:hidden}
+.cell:hover{border-color:var(--gold-dim)}
+.cell .d{font-size:.8rem}
+.cell .m{color:var(--muted);font-size:.66rem;line-height:1.25;overflow:hidden}
+.cell.out{opacity:.32}
+.cell.today{border-color:var(--ember)}
+.cell.sel{outline:2px solid var(--gold);outline-offset:-2px}
+.cell.missed::after{content:"";position:absolute;right:5px;top:6px;width:6px;height:6px;border-radius:50%;background:var(--bad)}
+.cell.logged::after{content:"";position:absolute;right:5px;top:6px;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.cell.won .d{color:var(--gold)}
+.heat{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--ember)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:10px}
+.legend span::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle;background:var(--c)}
+@media (max-width:520px){.cell .m{display:none}.cell{padding:4px}}
+.metgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:10px}
+
+/* pipeline */
+.stagecol{display:grid;gap:8px;align-content:start}
+.deal{border:1px solid var(--line);background:var(--panel2);padding:12px;display:grid;gap:8px;min-width:0}
+.deal .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.deal .nm{font-weight:600;overflow-wrap:anywhere}
+.deal.over{border-color:var(--bad)}
+.deal details summary{cursor:pointer;color:var(--muted);font-size:.85rem}
+.board{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}
+
+/* inquisitor */
+.verdict{background:#120d0c;border:1px solid var(--line);border-top:3px double var(--gold-dim);padding:18px 20px;min-height:120px;max-width:none;overflow-wrap:anywhere}
+.verdict h4{font-family:var(--display);font-weight:400;color:var(--gold);font-size:1.15rem;margin:16px 0 6px}
+.verdict h4:first-child{margin-top:0}
+.verdict p{margin:0 0 8px;max-width:72ch}
+.verdict ul{margin:0 0 8px;padding-left:20px;max-width:72ch}
+.verdict li{margin-bottom:4px}
+.verdict strong{color:var(--fg)}
+.verdict.empty{color:var(--faint);font-family:var(--italic);font-style:italic;display:flex;align-items:center}
+.hist{display:grid;gap:8px}
+.hist details{border:1px solid var(--line2);background:var(--panel);padding:10px 14px}
+.hist summary{cursor:pointer;display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
+.hist summary .when{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+
+/* grimoire */
+.res{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;padding:12px 0;border-bottom:1px solid var(--line2)}
+.res:last-child{border-bottom:0}
+.res .t{font-weight:600}
+.res .t a{color:var(--fg);text-decoration-color:var(--gold-dim)}
+.res .by{color:var(--muted);font-style:italic}
+.res .why{color:var(--muted);font-size:.93rem;grid-column:1/-1;max-width:70ch}
+.res textarea{grid-column:1/-1;min-height:56px;font-size:.92rem}
+.typ{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ember);margin-right:8px}
+.stbtn{font-family:var(--mono);font-size:.7rem;padding:4px 9px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;cursor:pointer;white-space:nowrap;align-self:start}
+.stbtn[data-s="studying"]{color:var(--warn);border-color:var(--warn)}
+.stbtn[data-s="done"]{color:var(--good);border-color:var(--good)}
+
+.notice{border:1px dashed var(--line);padding:12px 14px;color:var(--muted);font-size:.92rem}
+.confirm{display:inline-flex;gap:6px;align-items:center}
+.small{font-size:.85rem}
+.foot{color:var(--faint);font-family:var(--italic);font-style:italic;text-align:center;padding-block:10px 40px}
+@media (prefers-reduced-motion:no-preference){.flick{animation:flick 5s ease-in-out infinite}@keyframes flick{0%,100%{opacity:1}46%{opacity:.82}50%{opacity:.95}54%{opacity:.78}}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <svg class="sigil flick" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="29" fill="none" stroke="var(--gold)" stroke-width="1.2"/>
+      <circle cx="32" cy="32" r="24.5" fill="none" stroke="var(--gold-dim)" stroke-width=".8"/>
+      <path d="M32 8 L45 51 L11 24 L53 24 L19 51 Z" fill="none" stroke="var(--ember)" stroke-width="1.1"/>
+      <circle cx="32" cy="32" r="3" fill="var(--blood)"/>
+    </svg>
+    <div class="grow">
+      <h1>The Closer's Pact</h1>
+      <p class="sub">A ledger for the high-ticket trade. It counts what you did, not what you meant to do.</p>
+    </div>
+    <div class="savestate" id="savestate">Opening the ledger…</div>
+  </header>
+</div>
+
+<div class="tabsbar"><div class="wrap">
+  <nav class="tabs" aria-label="Sections">
+    <a href="#ledger" data-t="ledger">The Ledger</a>
+    <a href="#calendar" data-t="calendar">Daily Log</a>
+    <a href="#pipeline" data-t="pipeline">Pipeline</a>
+    <a href="#inquisitor" data-t="inquisitor">The Inquisitor</a>
+    <a href="#reckoning" data-t="reckoning">Weekly Reckoning</a>
+    <a href="#grimoire" data-t="grimoire">Grimoire</a>
+    <a href="#pact" data-t="pact">The Pact</a>
+  </nav>
+</div></div>
+
+<main class="wrap">
+  <section class="pane" id="p-ledger"></section>
+  <section class="pane" id="p-calendar" hidden></section>
+  <section class="pane" id="p-pipeline" hidden></section>
+  <section class="pane" id="p-inquisitor" hidden></section>
+  <section class="pane" id="p-reckoning" hidden></section>
+  <section class="pane" id="p-grimoire" hidden></section>
+  <section class="pane" id="p-pact" hidden></section>
+  <p class="foot">Every soul has a price. Yours is whatever you didn't do this week.</p>
+</main>
+
+<script>
+(() => {
+"use strict";
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2, "0");
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseKey = k => { const [y,m,d] = k.split("-").map(Number); return new Date(y, m-1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const mondayOf = d => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); return addDays(x, -((x.getDay()+6)%7)); };
+const weekIdOf = d => keyOf(mondayOf(d));
+const fmtDay = d => d.toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"});
+const fmtLong = d => d.toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
+const fmtWeek = wid => { const m = parseKey(wid), s = addDays(m, 6); return `${m.toLocaleDateString("en-GB",{day:"numeric",month:"short"})} – ${s.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}`; };
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const n = v => Number(v) || 0;
+const pct = (a, b) => b > 0 ? a / b : null;
+const fmtPct = v => v == null ? "—" : `${Math.round(v*100)}%`;
+const TODAY = new Date();
+const TODAYK = keyOf(TODAY);
+
+/* ---------- domain ---------- */
+const METRICS = [
+  {k:"outreach",  label:"Outreach sent",       short:"Outreach", hint:"DMs, emails, dials"},
+  {k:"convos",    label:"Conversations",       short:"Convos",   hint:"real replies or pickups"},
+  {k:"booked",    label:"Calls booked",        short:"Booked"},
+  {k:"shown",     label:"Calls taken",         short:"Taken",    hint:"they actually showed"},
+  {k:"pitched",   label:"Offers made",         short:"Offers"},
+  {k:"closed",    label:"Deals closed",        short:"Closed"},
+  {k:"cash",      label:"Cash collected",      short:"Cash",     money:true},
+  {k:"contracted",label:"Revenue contracted",  short:"Contract", money:true},
+  {k:"hProspect", label:"Hours prospecting",   short:"h Prosp",  step:.25},
+  {k:"hCalls",    label:"Hours on calls",      short:"h Calls",  step:.25},
+  {k:"hLearn",    label:"Hours learning",      short:"h Learn",  step:.25, hint:"books, videos, roleplay"},
+];
+const DEF_TARGETS = {outreach:250, convos:50, booked:10, shown:7, pitched:6, closed:2, cash:0, contracted:0, hProspect:15, hCalls:6, hLearn:4};
+const STAGES = [["lead","Lead"],["booked","Call booked"],["held","Call held"],["follow","Proposal / follow-up"],["won","Won"],["lost","Lost"]];
+const SKILLS = [["prospect","Prospecting"],["discovery","Discovery & qualification"],["offer","Offer & pitch"],["objections","Objection handling"],["closing","Closing"],["follow","Follow-up & retention"],["mind","Discipline & mindset"]];
+
+const gr = q => "https://www.goodreads.com/search?q=" + encodeURIComponent(q);
+const yt = q => "https://www.youtube.com/results?search_query=" + encodeURIComponent(q);
+const GRIMOIRE = [
+  {id:"fanatical", s:"prospecting", t:"Book", title:"Fanatical Prospecting", by:"Jeb Blount", why:"The argument for protected daily prospecting blocks and why an empty pipeline is always a prospecting problem.", url:gr("Fanatical Prospecting Jeb Blount")},
+  {id:"100mleads", s:"prospecting", t:"Book", title:"$100M Leads", by:"Alex Hormozi", why:"The four ways to get anyone's attention (warm, cold, content, paid) and how much volume each one needs.", url:gr("$100M Leads Hormozi")},
+  {id:"v-prosp", s:"prospecting", t:"YouTube search", title:"Cold outreach teardowns for high-ticket offers", by:"Search results", why:"Watch real DMs and cold emails get taken apart. Compare against what you sent today.", url:yt("cold outreach teardown high ticket DM")},
+  {id:"spin", s:"discovery", t:"Book", title:"SPIN Selling", by:"Neil Rackham", why:"Built on research into large sales: Situation, Problem, Implication, Need-payoff. Implication questions are where most reps are weakest.", url:gr("SPIN Selling Rackham")},
+  {id:"gap", s:"discovery", t:"Book", title:"Gap Selling", by:"Keenan", why:"Sell the distance between the prospect's current state and future state, not your features.", url:gr("Gap Selling Keenan")},
+  {id:"momtest", s:"discovery", t:"Book", title:"The Mom Test", by:"Rob Fitzpatrick", why:"How to ask questions people can't politely lie to you about. Short and useful for qualification.", url:gr("The Mom Test Rob Fitzpatrick")},
+  {id:"v-nepq", s:"discovery", t:"YouTube search", title:"NEPQ discovery questions", by:"Jeremy Miner (search)", why:"Question-led selling: getting the prospect to say the problem out loud instead of you telling them.", url:yt("Jeremy Miner NEPQ discovery questions")},
+  {id:"100moffers", s:"offer", t:"Book", title:"$100M Offers", by:"Alex Hormozi", why:"The value equation. If your offer needs heavy closing, the offer is often the real problem.", url:gr("$100M Offers Hormozi")},
+  {id:"pitchanything", s:"offer", t:"Book", title:"Pitch Anything", by:"Oren Klaff", why:"Frame control and status. Read it critically: some of it is theatre, the frame material holds up.", url:gr("Pitch Anything Oren Klaff")},
+  {id:"v-value", s:"offer", t:"YouTube search", title:"The value equation explained", by:"Alex Hormozi (search)", why:"Dream outcome, likelihood, time delay, effort. Run your own offer through it.", url:yt("Alex Hormozi value equation")},
+  {id:"nsplit", s:"objections", t:"Book", title:"Never Split the Difference", by:"Chris Voss", why:"Labels, mirrors, calibrated questions, accusation audits. The most transferable book on this list.", url:gr("Never Split the Difference Chris Voss")},
+  {id:"objections", s:"objections", t:"Book", title:"Objections", by:"Jeb Blount", why:"Why objections happen, and a repeatable pattern for turning them around without sounding scripted.", url:gr("Objections Jeb Blount")},
+  {id:"v-voss", s:"objections", t:"YouTube search", title:"Tactical empathy and labelling", by:"Chris Voss (search)", why:"See the tone of voice. Voss's techniques fail when you read them and deliver them flat.", url:yt("Chris Voss tactical empathy labeling")},
+  {id:"v-obj", s:"objections", t:"YouTube search", title:"Price and 'I need to think about it' objections", by:"Search results", why:"The two objections you'll hear most. Watch several approaches and pick one to drill.", url:yt("high ticket sales I need to think about it objection")},
+  {id:"wolf", s:"closing", t:"Book", title:"Way of the Wolf", by:"Jordan Belfort", why:"The Straight Line system: certainty in the product, in you, and in the company. Take the structure, leave the persona.", url:gr("Way of the Wolf Jordan Belfort")},
+  {id:"challenger", s:"closing", t:"Book", title:"The Challenger Sale", by:"Matthew Dixon & Brent Adamson", why:"Teach, tailor, take control. Research-backed case for pushing back on the buyer.", url:gr("The Challenger Sale Dixon Adamson")},
+  {id:"v-close", s:"closing", t:"YouTube search", title:"Full high-ticket closing call breakdowns", by:"Search results", why:"Recorded or roleplayed full calls. Note every point where the closer asks rather than tells.", url:yt("high ticket closing call breakdown full call")},
+  {id:"influence", s:"follow", t:"Book", title:"Influence", by:"Robert Cialdini", why:"Reciprocity, commitment and consistency, social proof. The basis of good follow-up and onboarding.", url:gr("Influence Robert Cialdini")},
+  {id:"v-follow", s:"follow", t:"YouTube search", title:"Sales follow-up without chasing", by:"Search results", why:"Follow-up that adds a reason to reply instead of 'just checking in'.", url:yt("sales follow up without being pushy")},
+  {id:"tosell", s:"mind", t:"Book", title:"To Sell Is Human", by:"Daniel Pink", why:"Attunement, buoyancy, clarity. Useful for handling rejection volume.", url:gr("To Sell Is Human Daniel Pink")},
+  {id:"extreme", s:"mind", t:"Book", title:"Extreme Ownership", by:"Jocko Willink & Leif Babin", why:"Not a sales book. Read it if you catch yourself blaming leads, the market or the offer.", url:gr("Extreme Ownership Willink")},
+  {id:"psych", s:"mind", t:"Book", title:"The Psychology of Selling", by:"Brian Tracy", why:"Self-concept and its effect on income. Dated in places, still useful on call reluctance.", url:gr("The Psychology of Selling Brian Tracy")},
+];
+const GSTAGES = [["prospecting","Prospecting"],["discovery","Discovery & qualification"],["offer","Offer & pitch"],["objections","Objection handling"],["closing","Closing"],["follow","Follow-up & retention"],["mind","Discipline & mindset"]];
+
+/* ---------- state ---------- */
+const S = {
+  pact: {targets:{...DEF_TARGETS}, currency:"$", offer:"", price:"", monthly:"", why:"", clause:""},
+  grim: {status:{}, notes:{}, custom:[]},
+  days:{}, weeks:{}, deals:{}, verdicts:{},
+  view:{ week: weekIdOf(TODAY), month: new Date(TODAY.getFullYear(), TODAY.getMonth(), 1), day: TODAYK, reck: weekIdOf(TODAY), mode:"call", brutal:false, stageFilter:"all" },
+  loaded:false,
+};
+const money = v => (S.pact.currency || "$") + Math.round(n(v)).toLocaleString("en-GB");
+const fmtM = (m, v) => m.money ? money(v) : (m.step ? (n(v) ? String(+n(v).toFixed(2)) : "0") : String(n(v)));
+
+/* ---------- storage: claude db (per-person, private) with browser fallback ---------- */
+const Store = {
+  mode:"local", base:null,
+  async init(){
+    try {
+      if (!window.claude || !window.claude.use) return;
+      const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+      const id = user ? await user.id() : null;
+      if (db && id) { this.base = db.doc(`data/users/${id}/ledger`); this.mode = "cloud"; }
+    } catch (e) { this.mode = "local"; }
+  },
+  lsGet(col){ try { return JSON.parse(localStorage.getItem("pact:"+col) || "{}"); } catch { return {}; } },
+  lsSet(col, obj){ try { localStorage.setItem("pact:"+col, JSON.stringify(obj)); return true; } catch { return false; } },
+  async list(col){
+    if (this.mode === "cloud") {
+      const snap = await this.base.collection(col).get();
+      const out = {}; snap.docs.forEach(d => { if (d.exists) out[d.id] = {...d.data()}; }); return out;
+    }
+    return this.lsGet(col);
+  },
+  async put(col, id, data){
+    if (this.mode === "cloud") return this.base.collection(col).doc(id).set(JSON.parse(JSON.stringify(data)));
+    const all = this.lsGet(col); all[id] = data; if (!this.lsSet(col, all)) throw {code:"local_failed"};
+  },
+  async del(col, id){
+    if (this.mode === "cloud") return this.base.collection(col).doc(id).delete();
+    const all = this.lsGet(col); delete all[id]; this.lsSet(col, all);
+  },
+};
+const chains = {}, timers = {};
+let pending = 0;
+function setSave(txt){ $("#savestate").innerHTML = txt; }
+function savedLabel(){ return Store.mode === "cloud" ? "<b>Sealed</b> · saved to your account" : "<b>Sealed</b> · this browser only"; }
+function write(col, id, getData, isDelete){
+  const key = col + "/" + id;
+  pending++; setSave("Writing…");
+  const p = (chains[key] || Promise.resolve()).catch(()=>{}).then(() => isDelete ? Store.del(col, id) : Store.put(col, id, getData()));
+  chains[key] = p;
+  p.then(() => { pending--; if (!pending) setSave(savedLabel()); })
+   .catch(e => { pending--; setSave(e && e.code === "quota_exceeded" ? "Storage full — delete old entries" : "Not saved — check connection"); });
+  return p;
+}
+function saveLater(col, id, getData, ms = 800){
+  clearTimeout(timers[col+id]);
+  setSave("Unsaved changes…");
+  timers[col+id] = setTimeout(() => write(col, id, getData), ms);
+}
+const savePact = () => saveLater("meta", "pact", () => S.pact);
+const saveGrim = () => saveLater("meta", "grimoire", () => S.grim);
+const saveDay = k => saveLater("days", k, () => S.days[k]);
+const saveWeek = w => saveLater("weeks", w, () => S.weeks[w]);
+const saveDeal = id => saveLater("deals", id, () => S.deals[id]);
+
+/* ---------- derived numbers ---------- */
+const weekKeys = wid => { const m = parseKey(wid); return [...Array(7)].map((_, i) => keyOf(addDays(m, i))); };
+function sumDays(keys){ const t = {}; METRICS.forEach(m => t[m.k] = 0); keys.forEach(k => { const d = S.days[k]; if (d) METRICS.forEach(m => t[m.k] += n(d[m.k])); }); return t; }
+function paceDays(wid){ const keys = weekKeys(wid); if (keys[0] > TODAYK) return 0; if (keys[6] < TODAYK) return 7; const i = keys.indexOf(TODAYK); return i + (S.days[TODAYK] ? 1 : 0); }
+function elapsedIn(wid){ const keys = weekKeys(wid); if (keys[0] > TODAYK) return 0; if (keys[6] < TODAYK) return 7; return keys.indexOf(TODAYK) + 1; }
+function ratios(t){
+  return [
+    {k:"Reply rate", v:pct(t.convos,t.outreach), good:.10, poor:.05, note:"conversations ÷ outreach"},
+    {k:"Book rate", v:pct(t.booked,t.convos), good:.20, poor:.10, note:"booked ÷ conversations"},
+    {k:"Show rate", v:pct(t.shown,t.booked), good:.70, poor:.60, note:"taken ÷ booked"},
+    {k:"Close rate", v:pct(t.closed,t.shown), good:.25, poor:.15, note:"closed ÷ calls taken"},
+    {k:"Cash per call", v:t.shown ? t.cash/t.shown : null, money:true, note:"cash ÷ calls taken"},
+    {k:"Average deal", v:t.closed ? t.contracted/t.closed : null, money:true, note:"contracted ÷ closed"},
+  ];
+}
+function judgement(wid){
+  const keys = weekKeys(wid), el = elapsedIn(wid), pd = paceDays(wid), T = S.pact.targets, t = sumDays(keys), out = [];
+  if (el === 0) return [{c:"muted", m:"·", txt:"This week hasn't started. Write the briefing in Weekly Reckoning before Monday ends."}];
+  const past = keys.slice(0, el), missing = past.filter(k => !S.days[k] && k !== TODAYK);
+  if (missing.length) out.push({c:"bad", m:"✕", txt:`${missing.length} of ${el} day${el>1?"s":""} so far have no entry. An unlogged day is usually one you'd rather not look at.`});
+  const behind = [];
+  METRICS.forEach(m => { const tg = n(T[m.k]); if (tg > 0 && m.k !== "hLearn") { const due = tg * pd / 7; if (due >= 1 && t[m.k] < due * .85) behind.push(`${m.label.toLowerCase()} ${fmtM(m,t[m.k])} of ${m.step ? +due.toFixed(1) : (m.money ? money(due) : Math.round(due))} due`); } });
+  if (pd === 0 && !behind.length) out.push({c:"muted", m:"·", txt:"Pace is checked from the days behind you. Log today and it counts."});
+  else if (behind.length) out.push({c:"bad", m:"✕", txt:`Behind pace on ${behind.length} target${behind.length>1?"s":""}: ${behind.join("; ")}.`});
+  else if (Object.values(T).some(v => n(v) > 0)) out.push({c:"ok", m:"✓", txt:"On pace for every target you set. If that felt comfortable, the targets are too low."});
+  const work = t.hProspect + t.hCalls;
+  if (t.hLearn > 0 && t.hLearn >= work) out.push({c:"bad", m:"✕", txt:`${+t.hLearn.toFixed(2)}h learning against ${+work.toFixed(2)}h prospecting and on calls. Studying is a comfortable way to avoid rejection.`});
+  if (t.outreach >= 50 && pct(t.convos,t.outreach) < .05) out.push({c:"bad", m:"✕", txt:`Reply rate ${fmtPct(pct(t.convos,t.outreach))}. Your opener or your list is wrong. Paste your opener into the Inquisitor.`});
+  if (t.booked >= 3 && pct(t.shown,t.booked) < .6) out.push({c:"warn", m:"!", txt:`Show rate ${fmtPct(pct(t.shown,t.booked))}. Fix confirmations and pre-call commitment before you book more.`});
+  if (t.shown >= 4 && pct(t.closed,t.shown) < .15) out.push({c:"warn", m:"!", txt:`${t.shown} calls, ${t.closed} close${t.closed===1?"":"s"}. Either you're taking unqualified calls or your diagnosis is shallow. Review a call.`});
+  if (t.pitched >= 3 && t.closed === 0) out.push({c:"warn", m:"!", txt:`${t.pitched} offers made, nothing closed. Price is landing before the value does.`});
+  if (t.contracted > 0 && t.cash === 0) out.push({c:"warn", m:"!", txt:"Revenue contracted but no cash collected. It isn't money until it clears."});
+  const scores = past.map(k => S.days[k]?.score).filter(v => v !== "" && v != null).map(Number);
+  if (scores.length >= 2) { const avg = scores.reduce((a,b)=>a+b,0)/scores.length; if (avg >= 7 && behind.length) out.push({c:"warn", m:"!", txt:`You rated your days ${avg.toFixed(1)}/10 on average while behind pace. You're marking your own homework generously.`}); }
+  if (!out.some(o => o.c !== "ok")) out.push({c:"muted", m:"·", txt:"No red flags from the numbers. Numbers don't show how well you sell, so send a call to the Inquisitor."});
+  return out;
+}
+function weekContext(wid){
+  const keys = weekKeys(wid), T = S.pact.targets, t = sumDays(keys);
+  let s = `Week ${fmtWeek(wid)} (days elapsed: ${elapsedIn(wid)}/7)\nTotals vs weekly targets:\n`;
+  METRICS.forEach(m => s += `- ${m.label}: ${fmtM(m,t[m.k])}${n(T[m.k]) ? ` / target ${fmtM(m,T[m.k])}` : ""}\n`);
+  s += "Ratios: " + ratios(t).map(r => `${r.k} ${r.money ? (r.v==null?"—":money(r.v)) : fmtPct(r.v)}`).join(", ") + "\n\nDaily entries:\n";
+  keys.forEach(k => { const d = S.days[k]; const dt = fmtDay(parseKey(k));
+    if (!d) { if (k <= TODAYK) s += `${dt}: NO ENTRY\n`; return; }
+    s += `${dt}: ` + METRICS.filter(m => n(d[m.k])).map(m => `${m.short} ${fmtM(m,d[m.k])}`).join(", ") + (d.score ? `; self-score ${d.score}/10` : "") + "\n";
+    ["did","wins","losses","lesson"].forEach(f => { if (d[f]) s += `  ${f}: ${String(d[f]).slice(0,400)}\n`; });
+  });
+  return s;
+}
+function pactContext(){
+  const p = S.pact; const bits = [];
+  if (p.offer) bits.push(`Offer: ${p.offer}`); if (p.price) bits.push(`Price: ${p.price}`);
+  if (p.monthly) bits.push(`Monthly cash goal: ${p.monthly}`); if (p.why) bits.push(`Why they're doing this: ${p.why}`);
+  if (p.clause) bits.push(`Their own penalty clause: ${p.clause}`);
+  return bits.length ? bits.join("\n") : "(No offer details given yet.)";
+}
+
+/* ---------- AI ---------- */
+let samplePromise = null;
+const getSample = () => samplePromise || (samplePromise = (window.claude && window.claude.use) ? window.claude.use("sample").catch(() => null) : Promise.resolve(null));
+const AI_ERR = {
+  not_granted:"Claude wasn't allowed for this page. Allow it from the artifact's permissions to use the Inquisitor.",
+  sampling_disabled:"Claude isn't available on this account.", rate_limited:"Too many requests right now. Wait a minute and try again.",
+  session_expired:"Your session expired. Sign in again.", refused:"Claude declined that input. Change what you're asking.",
+  prompt_too_large:"That's too much text. Paste a shorter section.", empty_completion:"No answer came back. Try a shorter input.",
+};
+const errCopy = e => AI_ERR[e?.code] || "The Inquisitor was interrupted. Try again.";
+const RULES = `You are the Inquisitor: a veteran high-ticket sales manager and closer (15+ years, offers from $3k to $50k, phone, Zoom and DM-led sales). The rep in front of you asked explicitly NOT to be flattered. They want the truth that costs them money if they don't hear it.
+
+Rules:
+- No compliments unless tied to a specific line or number. At most one, and only after the problems.
+- Lead with the single biggest problem costing them deals.
+- Quote their exact words when you criticise them.
+- Call out: excuses, vanity activity (learning or "admin" instead of selling), talking more than the prospect, pitching before diagnosing, weak or needy frames, chasing, discounting, accepting "I need to think about it", vague next steps.
+- If the input is too thin to judge, say exactly that and say what you need. Never invent details.
+- Be concrete: rewrite lines the way they should have been said.
+- Plain language. No motivational filler, no "great job", no emojis.
+
+Format your answer in Markdown with exactly these headings:
+## Verdict
+(One or two sentences and a score out of 10.)
+## What's costing you money
+(Bullets, worst first.)
+## Say this instead
+(Rewritten lines.)
+## The drill for tomorrow
+(One specific, measurable practice task.)`;
+const MODES = {
+  call:{label:"Sales call", ph:"Paste the transcript or your notes from the call. Include what they said, what you said, the objection, and how it ended.", focus:"This is a sales call. Judge discovery depth, who controlled the frame, how pain and stakes were established before the offer, how price was presented, objection handling, and whether a hard next step was set."},
+  outreach:{label:"Outreach message", ph:"Paste the DM, email or cold-call opener exactly as sent. Add who it went to.", focus:"This is cold or warm outreach. Judge relevance, length, whether it's about them or about the rep, the call to action, and whether a busy person would reply. Write two better versions."},
+  objection:{label:"Objection handling", ph:"Write the objection and exactly how you responded.", focus:"This is objection handling. Judge whether the rep isolated the real objection, stayed curious, or caved and argued. Give a better response word for word, plus a question to ask next."},
+  offer:{label:"Offer & pitch", ph:"Describe your offer, price, guarantee and how you pitch it.", focus:"This is the offer and pitch. Use the value equation (dream outcome, perceived likelihood, time delay, effort). Say what makes the price feel too high and what to change in the offer itself, not only in the wording."},
+  day:{label:"My day / week", ph:"Optional: add anything the numbers don't show. Your logged week is attached automatically.", focus:"Judge the rep's activity and results for the period below against their targets. Look for avoidance, fake productivity, leaks in the funnel, and gaps between how they rated themselves and what they produced."},
+  free:{label:"Open question", ph:"Ask anything about your sales: a situation, a decision, a plan.", focus:"Answer the rep's question as their blunt sales manager."},
+};
+async function askClaude(prompt, outEl, btn){
+  const sample = await getSample();
+  if (!sample) { outEl.className = "verdict empty"; outEl.textContent = "The Inquisitor only speaks inside Claude. Open this page in claude.ai to use it."; return null; }
+  outEl.className = "verdict empty"; outEl.textContent = "The Inquisitor is reading…";
+  btn && (btn.disabled = true);
+  try {
+    const {text, truncated} = await sample(prompt, {cache:false, onText:({text}) => { outEl.className = "verdict"; outEl.innerHTML = md(text); }});
+    outEl.className = "verdict"; outEl.innerHTML = md(text) + (truncated ? `<p class="muted small">Cut short. Send less at once.</p>` : "");
+    return text;
+  } catch (e) {
+    if (e?.text) { outEl.className = "verdict"; outEl.innerHTML = md(e.text) + `<p class="bad small">${esc(errCopy(e))}</p>`; }
+    else { outEl.className = "verdict empty"; outEl.textContent = errCopy(e); }
+    return null;
+  } finally { btn && (btn.disabled = false); }
+}
+function md(t){
+  const lines = esc(t).split("\n"); let out = "", list = false;
+  for (const raw of lines) {
+    const s = raw.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>");
+    if (/^#{1,4}\s/.test(s)) { if (list) { out += "</ul>"; list = false; } out += `<h4>${s.replace(/^#{1,4}\s/,"")}</h4>`; }
+    else if (/^\s*([-*•]|\d+\.)\s/.test(s)) { if (!list) { out += "<ul>"; list = true; } out += `<li>${s.replace(/^\s*([-*•]|\d+\.)\s/,"")}</li>`; }
+    else { if (list) { out += "</ul>"; list = false; } if (s.trim()) out += `<p>${s}</p>`; }
+  }
+  return out + (list ? "</ul>" : "");
+}
+
+/* ---------- shared bits ---------- */
+function weekNav(cur, act){
+  const isThis = cur === weekIdOf(TODAY);
+  return `<div class="row"><button class="btn sm ghost" data-act="${act}" data-d="-7" aria-label="Previous week">←</button>
+    <span class="mono small">${fmtWeek(cur)}${isThis ? ` <span class="pill warn">this week</span>` : ""}</span>
+    <button class="btn sm ghost" data-act="${act}" data-d="7" aria-label="Next week">→</button>
+    ${isThis ? "" : `<button class="btn sm ghost" data-act="${act}" data-d="0">This week</button>`}</div>`;
+}
+function shiftWeek(wid, d){ return d === 0 ? weekIdOf(TODAY) : keyOf(addDays(parseKey(wid), d)); }
+function openDay(k){ S.view.day = k; const d = parseKey(k); S.view.month = new Date(d.getFullYear(), d.getMonth(), 1); }
+
+/* ---------- LEDGER ---------- */
+const render = {};
+render.ledger = () => {
+  const el = $("#p-ledger"), wid = S.view.week, keys = weekKeys(wid), T = S.pact.targets, t = sumDays(keys), ela = paceDays(wid);
+  const tiles = ["cash","closed","shown","outreach"].map(k => {
+    const m = METRICS.find(x => x.k === k), tg = n(T[k]), w = tg ? Math.min(100, t[k]/tg*100) : 0, due = tg * ela / 7;
+    return `<div class="box tile"><span class="lbl">${m.label}</span><span class="v">${fmtM(m,t[k])}</span>
+      <span class="of">${tg ? `target ${fmtM(m,tg)} · ${Math.round(t[k]/tg*100)}%` : `no target set`}</span>
+      <div class="bar"><i class="${tg && t[k] < due*.85 ? "behind" : ""}" style="width:${w}%"></i>${tg ? `<b style="left:${ela/7*100}%"></b>` : ""}</div></div>`;
+  }).join("");
+  const head = `<tr><th style="text-align:left">Day</th>${METRICS.map(m => `<th title="${m.label}">${m.short}</th>`).join("")}<th>Score</th></tr>`;
+  const rows = keys.map(k => {
+    const d = S.days[k], fut = k > TODAYK, cls = [k === TODAYK ? "today" : "", fut ? "future" : "", !d && !fut && k !== TODAYK ? "empty" : ""].join(" ");
+    return `<tr class="${cls}"><th><a href="#calendar" data-act="openday" data-k="${k}">${fmtDay(parseKey(k))}</a></th>${METRICS.map(m => `<td>${d ? fmtM(m, d[m.k]) : (fut ? "" : (k === TODAYK ? "·" : "—"))}</td>`).join("")}<td>${d?.score ? esc(d.score) : ""}</td></tr>`;
+  }).join("");
+  const totals = `<tr class="total"><th>Total</th>${METRICS.map(m => `<td>${fmtM(m,t[m.k])}</td>`).join("")}<td></td></tr>
+    <tr><th class="muted">Weekly target</th>${METRICS.map(m => `<td class="muted">${n(T[m.k]) ? fmtM(m,T[m.k]) : "—"}</td>`).join("")}<td></td></tr>
+    <tr class="pct"><th class="muted">vs pace</th>${METRICS.map(m => { const tg = n(T[m.k]); if (!tg || !ela) return "<td></td>"; const r = t[m.k] / (tg*ela/7); return `<td class="${r >= 1 ? "ok" : r >= .85 ? "warn" : "bad"}">${Math.round(r*100)}%</td>`; }).join("")}<td></td></tr>`;
+  const rat = ratios(t).map(r => {
+    const cls = r.money || r.v == null ? "" : r.v >= r.good ? "ok" : r.v < r.poor ? "bad" : "warn";
+    return `<div class="box tight tile"><span class="lbl">${r.k}</span><span class="v ${cls}" style="font-size:1.35rem">${r.money ? (r.v==null?"—":money(r.v)) : fmtPct(r.v)}</span><span class="of">${r.note}</span></div>`;
+  }).join("");
+  const deals = Object.values(S.deals), open = deals.filter(d => !["won","lost"].includes(d.stage));
+  const overdue = open.filter(d => d.nextDate && d.nextDate < TODAYK).length;
+  const todayLogged = !!S.days[TODAYK];
+  el.innerHTML = `
+    <div class="panehead"><div><h2>The Ledger</h2><p class="desc">Your week by the numbers. Each row is a day; click a day to open its entry. The thin line on each bar marks where you should be by today.</p></div>${weekNav(wid,"wk")}</div>
+    ${!S.loaded ? `<div class="notice">Reading your entries…</div>` : ""}
+    ${S.loaded && !todayLogged && wid === weekIdOf(TODAY) ? `<div class="notice row" style="justify-content:space-between"><span>Today isn't logged yet.</span><a class="btn gold sm" href="#calendar" data-act="openday" data-k="${TODAYK}">Log today</a></div>` : ""}
+    <div class="grid g4">${tiles}</div>
+    <div class="stack"><h3>Day by day</h3><div class="tblwrap"><table class="tbl"><thead>${head}</thead><tbody>${rows}${totals}</tbody></table></div></div>
+    <div class="grid g2">
+      <div class="box stack"><h3>The ledger's judgement</h3><p class="muted small">Worked out from your numbers by fixed rules. It doesn't soften anything.</p>
+        <ul class="judg">${judgement(wid).map(j => `<li><span class="mk ${j.c}">${j.m}</span><span>${esc(j.txt)}</span></li>`).join("")}</ul>
+        <div class="row"><a class="btn sm" href="#inquisitor" data-act="judgeweek">Have the Inquisitor judge this week</a></div>
+      </div>
+      <div class="stack"><h3>Funnel</h3><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))">${rat}</div>
+        <p class="muted small">Colours use rough high-ticket benchmarks (reply 5–10%, book 10–20%, show 60–70%, close 15–25%). Your market will differ; your own trend matters more.</p>
+        <div class="box tight row" style="justify-content:space-between"><span>Open pipeline <span class="mono">${money(open.reduce((a,d)=>a+n(d.value),0))}</span> across ${open.length} deal${open.length===1?"":"s"}</span>${overdue ? `<a href="#pipeline" class="pill bad" style="text-decoration:none">${overdue} follow-up${overdue>1?"s":""} overdue</a>` : `<span class="pill ok">no overdue follow-ups</span>`}</div>
+      </div>
+    </div>`;
+};
+
+/* ---------- DAILY LOG / CALENDAR ---------- */
+render.calendar = () => {
+  const el = $("#p-calendar"), mo = S.view.month, T = S.pact.targets, dailyOut = n(T.outreach) / 5;
+  const first = mondayOf(mo), cells = [];
+  for (let i = 0; i < 42; i++) {
+    const d = addDays(first, i), k = keyOf(d), e = S.days[k], inMonth = d.getMonth() === mo.getMonth();
+    if (i >= 35 && !inMonth && d > mo) break;
+    const cls = ["cell", inMonth ? "" : "out", k === TODAYK ? "today" : "", k === S.view.day ? "sel" : "", e ? "logged" : (k < TODAYK ? "missed" : ""), e && n(e.closed) ? "won" : ""].join(" ");
+    const heat = e && dailyOut ? Math.min(1, n(e.outreach) / dailyOut) : 0;
+    const meta = e ? [n(e.outreach) ? `${n(e.outreach)} out` : "", n(e.shown) ? `${n(e.shown)} calls` : "", n(e.closed) ? `${n(e.closed)} won` : "", n(e.cash) ? money(e.cash) : ""].filter(Boolean).slice(0,3).join("<br>") : "";
+    cells.push(`<button class="${cls}" data-act="pick" data-k="${k}" aria-label="${fmtLong(d)}${e ? ", logged" : ""}"><span class="d">${d.getDate()}</span><span class="m">${meta}</span>${heat ? `<span class="heat" style="opacity:${.25 + heat*.75};width:${heat*100}%"></span>` : ""}</button>`);
+  }
+  const monthStr = mo.toLocaleDateString("en-GB", {month:"long", year:"numeric"});
+  const logged = Object.keys(S.days).filter(k => k.startsWith(`${mo.getFullYear()}-${pad(mo.getMonth()+1)}`)).length;
+  el.innerHTML = `
+    <div class="panehead"><div><h2>Daily Log</h2><p class="desc">Pick a day and record it. Everything saves as you type. Gold dot: logged. Red dot: a past day with nothing written. The ember line under a day shows outreach against your daily share of the weekly target.</p></div></div>
+    <div class="calwrap">
+      <div class="box">
+        <div class="calhead"><button class="btn sm ghost" data-act="mon" data-d="-1" aria-label="Previous month">←</button><h3>${monthStr}</h3><button class="btn sm ghost" data-act="mon" data-d="1" aria-label="Next month">→</button></div>
+        <div class="cal">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d => `<div class="dow">${d}</div>`).join("")}${cells.join("")}</div>
+        <div class="legend"><span style="--c:var(--gold)">logged</span><span style="--c:var(--bad)">unrecorded</span><span style="--c:var(--ember)">outreach vs daily target</span><span class="mono">${logged} day${logged===1?"":"s"} logged this month</span></div>
+      </div>
+      <div id="dayeditor"></div>
+    </div>`;
+  renderDayEditor();
+};
+function renderDayEditor(){
+  const host = $("#dayeditor"), k = S.view.day, d = S.days[k], dt = parseKey(k);
+  const fut = k > TODAYK;
+  if (!d) {
+    host.innerHTML = `<div class="box stack"><span class="lbl">${k === TODAYK ? "Today" : fut ? "Ahead" : "Unrecorded"}</span><h3 style="color:var(--fg)">${fmtLong(dt)}</h3>
+      <p class="muted">${fut ? "This day hasn't happened. You can plan it, but you can only log what you did." : "Nothing written for this day. If you worked, log it. If you didn't, log that too: a zero is information."}</p>
+      <div class="row"><button class="btn gold" data-act="newday">Open entry for this day</button></div></div>`;
+    return;
+  }
+  host.innerHTML = `<div class="box stack">
+    <div class="row" style="justify-content:space-between"><div><span class="lbl">${k === TODAYK ? "Today" : "Entry"}</span><h3 style="color:var(--fg)">${fmtLong(dt)}</h3></div><span id="dayconfirm"><button class="btn sm ghost" data-act="delday">Delete entry</button></span></div>
+    <div class="metgrid">${METRICS.map(m => `<label class="f"><span>${m.label}${m.hint ? ` <i>${m.hint}</i>` : ""}</span><input type="number" min="0" step="${m.step || 1}" inputmode="decimal" id="f-${m.k}" data-f="${m.k}" value="${d[m.k] === undefined || d[m.k] === "" ? "" : esc(d[m.k])}" placeholder="0"></label>`).join("")}
+      <label class="f"><span>Honest score <i>/10</i></span><input type="number" min="1" max="10" step="1" id="f-score" data-f="score" value="${esc(d.score ?? "")}" placeholder="–"></label></div>
+    <label class="f"><span>What I actually did</span><textarea id="f-did" data-f="did" placeholder="Hours, blocks, who you spoke to. Facts, not intentions.">${esc(d.did)}</textarea></label>
+    <div class="grid g2" style="gap:12px">
+      <label class="f"><span>Wins <i>with proof</i></span><textarea id="f-wins" data-f="wins">${esc(d.wins)}</textarea></label>
+      <label class="f"><span>Where I lost or hid</span><textarea id="f-losses" data-f="losses">${esc(d.losses)}</textarea></label>
+    </div>
+    <label class="f"><span>Lesson I'm taking into tomorrow</span><textarea id="f-lesson" data-f="lesson" style="min-height:60px">${esc(d.lesson)}</textarea></label>
+    <div class="row"><a class="btn" href="#inquisitor" data-act="judgeday">Have the Inquisitor judge this day</a><span class="muted small">Saves automatically.</span></div>
+  </div>`;
+}
+$("#p-calendar").addEventListener("input", e => {
+  const f = e.target.dataset.f; if (!f) return;
+  const k = S.view.day; if (!S.days[k]) return;
+  S.days[k][f] = e.target.value; S.days[k].updatedAt = new Date().toISOString();
+  saveDay(k);
+  if (METRICS.some(m => m.k === f)) refreshCell(k);
+});
+function refreshCell(k){
+  const b = $(`#p-calendar .cell[data-k="${k}"]`); if (!b) return;
+  const e = S.days[k], dailyOut = n(S.pact.targets.outreach) / 5;
+  const meta = [n(e.outreach) ? `${n(e.outreach)} out` : "", n(e.shown) ? `${n(e.shown)} calls` : "", n(e.closed) ? `${n(e.closed)} won` : "", n(e.cash) ? money(e.cash) : ""].filter(Boolean).slice(0,3).join("<br>");
+  b.querySelector(".m").innerHTML = meta;
+  b.classList.toggle("won", !!n(e.closed));
+  let h = b.querySelector(".heat"); const heat = dailyOut ? Math.min(1, n(e.outreach)/dailyOut) : 0;
+  if (heat) { if (!h) { h = document.createElement("span"); h.className = "heat"; b.appendChild(h); } h.style.opacity = .25 + heat*.75; h.style.width = heat*100 + "%"; } else if (h) h.remove();
+}
+
+/* ---------- PIPELINE ---------- */
+render.pipeline = () => {
+  const el = $("#p-pipeline"), deals = Object.entries(S.deals).map(([id, d]) => ({id, ...d}));
+  const open = deals.filter(d => !["won","lost"].includes(d.stage));
+  const won = deals.filter(d => d.stage === "won"), lost = deals.filter(d => d.stage === "lost");
+  const overdue = open.filter(d => d.nextDate && d.nextDate < TODAYK);
+  const noNext = open.filter(d => !d.nextStep || !d.nextDate);
+  const card = d => {
+    const over = d.nextDate && d.nextDate < TODAYK && !["won","lost"].includes(d.stage);
+    return `<div class="deal ${over ? "over" : ""}" data-id="${d.id}">
+      <div class="top"><span class="nm">${esc(d.name || "Unnamed")}</span><span class="mono">${money(d.value)}</span></div>
+      <div class="small ${over ? "bad" : "muted"}">${d.nextStep ? esc(d.nextStep) : "<span class='warn'>No next step set</span>"}${d.nextDate ? ` · ${esc(fmtDay(parseKey(d.nextDate)))}${over ? " · overdue" : ""}` : ""}</div>
+      <details><summary>Edit</summary><div class="stack" style="margin-top:10px">
+        <label class="f"><span>Name / company</span><input data-df="name" value="${esc(d.name)}"></label>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:8px">
+          <label class="f"><span>Value</span><input type="number" min="0" data-df="value" value="${esc(d.value)}"></label>
+          <label class="f"><span>Stage</span><select data-df="stage">${STAGES.map(([v,l]) => `<option value="${v}" ${d.stage===v?"selected":""}>${l}</option>`).join("")}</select></label>
+        </div>
+        <label class="f"><span>Next step</span><input data-df="nextStep" value="${esc(d.nextStep)}" placeholder="e.g. Call to go through contract"></label>
+        <label class="f"><span>Date</span><input type="date" data-df="nextDate" value="${esc(d.nextDate)}"></label>
+        <label class="f"><span>Notes <i>pain, stakes, objections</i></span><textarea data-df="notes">${esc(d.notes)}</textarea></label>
+        <div class="row"><span class="dconf"><button class="btn sm ghost" data-act="deldeal">Delete deal</button></span></div>
+      </div></details></div>`;
+  };
+  const cols = STAGES.map(([v,l]) => { const list = deals.filter(d => d.stage === v); return `<div class="stagecol"><div class="row" style="justify-content:space-between"><span class="lbl">${l}</span><span class="mono small muted">${list.length} · ${money(list.reduce((a,d)=>a+n(d.value),0))}</span></div>${list.map(card).join("") || `<p class="small" style="color:var(--faint)">Empty</p>`}</div>`; }).join("");
+  el.innerHTML = `
+    <div class="panehead"><div><h2>Pipeline</h2><p class="desc">Every live deal and its next step. A deal without a dated next step isn't in your pipeline, it's in your hopes.</p></div></div>
+    <div class="grid g4">
+      <div class="box tight tile"><span class="lbl">Open value</span><span class="v">${money(open.reduce((a,d)=>a+n(d.value),0))}</span><span class="of">${open.length} open deal${open.length===1?"":"s"}</span></div>
+      <div class="box tight tile"><span class="lbl">Overdue follow-ups</span><span class="v ${overdue.length ? "bad" : "ok"}">${overdue.length}</span><span class="of">next-step date has passed</span></div>
+      <div class="box tight tile"><span class="lbl">No next step</span><span class="v ${noNext.length ? "warn" : "ok"}">${noNext.length}</span><span class="of">open deals with nothing dated</span></div>
+      <div class="box tight tile"><span class="lbl">Won / lost</span><span class="v">${won.length} / ${lost.length}</span><span class="of">${won.length + lost.length ? `win rate ${fmtPct(won.length/(won.length+lost.length))}` : "no decided deals yet"}</span></div>
+    </div>
+    <form class="box stack" id="dealform"><h3>Add a deal</h3>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px">
+        <label class="f"><span>Name / company</span><input id="nd-name" required placeholder="Prospect name"></label>
+        <label class="f"><span>Value</span><input id="nd-value" type="number" min="0" placeholder="0"></label>
+        <label class="f"><span>Stage</span><select id="nd-stage">${STAGES.map(([v,l]) => `<option value="${v}">${l}</option>`).join("")}</select></label>
+        <label class="f"><span>Next step</span><input id="nd-next" placeholder="What happens next"></label>
+        <label class="f"><span>Date</span><input id="nd-date" type="date"></label>
+      </div>
+      <div class="row"><button class="btn gold" type="submit">Add to pipeline</button></div>
+    </form>
+    ${deals.length ? `<div class="board">${cols}</div>` : `<div class="notice">No deals yet. Add the first person you've spoken to about your offer, even if it's only a lead.</div>`}`;
+};
+$("#p-pipeline").addEventListener("submit", e => {
+  if (e.target.id !== "dealform") return; e.preventDefault();
+  const id = uid(); S.deals[id] = { name:$("#nd-name").value.trim(), value:$("#nd-value").value, stage:$("#nd-stage").value, nextStep:$("#nd-next").value.trim(), nextDate:$("#nd-date").value, notes:"", createdAt:new Date().toISOString() };
+  write("deals", id, () => S.deals[id]); render.pipeline();
+});
+$("#p-pipeline").addEventListener("input", e => {
+  const f = e.target.dataset.df; if (!f) return;
+  const id = e.target.closest(".deal").dataset.id; S.deals[id][f] = e.target.value; saveDeal(id);
+});
+$("#p-pipeline").addEventListener("change", e => { if (["stage","nextDate"].includes(e.target.dataset.df)) { clearTimeout(timers["deals"+e.target.closest(".deal").dataset.id]); const id = e.target.closest(".deal").dataset.id; write("deals", id, () => S.deals[id]); render.pipeline(); } });
+
+/* ---------- INQUISITOR ---------- */
+let inqPrefill = null;
+render.inquisitor = () => {
+  const el = $("#p-inquisitor"), mode = S.view.mode, M = MODES[mode];
+  const hist = Object.entries(S.verdicts).map(([id,v]) => ({id,...v})).sort((a,b) => String(b.at).localeCompare(String(a.at))).slice(0, 25);
+  el.innerHTML = `
+    <div class="panehead"><div><h2>The Inquisitor</h2><p class="desc">Paste what you did and Claude tears it apart as a blunt sales manager would. It's told not to flatter you, to quote your own words back, and to say when you've given it too little to judge. Your offer from The Pact is attached each time.</p></div></div>
+    <div class="grid g2" style="align-items:start">
+      <div class="box stack">
+        <span class="lbl">What's on trial</span>
+        <div class="chips" role="group" aria-label="Critique type">${Object.entries(MODES).map(([k,v]) => `<button class="chip" data-act="mode" data-m="${k}" aria-pressed="${k===mode}">${v.label}</button>`).join("")}</div>
+        ${mode === "day" ? `<label class="f"><span>Period</span><select id="inq-period"><option value="week">This ledger week (${fmtWeek(S.view.week)})</option><option value="day" ${S.view.period === "day" ? "selected" : ""}>Selected day (${fmtDay(parseKey(S.view.day))})</option></select></label>` : ""}
+        <label class="f"><span>The evidence</span><textarea id="inq-input" style="min-height:220px" placeholder="${esc(M.ph)}"></textarea></label>
+        <label class="f"><span>Context <i>optional: who the prospect was, what you were going for</i></span><input id="inq-ctx"></label>
+        <div class="row"><label class="row small" style="gap:6px;cursor:pointer"><input type="checkbox" id="inq-brutal" style="width:auto" ${S.view.brutal ? "checked" : ""}> No mercy</label></div>
+        <div class="row"><button class="btn blood" data-act="ask">Submit for judgement</button><button class="btn ghost" data-act="stop" hidden id="inq-stop">Stop</button></div>
+      </div>
+      <div class="stack"><span class="lbl">Verdict</span><div id="inq-out" class="verdict empty">Nothing on trial yet. Choose a type, paste the evidence and submit.</div>
+        <div class="row"><button class="btn sm" data-act="keep" id="inq-keep" hidden>Keep in the record</button><span class="small muted" id="inq-kept"></span></div>
+      </div>
+    </div>
+    <div class="stack"><h3>The record</h3>${hist.length ? `<div class="hist">${hist.map(h => `<details><summary><span class="pill warn">${esc(MODES[h.mode]?.label || h.mode)}</span><span class="when">${esc(new Date(h.at).toLocaleString("en-GB",{dateStyle:"medium",timeStyle:"short"}))}</span><span class="small muted">${esc(String(h.input||"").slice(0,90))}${String(h.input||"").length>90?"…":""}</span></summary><div class="verdict" style="margin-top:10px">${md(h.output)}</div><div class="row" style="margin-top:8px"><span class="vconf" data-id="${h.id}"><button class="btn sm ghost" data-act="delv">Delete</button></span></div></details>`).join("")}</div>` : `<p class="muted">Verdicts you keep appear here, so you can see whether the same faults keep coming back.</p>`}</div>`;
+  if (inqPrefill) { $("#inq-input").value = inqPrefill; inqPrefill = null; }
+};
+let lastVerdict = null, inqCtl = null;
+async function runInquisitor(btn){
+  const mode = S.view.mode, M = MODES[mode], input = $("#inq-input").value.trim(), ctx = $("#inq-ctx").value.trim(), brutal = $("#inq-brutal").checked;
+  let data = "";
+  if (mode === "day") {
+    const per = $("#inq-period")?.value || "week";
+    if (per === "day") { const k = S.view.day, d = S.days[k]; data = `Day ${fmtLong(parseKey(k))}:\n` + (d ? METRICS.map(m => `- ${m.label}: ${fmtM(m,d[m.k])}`).join("\n") + `\nSelf-score: ${d.score || "—"}/10\nDid: ${d.did||""}\nWins: ${d.wins||""}\nLosses: ${d.losses||""}\nLesson: ${d.lesson||""}` : "NO ENTRY for this day.") + `\nWeekly targets: ` + METRICS.filter(m => n(S.pact.targets[m.k])).map(m => `${m.label} ${fmtM(m,S.pact.targets[m.k])}/week`).join(", "); }
+    else data = weekContext(S.view.week);
+  } else if (!input) { const o = $("#inq-out"); o.className = "verdict empty"; o.textContent = "Paste something first. The Inquisitor can't judge an empty page."; return; }
+  const prompt = `${RULES}\n\n${brutal ? "NO MERCY MODE: the rep wants it harsher than usual. Be cutting and direct, still accurate and useful. Don't be cruel for its own sake.\n\n" : ""}FOCUS: ${M.focus}\n\nTHE REP'S OFFER:\n${pactContext()}\n${ctx ? `\nCONTEXT FROM REP: ${ctx}\n` : ""}${data ? `\nLOGGED DATA:\n${data}\n` : ""}${input ? `\nEVIDENCE:\n"""\n${input.slice(0, 30000)}\n"""` : ""}`;
+  $("#inq-keep").hidden = true; $("#inq-kept").textContent = "";
+  const text = await askClaude(prompt, $("#inq-out"), btn);
+  if (text) { lastVerdict = {mode, input: input || (mode === "day" ? "Logged numbers" : ""), output:text, at:new Date().toISOString()}; $("#inq-keep").hidden = false; }
+}
+
+/* ---------- WEEKLY RECKONING ---------- */
+render.reckoning = () => {
+  const el = $("#p-reckoning"), wid = S.view.reck, w = S.weeks[wid] || {}, t = sumDays(weekKeys(wid)), T = S.pact.targets;
+  const strip = METRICS.filter(m => !m.step).map(m => { const tg = n(T[m.k]); const cls = tg ? (t[m.k] >= tg ? "ok" : t[m.k] >= tg*.85 ? "warn" : "bad") : ""; return `<div class="tile"><span class="lbl">${m.short}</span><span class="v ${cls}" style="font-size:1.15rem">${fmtM(m,t[m.k])}</span><span class="of">${tg ? "of " + fmtM(m,tg) : "no target"}</span></div>`; }).join("");
+  const weeks = Object.keys(S.weeks).sort().reverse().slice(0, 16);
+  const ta = (f, label, ph, h) => `<label class="f"><span>${label}</span><textarea data-wf="${f}" id="w-${f}" placeholder="${esc(ph)}" ${h ? `style="min-height:${h}px"` : ""}>${esc(w[f])}</textarea></label>`;
+  el.innerHTML = `
+    <div class="panehead"><div><h2>Weekly Reckoning</h2><p class="desc">Monday, write the briefing: what you're committing to. Sunday, write the summary: what actually happened. Then have the Inquisitor hold the two side by side.</p></div>${weekNav(wid,"rk")}</div>
+    ${weeks.length ? `<div class="chips">${weeks.map(x => `<button class="chip" data-act="rkgo" data-w="${x}" aria-pressed="${x===wid}">${esc(parseKey(x).toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}${S.weeks[x]?.verdict ? " ✓" : ""}</button>`).join("")}</div>` : ""}
+    <div class="grid g2" style="align-items:start">
+      <div class="box stack"><span class="lbl">Briefing · Monday</span><h3>What I'm signing up for</h3>
+        <label class="f"><span>The one number that matters this week</span><input data-wf="oneNumber" id="w-oneNumber" value="${esc(w.oneNumber)}" placeholder="e.g. 12 calls taken"></label>
+        <label class="f"><span>Skill under the knife</span><select data-wf="skill" id="w-skill"><option value="">Choose one</option>${SKILLS.map(([v,l]) => `<option value="${v}" ${w.skill===v?"selected":""}>${l}</option>`).join("")}</select></label>
+        ${ta("commit","Commitments, specific and countable","Daily prospecting block 9–11, 50 DMs a day, 3 roleplays…")}
+        ${ta("risks","What will try to stop me","The excuse you already know you'll reach for.",70)}
+        ${ta("calls","Calls and follow-ups already booked","Names, days, what each one needs.",70)}
+      </div>
+      <div class="box stack"><span class="lbl">Summary · Sunday</span><h3>What actually happened</h3>
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;padding:10px 0;border-block:1px solid var(--line2)">${strip}</div>
+        ${ta("happened","The facts","What you did, in order of importance.")}
+        ${ta("wins","Wins, with proof","Closed, booked, or a skill that measurably improved.",70)}
+        ${ta("losses","Where I lost, hid or made excuses","Be specific.",70)}
+        ${ta("lesson","The lesson I paid for","One sentence.",56)}
+        <label class="f"><span>Did I keep the briefing?</span><select data-wf="kept" id="w-kept"><option value="">Not yet answered</option>${["Yes, all of it","Partly","No"].map(v => `<option ${w.kept===v?"selected":""}>${v}</option>`).join("")}</select></label>
+      </div>
+    </div>
+    <div class="stack"><div class="row" style="justify-content:space-between"><h3>The Inquisitor's verdict on this week</h3><button class="btn blood" data-act="judgewk">${w.verdict ? "Judge again" : "Judge this week"}</button></div>
+      <div id="rk-out" class="${w.verdict ? "verdict" : "verdict empty"}">${w.verdict ? md(w.verdict) : "No verdict yet. Fill in what you can, then submit. It reads the briefing, the summary, your daily entries and your numbers together."}</div>
+      ${w.verdictAt ? `<p class="small muted">Judged ${esc(new Date(w.verdictAt).toLocaleString("en-GB",{dateStyle:"medium",timeStyle:"short"}))}. Saved with this week.</p>` : ""}
+    </div>`;
+};
+$("#p-reckoning").addEventListener("input", e => {
+  const f = e.target.dataset.wf; if (!f) return; const wid = S.view.reck;
+  S.weeks[wid] = S.weeks[wid] || {}; S.weeks[wid][f] = e.target.value; saveWeek(wid);
+});
+async function judgeWeek(btn){
+  const wid = S.view.reck, w = S.weeks[wid] || {};
+  const skill = SKILLS.find(s => s[0] === w.skill)?.[1] || "not chosen";
+  const prompt = `${RULES}\n\nFOCUS: Weekly review. Compare what the rep promised in the Monday briefing with what the numbers and daily entries show. Name every promise broken. Check whether the 'one number' was hit. Check whether the summary is honest against the data (e.g. claiming a good week while behind on targets). Judge the skill they chose to work on. End the drill section with what next week's one number should be.\n\nTHE REP'S OFFER:\n${pactContext()}\n\nBRIEFING (Monday):\n- One number: ${w.oneNumber||"(blank)"}\n- Skill under the knife: ${skill}\n- Commitments: ${w.commit||"(blank)"}\n- Expected obstacles: ${w.risks||"(blank)"}\n- Booked calls: ${w.calls||"(blank)"}\n\nSUMMARY (Sunday):\n- Facts: ${w.happened||"(blank)"}\n- Wins: ${w.wins||"(blank)"}\n- Losses: ${w.losses||"(blank)"}\n- Lesson: ${w.lesson||"(blank)"}\n- Kept the briefing?: ${w.kept||"(not answered)"}\n\nLOGGED DATA:\n${weekContext(wid)}\n\nIf the briefing was left blank, say that not planning the week is itself the first finding.`;
+  const text = await askClaude(prompt, $("#rk-out"), btn);
+  if (text) { S.weeks[wid] = S.weeks[wid] || {}; S.weeks[wid].verdict = text; S.weeks[wid].verdictAt = new Date().toISOString(); write("weeks", wid, () => S.weeks[wid]); }
+}
+
+/* ---------- GRIMOIRE ---------- */
+render.grimoire = () => {
+  const el = $("#p-grimoire"), all = [...GRIMOIRE, ...S.grim.custom], st = S.grim.status;
+  const done = all.filter(r => st[r.id] === "done").length, studying = all.filter(r => st[r.id] === "studying").length;
+  const t = sumDays(weekKeys(weekIdOf(TODAY)));
+  const label = s => s === "done" ? "Done" : s === "studying" ? "Studying" : "Not started";
+  const row = r => `<div class="res" data-id="${esc(r.id)}"><div><div class="t"><span class="typ">${esc(r.t)}</span>${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a>` : esc(r.title)}</div><div class="by">${esc(r.by || "")}</div></div>
+    <button class="stbtn" data-act="cyc" data-s="${st[r.id] || ""}">${label(st[r.id])}</button>
+    ${r.why ? `<p class="why">${esc(r.why)}</p>` : ""}
+    ${st[r.id] ? `<textarea data-gn="${esc(r.id)}" placeholder="What will you do differently on your next call because of this?">${esc(S.grim.notes[r.id])}</textarea>` : ""}
+    ${r.custom ? `<div style="grid-column:1/-1"><span class="gconf"><button class="btn sm ghost" data-act="delres">Remove</button></span></div>` : ""}</div>`;
+  el.innerHTML = `
+    <div class="panehead"><div><h2>Grimoire</h2><p class="desc">Books and videos for each part of the sale. Video entries open a YouTube search rather than a single link, so you pick a recent one. Once you start something, note what you'll change on your next call. A book with no note didn't change anything.</p></div></div>
+    <div class="grid g4">
+      <div class="box tight tile"><span class="lbl">Finished</span><span class="v">${done}</span><span class="of">of ${all.length}</span></div>
+      <div class="box tight tile"><span class="lbl">In progress</span><span class="v ${studying > 2 ? "warn" : ""}">${studying}</span><span class="of">${studying > 2 ? "too many at once" : "keep it to one or two"}</span></div>
+      <div class="box tight tile"><span class="lbl">Learning vs selling this week</span><span class="v ${t.hLearn > t.hProspect + t.hCalls && t.hLearn > 0 ? "bad" : ""}">${+t.hLearn.toFixed(2)}h : ${+(t.hProspect + t.hCalls).toFixed(2)}h</span><span class="of">study time : prospecting + calls</span></div>
+    </div>
+    <div class="grid g2" style="align-items:start">${GSTAGES.map(([s,l]) => { const list = all.filter(r => r.s === s); return `<div class="box"><h3>${l}</h3>${list.map(row).join("") || `<p class="small muted">Nothing here yet.</p>`}</div>`; }).join("")}
+      <form class="box stack" id="resform"><h3>Add your own</h3>
+        <label class="f"><span>Title</span><input id="nr-title" required></label>
+        <label class="f"><span>Author / creator</span><input id="nr-by"></label>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+          <label class="f"><span>Part of the sale</span><select id="nr-s">${GSTAGES.map(([v,l]) => `<option value="${v}">${l}</option>`).join("")}</select></label>
+          <label class="f"><span>Type</span><select id="nr-t"><option>Book</option><option>Video</option><option>Course</option><option>Podcast</option><option>Article</option></select></label>
+        </div>
+        <label class="f"><span>Link <i>optional</i></span><input id="nr-url" type="url" placeholder="https://"></label>
+        <label class="f"><span>Why it's here</span><input id="nr-why"></label>
+        <div class="row"><button class="btn gold" type="submit">Add to the grimoire</button></div>
+      </form>
+    </div>`;
+};
+$("#p-grimoire").addEventListener("input", e => { const id = e.target.dataset.gn; if (!id) return; S.grim.notes[id] = e.target.value; saveGrim(); });
+$("#p-grimoire").addEventListener("submit", e => {
+  if (e.target.id !== "resform") return; e.preventDefault();
+  const url = $("#nr-url").value.trim();
+  S.grim.custom.push({id:"c-"+uid(), custom:true, s:$("#nr-s").value, t:$("#nr-t").value, title:$("#nr-title").value.trim(), by:$("#nr-by").value.trim(), why:$("#nr-why").value.trim(), url:/^https?:\/\//i.test(url) ? url : ""});
+  write("meta", "grimoire", () => S.grim); render.grimoire();
+});
+
+/* ---------- PACT ---------- */
+render.pact = () => {
+  const el = $("#p-pact"), p = S.pact;
+  el.innerHTML = `
+    <div class="panehead"><div><h2>The Pact</h2><p class="desc">The terms you're holding yourself to. Your weekly targets drive every pace bar and judgement in the ledger, and your offer is sent to the Inquisitor with each critique. Set them where they make you uncomfortable.</p></div></div>
+    <div class="grid g2" style="align-items:start">
+      <div class="box stack"><h3>The offer</h3>
+        <label class="f"><span>What I sell, and to whom</span><textarea data-pf="offer" id="p-offer" placeholder="e.g. 12-week coaching programme for agency owners stuck under $30k/month">${esc(p.offer)}</textarea></label>
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:10px">
+          <label class="f"><span>Price</span><input data-pf="price" id="p-price" value="${esc(p.price)}" placeholder="e.g. $6,000 or 3 × $2,200"></label>
+          <label class="f"><span>Currency symbol</span><input data-pf="currency" id="p-currency" value="${esc(p.currency)}" maxlength="3"></label>
+          <label class="f"><span>Monthly cash goal</span><input data-pf="monthly" id="p-monthly" value="${esc(p.monthly)}" placeholder="e.g. 20,000"></label>
+        </div>
+        <label class="f"><span>Why I signed this</span><textarea data-pf="why" id="p-why" placeholder="The real reason, not the LinkedIn version.">${esc(p.why)}</textarea></label>
+        <label class="f"><span>Penalty clause</span><textarea data-pf="clause" id="p-clause" style="min-height:60px" placeholder="If I miss my outreach target two weeks running, I will…">${esc(p.clause)}</textarea></label>
+      </div>
+      <div class="box stack"><h3>Weekly targets</h3><p class="small muted">Leave a target at 0 to stop tracking it against pace. Cash and contracted revenue start at 0 because only you know your numbers. Set them.</p>
+        <div class="metgrid">${METRICS.map(m => `<label class="f"><span>${m.label}</span><input type="number" min="0" step="${m.step || 1}" data-tf="${m.k}" id="t-${m.k}" value="${esc(p.targets[m.k] ?? 0)}"></label>`).join("")}</div>
+        <div class="notice small">The outreach target ÷ 5 is your daily bar on the calendar. That assumes five working days. Weekends count as bonus.</div>
+      </div>
+    </div>`;
+};
+$("#p-pact").addEventListener("input", e => {
+  const pf = e.target.dataset.pf, tf = e.target.dataset.tf;
+  if (pf) S.pact[pf] = e.target.value; else if (tf) S.pact.targets[tf] = e.target.value; else return;
+  savePact();
+});
+
+/* ---------- global click handling ---------- */
+function inlineConfirm(holder, label, onYes){
+  const orig = holder.innerHTML;
+  holder.innerHTML = `<span class="confirm"><span class="small bad">${label}</span><button class="btn sm blood" type="button">Yes</button><button class="btn sm ghost" type="button">Cancel</button></span>`;
+  const [yes, no] = holder.querySelectorAll("button");
+  yes.onclick = onYes; no.onclick = () => holder.innerHTML = orig;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act;
+  switch (act) {
+    case "wk": S.view.week = shiftWeek(S.view.week, +b.dataset.d); render.ledger(); break;
+    case "rk": S.view.reck = shiftWeek(S.view.reck, +b.dataset.d); render.reckoning(); break;
+    case "rkgo": S.view.reck = b.dataset.w; render.reckoning(); break;
+    case "openday": openDay(b.dataset.k); if (location.hash === "#calendar") { e.preventDefault(); render.calendar(); } break;
+    case "mon": S.view.month = new Date(S.view.month.getFullYear(), S.view.month.getMonth() + +b.dataset.d, 1); render.calendar(); break;
+    case "pick": S.view.day = b.dataset.k; document.querySelectorAll("#p-calendar .cell.sel").forEach(c => c.classList.remove("sel")); b.classList.add("sel"); renderDayEditor(); if (innerWidth < 980) $("#dayeditor").scrollIntoView({behavior:"smooth", block:"start"}); break;
+    case "newday": { const k = S.view.day; S.days[k] = {createdAt:new Date().toISOString()}; write("days", k, () => S.days[k]); render.calendar(); setTimeout(() => $("#f-outreach")?.focus(), 0); break; }
+    case "delday": inlineConfirm($("#dayconfirm"), "Delete this day?", () => { const k = S.view.day; delete S.days[k]; clearTimeout(timers["days"+k]); write("days", k, null, true); render.calendar(); }); break;
+    case "judgeday": S.view.mode = "day"; S.view.period = "day"; break;
+    case "judgeweek": S.view.mode = "day"; S.view.period = "week"; break;
+    case "deldeal": { const card = b.closest(".deal"); inlineConfirm(b.closest(".dconf"), "Delete?", () => { const id = card.dataset.id; delete S.deals[id]; clearTimeout(timers["deals"+id]); write("deals", id, null, true); render.pipeline(); }); break; }
+    case "mode": { const keep = $("#inq-input")?.value; S.view.mode = b.dataset.m; inqPrefill = keep; render.inquisitor(); break; }
+    case "ask": S.view.period = $("#inq-period")?.value || S.view.period; S.view.brutal = $("#inq-brutal").checked; runInquisitor(b); break;
+    case "keep": if (lastVerdict) { const id = uid(); S.verdicts[id] = lastVerdict; lastVerdict = null; write("verdicts", id, () => S.verdicts[id]).then(() => {}); b.hidden = true; const out = $("#inq-out").innerHTML; inqPrefill = $("#inq-input").value; render.inquisitor(); $("#inq-out").className = "verdict"; $("#inq-out").innerHTML = out; $("#inq-kept").textContent = "Kept in the record."; } break;
+    case "delv": { const h = b.closest(".vconf"); inlineConfirm(h, "Delete this verdict?", () => { const id = h.dataset.id; delete S.verdicts[id]; write("verdicts", id, null, true); render.inquisitor(); }); break; }
+    case "judgewk": judgeWeek(b); break;
+    case "cyc": { const id = b.closest(".res").dataset.id, cur = S.grim.status[id] || ""; const next = cur === "" ? "studying" : cur === "studying" ? "done" : ""; if (next) S.grim.status[id] = next; else delete S.grim.status[id]; write("meta","grimoire",() => S.grim); render.grimoire(); break; }
+    case "delres": { const id = b.closest(".res").dataset.id; inlineConfirm(b.closest(".gconf"), "Remove?", () => { S.grim.custom = S.grim.custom.filter(r => r.id !== id); delete S.grim.status[id]; delete S.grim.notes[id]; write("meta","grimoire",() => S.grim); render.grimoire(); }); break; }
+  }
+});
+
+/* ---------- routing ---------- */
+const TABS = ["ledger","calendar","pipeline","inquisitor","reckoning","grimoire","pact"];
+function route(){
+  let t = location.hash.slice(1); if (!TABS.includes(t)) t = "ledger";
+  document.querySelectorAll(".tabs a").forEach(a => a.setAttribute("aria-current", a.dataset.t === t ? "page" : "false"));
+  document.querySelectorAll("section.pane").forEach(p => p.hidden = p.id !== "p-" + t);
+  render[t]();
+}
+window.addEventListener("hashchange", route);
+route();
+
+/* ---------- boot ---------- */
+(async () => {
+  await Store.init();
+  setSave(Store.mode === "cloud" ? "Reading your ledger…" : "Saving to this browser only");
+  try {
+    const [meta, days, weeks, deals, verdicts] = await Promise.all(["meta","days","weeks","deals","verdicts"].map(c => Store.list(c)));
+    if (meta.pact) S.pact = {...S.pact, ...meta.pact, targets:{...DEF_TARGETS, ...(meta.pact.targets || {})}};
+    if (meta.grimoire) S.grim = {status:{}, notes:{}, custom:[], ...meta.grimoire};
+    Object.assign(S.days, days); Object.assign(S.weeks, weeks); Object.assign(S.deals, deals); Object.assign(S.verdicts, verdicts);
+    setSave(Store.mode === "cloud" ? savedLabel() : "Saving to <b>this browser only</b>");
+  } catch (e) {
+    setSave("Couldn't reach your saved data");
+  }
+  S.loaded = true;
+  route();
+})();
+})();
+</script>
