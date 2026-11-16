@@ -11,7 +11,7 @@ One essay plan on the cloth trade. The key idea is the difference between the **
 
 | Date | Event |
 |---|---|
-| c.1600 | Woollen cloth makes up around three-quarters or more of English exports, mostly unfinished broadcloth sent via London by the Merchant Adventurers |
+| c.1600 | Cloth dominates English exports, mostly unfinished broadcloth sent via London by the Merchant Adventurers. Your textbook gives cloth as 92% of London's exports in 1640 |
 | 1614–17 | Cockayne Project: export of unfinished cloth banned; the Dutch refuse English finished cloth; exports collapse; the scheme is abandoned |
 | 1620–24 | Trade depression: currency debasement in Germany and the Baltic, and the Thirty Years' War, wreck the old markets |
 | 1620s–40s | New draperies grow, centred on Norwich and Colchester and built on the skills of Dutch and Walloon immigrants ("Strangers") |
@@ -23,7 +23,7 @@ One essay plan on the cloth trade. The key idea is the difference between the **
 | 1685 onwards | Huguenot refugees bring silk weaving to Spitalfields and other skills |
 | 1700 | Calico Act bans imports of printed Indian cotton cloth to protect wool and silk |
 
-- **Around 1700:** woollens were still the largest export, but re-exports of colonial and Asian goods (tobacco, sugar, calicoes) made up roughly a third of all exports.
+- **Your textbook's figures:** cloth was 92% of London's exports in 1640, 74% in 1660 and 72% in 1700. London alone exported £1.5 million of textiles in the 1660s.
 - **Regional shift:** the old broadcloth areas of Suffolk and Essex declined. Devon serges (around Exeter) and the West Riding of Yorkshire grew.
 
 ## Introduction
@@ -61,7 +61,7 @@ One essay plan on the cloth trade. The key idea is the difference between the **
 - **Point:** the most important change was that cloth stopped dominating the economy.
 - **Evidence:**
   - The Navigation Acts (1651, 1660) built a protected colonial trade.
-  - Re-exports of tobacco, sugar and Asian textiles grew rapidly after 1660. By 1700 they made up roughly a third of all exports.
+  - Colonial goods such as tobacco and sugar grew rapidly after 1660. Cloth's share of London's exports fell from 92% (1640) to 72% (1700).
   - The East India Company's imports of calicoes and silks created new fashions and new competition.
   - Huguenot refugees after 1685 strengthened silk and other industries.
 - **Analysis:** this "commercial revolution" (Ralph Davis's phrase) made English trade broader and less dependent on one product. Cloth grew less than the rest of trade, so its share fell even if its output did not.
