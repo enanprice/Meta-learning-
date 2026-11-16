@@ -287,7 +287,7 @@ def entry_view(t: dict, e: dict) -> str:
 def essays_view(t: dict) -> str:
     pages = "".join(f"""
 <a class="essay-card" href="#{p['id']}">
-  <span class="entry-dates">{esc(next(a['dates'] for a in t['aspects'] if a['key'] == p['aspect']))}</span>
+  <span class="entry-dates">{esc(p.get('dates') or next(a['dates'] for a in t['aspects'] if a['key'] == p['aspect']))}</span>
   <span class="entry-name">{esc(p['title'])}</span>
   <span class="entry-role">{esc(p['summary'])}</span>
 </a>""" for p in t.get("essays", []))
@@ -321,7 +321,7 @@ def essay_page_view(t: dict, p: dict) -> str:
 {crumbs(t, (f"#{t['id']}-essays", "Essays"))}
 {strip(t, "-page-" + p["id"])}
 <header class="page-head">
-  <p class="topic-dates">{a['dates']}</p>
+  <p class="topic-dates">{p.get('dates', a['dates'])}</p>
   <h1>{esc(p['title'])}</h1>
   <p class="lede">{esc(p['summary'])}</p>
 </header>
