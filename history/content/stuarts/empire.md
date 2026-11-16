@@ -1,73 +1,72 @@
-One essay plan built from your textbook's chapter 1.4 (pp. 90, 103–105). The book's key question is "How significant was imperial expansion between 1625 and 1688 to the economy?"
+One essay plan built from your textbook's chapter 1.4 (pp. 90, 103–112). The book's key question is "How significant was imperial expansion between 1625 and 1688 to the economy?"
 
 ## Question: *How significant was imperial expansion to the British economy in the years 1625–88?*
 
-> **Line of argument:** significant, and growing, but more in the second half of the period and more as **potential** than achievement by 1688. Tobacco, sugar, fish and furs brought new trades and customs revenue. The Navigation Acts tied the colonies into a mercantilist system that strengthened English shipping against the Dutch. But early trade was "one-way", the northern colonies were less lucrative, and the biggest gains (the sugar boom and the slave trade) came after 1688.
+> **Line of argument:** significant, and increasingly so after 1650. The most important parts were the **East India Company** and the **mercantilist system** of the Navigation Acts, which turned colonial trade into profit for English shipping, merchants and the Crown. Tobacco and the slave-based sugar trade grew fast, but their biggest economic impact came after 1688. Early colonial trade was "one-way", and the domestic economy and cloth still mattered more. So: significant and rising, but not yet dominant.
 
 ## Evidence bank (all from your textbook)
 
 | Topic | Evidence |
 |---|---|
-| Virginia | Jamestown founded 1607. Tobacco was the first cash crop. In 1669 adultery was fined up to 1,000 lbs of tobacco |
-| Tobacco imports (Source 7) | Maximum proposed imports of Virginia tobacco: 55,000 lbs (1620), 200,000 (1625), 250,000 (1627), 600,000 (1635), 1,600,000 (1638) |
-| Tobacco exports | By 1700, 22 million lbs a year exported from the North American colonies |
-| Labour | Vagrants and indentured servants shipped out; most labourers in Virginia and Maryland were indentured servants |
-| Other colonies | Maryland (1632); Carolinas after 1660; Mayflower (1620); Massachusetts Bay (1629), about 20,000 Puritans in the 1630s; Newfoundland (1583), fish |
-| Puritan ventures | Providence Island Company (1629), backed by Pym, Hampden and Warwick |
-| Caribbean | Bermuda (1612), St Kitts (1624, Sir Thomas Warner, tobacco), then Montserrat, Barbados and Antigua. Codrington's first sugar plantation on Antigua (1674) |
-| Western Design | 1646–59: 109 navy vessels built and 111 captured. Hispaniola attack failed in 1655; Jamaica seized instead |
-| Jamaica | Spanish not defeated until 1660. 4,000 British settlers by 1662. 7,000 enslaved people in 1670, 55,000 by 1713. Treaty of Madrid (1670) |
+| Tobacco (Source 7) | Maximum proposed imports of Virginia tobacco: 55,000 lbs (1620), 200,000 (1625), 600,000 (1635), 1,600,000 (1638). 22 million lbs exported by 1700 |
+| Other colonies | Maryland (1632); Carolinas after 1660; Massachusetts Bay (1629), about 20,000 Puritans in the 1630s; Newfoundland (1583), fish |
+| East India Company | Officials executed by the Dutch at Amboyna (1623), so it turned to India: saltpetre (1626), pepper (1627), Madras (1633), calico. Charter withdrawn by Cromwell (1657); new charter and £740,000 of assets returned in 1660 |
+| East India Company profits | No more than £100,000 a year (1600–40); over £600,000 a year in the 1680s, equalling or beating Caribbean and American trade |
+| EIC and the Crown | Bombay (dowry of Catherine of Braganza, 1662); loans to the Crown of £10,000 (1660) and £50,000 (1667); first tea (1664); minting coins (1672); private army |
+| Western Design | 109 ships built and 111 captured (1646–59). Jamaica seized (1655); Spanish defeated (1660); Treaty of Madrid (1670) |
+| Slavery | No slaves in the English North American colonies in 1640. Slavery legal in most by 1660. Nearly 120,000 slaves by 1700, mainly in Jamaica and Barbados |
+| African companies | Royal Adventurers of England Trading in Africa (1663) took Dutch posts. Royal African Company (1672) had its own army and forts |
+| London | 15 Lord Mayors, 25 sheriffs and 38 aldermen were RAC shareholders (1660–90). African gold went to the Royal Mint; the guinea was first minted in 1663 |
 | Navigation Acts | 1651 (Rump), 1660 (Downing), Staple Act (1663). Customs revenue rose three and a half times between 1643 and 1659 |
 
 ## Introduction
 
-- **Define:** "imperial expansion" means English colonies in North America and the Caribbean, and the trading system around them. "Significant" means how much it changed the size and structure of the economy.
-- **Context:** early colonial interest came from the defeat of the Armada, Puritanism and the hope of gold. Barry Coward argues the two motives behind all colonisation were curing overpopulation and opening new markets.
-- **Judgement:** imperial expansion was significant, especially after 1650, because of tobacco, Jamaican sugar and the Navigation Acts. But much of its economic impact still lay in the future in 1688.
+- **Define:** "imperial expansion" means colonies in North America and the Caribbean, the East India Company's trade in Asia, the slave trade, and the mercantilist laws that bound them to England. "Significant" means how far it increased wealth and changed the structure of the economy.
+- **Context:** early expansion came from the Armada victory, Puritanism and hopes of gold. Barry Coward argues all colonisation was driven by curing overpopulation and opening new markets.
+- **Judgement:** significant and growing, especially after 1650 and through the East India Company and mercantilism. But much of its impact, especially sugar and slavery, came after 1688.
 
-## Paragraph 1: North America (significant, mainly through tobacco)
+## Paragraph 1: Trade with the Americas and Asia (significant, especially the East India Company)
 
-- **Point:** the American colonies created a new and valuable trade in tobacco and new markets.
+- **Point:** new colonial and Asian trades created major new sources of wealth.
 - **Evidence:**
-  - Virginia tobacco imports rose from 55,000 lbs (1620) to 1.6 million lbs (1638). By 1700, 22 million lbs were exported.
-  - Customs duties on tobacco boosted the Crown's income and later helped fund William III's wars.
-  - New England built fishing, fur and shipbuilding industries. Newfoundland supplied fish to sell on the continent.
-  - Indentured servants and vagrants were shipped out, easing unemployment, though poor relief costs stayed high.
-- **Analysis:** tobacco made England competitive with the Dutch in North America and became a lasting source of revenue.
-- **Counter:** much early trade was one-way, with raw material imports far greater than exports. The northern colonies were never as lucrative, and many were founded for religious reasons rather than economic ones.
-- **Mini-judgement:** significant, but uneven, and concentrated in the southern plantations.
+  - Virginia tobacco went from 55,000 lbs (1620) to a maximum of 1.6 million lbs (1638), with 22 million lbs exported by 1700. Customs duties later funded William III's wars.
+  - New England added fishing, furs and shipbuilding, and Newfoundland supplied fish for continental markets.
+  - The East India Company's profits rose from at most £100,000 a year (1600–40) to over £600,000 a year in the 1680s, matching or beating the Atlantic trades. It traded calico, pepper and saltpetre, and from 1664 tea.
+  - The Company lent to the Crown (£10,000 in 1660, £50,000 in 1667) and gained Bombay, its own coinage and a private army.
+- **Analysis:** the East India Company shows imperial trade becoming a central source of profit for courtiers, merchants and the Crown. The book calls it "crucial in ensuring the English were able to compete with the other major European powers".
+- **Counter:** early colonial trade was one-way, and the northern colonies were never as lucrative as Virginia and Maryland. The Company's privileges also sat awkwardly with mercantilist principles.
+- **Mini-judgement:** highly significant by the 1680s, especially in Asia.
 
-## Paragraph 2: The Caribbean and Jamaica (growing significance)
+## Paragraph 2: The Caribbean, sugar and the triangular trade (growing, built on slavery)
 
-- **Point:** Caribbean expansion, especially Jamaica, opened the sugar trade, which became hugely valuable.
+- **Point:** Caribbean expansion and the slave trade laid the basis for huge future wealth.
 - **Evidence:**
-  - Cromwell's Western Design built 109 ships and captured 111. Jamaica was seized in 1655 after the failure at Hispaniola.
-  - By 1662 Jamaica had 4,000 British settlers. Sugar, cocoa and coffee met rising demand from London.
-  - The Treaty of Madrid (1670) made Spain recognise English possessions and let English ships sail freely in the Caribbean.
-  - Codrington's sugar plantation on Antigua (1674). Plantations drove the expansion of the Atlantic slave trade: 7,000 enslaved people in Jamaica in 1670, 55,000 by 1713.
-- **Analysis:** sugar became far more profitable than tobacco, whose price had already fallen.
-- **Counter:** the book says the sugar trade's success "was particularly dramatic after 1688", so the biggest impact came after this period. That success was built on slavery.
-- **Mini-judgement:** important groundwork laid by 1688, with the major economic payoff afterwards.
+  - The Western Design seized Jamaica (1655). The Treaty of Madrid (1670) secured English possessions and free sailing.
+  - Labour shortages on Montserrat and Antigua after 1660 led planters to replace indentured servants with enslaved Africans. Nearly 120,000 slaves were held by 1700, mainly in Jamaica and Barbados.
+  - The Royal African Company (1672) controlled slave trading on the West African coast with its own army. Profits enriched the City of London, and African gold strengthened the Royal Mint.
+- **Analysis:** the triangular trade linked African slavery, plantation crops and European markets in a way that made merchants and the Crown rich. That wealth rested on the brutality of slavery, which the government treated as property.
+- **Counter:** the book says the sugar trade's success "was particularly dramatic after 1688". The RAC's monopoly was broken in 1688, and Britain only controlled about half the transatlantic slave trade by 1713. Much of this significance lies after the period.
+- **Mini-judgement:** important foundations laid, with most of the economic payoff after 1688.
 
-## Paragraph 3: The Navigation Acts and mercantilism (most significant)
+## Paragraph 3: The Navigation Acts and mercantilism (the most significant)
 
-- **Point:** empire mattered most through the mercantilist system that tied colonial trade to English ships and ports.
+- **Point:** empire mattered most through the mercantilist system that tied colonial trade to English ships, ports and customs.
 - **Evidence:**
-  - The 1651 Act (Source 8): goods from Asia, Africa and America had to come in English ships, at least half English-crewed, to break the Dutch hold on freight.
-  - The 1660 Act, promoted by Sir George Downing: banned imports and exports in foreign ships. Tobacco and sugar could be shipped only to England and its colonies. The Staple Act (1663): continental goods for the colonies had to pass through England.
-  - Customs revenue rose three and a half times between 1643 and 1659. The Levant Company and the new draperies both benefited.
-  - Ralph Davis calls this a "commercial revolution" based on mercantile shipping. Christopher Hill sees it as the victory of a national trading interest.
-- **Analysis:** the Navigation Acts turned colonies into protected markets and suppliers for English shipping, linking empire to the wider economy, including cloth.
-- **Counter:** they provoked costly wars with the Dutch, and England lost the Third Anglo-Dutch War in 1674.
-- **Mini-judgement:** the most significant way empire shaped the economy before 1688.
+  - The 1651 Act made colonial goods come in English ships with crews at least half English, breaking the Dutch hold on freight.
+  - The 1660 Act (Downing) limited tobacco and sugar to England and its colonies. The Staple Act (1663) routed colonial imports through England.
+  - Customs revenue rose three and a half times between 1643 and 1659. The Levant Company and the new draperies benefited.
+  - Ralph Davis calls this a "commercial revolution". Christopher Hill sees it as the victory of a national trading interest.
+- **Analysis:** mercantilism turned colonies into protected markets and suppliers for English shipping, so empire fed the wider economy, including the cloth trade.
+- **Counter:** the Acts provoked costly Dutch wars (England lost the third in 1674). New England colonists ignored them, and the book notes they may have been unnecessary where England was the only trading partner anyway.
+- **Mini-judgement:** the main way empire shaped the economy before 1688.
 
 ## Conclusion
 
-- **Weigh it up:** North America (P1) brought tobacco and revenue. The Caribbean (P2) laid the basis for sugar. Mercantilism (P3) tied it all together and strengthened English shipping.
-- **Final judgement:** imperial expansion was significant and increasingly important by 1688, but it was not yet the main source of Britain's wealth. That was still the domestic economy and the cloth trade. Its greatest economic impact came after 1688.
+- **Weigh it up:** the East India Company and mercantilism (P1, P3) made empire significant by the 1680s. The slave and sugar economy (P2) was growing but paid off mostly after 1688.
+- **Final judgement:** imperial expansion was significant and increasingly central by 1688. It changed the structure of trade and enriched London and the Crown. But it was not yet the main source of Britain's wealth, which was still the domestic economy and the cloth trade. In the book's words, these years were the "seedbed" for growth.
 
 ## Historians (from your textbook)
 
 - **Barry Coward:** colonisation was driven by curing overpopulation and opening new markets.
-- **Ralph Davis:** 17th-century trade underwent a "commercial revolution" based on mercantile shipping.
-- **Christopher Hill:** the Navigation Act marked the victory of a national trading interest over private trading companies.
+- **Ralph Davis:** a "commercial revolution" based on mercantile shipping.
+- **Christopher Hill:** the Navigation Act was the victory of a national trading interest over private companies.

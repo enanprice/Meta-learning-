@@ -363,20 +363,21 @@ def flashcards_view(t: dict) -> str:
     aspects = {a["key"]: a for a in t["aspects"]}
     decks = [deck(d["title"], f'{esc(aspects[d["aspect"]]["name"])} · {esc(d["source"])}', d["cards"])
              for d in t["flashcards"]]
-    # Starter decks built from the fact files, so every topic has cards to practise.
+    # Starter decks from the fact files, only until a topic has its own exam-question decks.
     people = [(f"Who was {e['name']}?", f"{e['role']} ({e['dates']})") for e in t["entries"] if e["kind"] == "person"]
     events = [(f"What was {e['name']}?", f"{e['role']} ({e['dates']})") for e in t["entries"] if e["kind"] == "event"]
     dated = [(f"What happened: {row[0]}?", row[1]) for row in t["timeline"]]
-    decks.append(deck("Key people", "Built from the fact files", people))
-    decks.append(deck("Key events", "Built from the fact files", events))
-    decks.append(deck("Timeline", "Built from the topic timeline", dated))
+    if not t["flashcards"]:
+        decks.append(deck("Key people", "Starter deck built from the fact files", people))
+        decks.append(deck("Key events", "Starter deck built from the fact files", events))
+        decks.append(deck("Timeline", "Starter deck built from the topic timeline", dated))
     body = f"""
 {crumbs(t)}
 {strip(t, "-cards-" + t["id"])}
 <header class="page-head">
   <p class="topic-dates">{t['dates']}</p>
   <h1>{esc(t['short'])}: Flashcards</h1>
-  <p class="lede">Read the question, say your answer out loud, then tap the card to check. Shuffle a deck once you know it in order.</p>
+  <p class="lede">Each deck is one exam question, and each card is evidence for it. Say the answer out loud, then tap to check. Shuffle once you know a deck in order.</p>
 </header>
 {tabs(t, "cards")}
 {''.join(decks)}"""
