@@ -40,6 +40,7 @@ def load_topics() -> list[dict]:
         t = dict(mod.TOPIC)
         t["timeline"] = mod.TIMELINE
         t["entries"] = mod.ENTRIES
+        t["flashcards"] = getattr(mod, "FLASHCARDS", [])
         t["by_id"] = {e["id"]: e for e in mod.ENTRIES}
         check(t)
         topics.append(t)
@@ -59,6 +60,8 @@ def check(t: dict) -> None:
             assert row[2] in t["by_id"], f"{t['id']} timeline: unknown entry {row[2]!r}"
     for p in t.get("essays", []):
         assert p["aspect"] in keys, f"{t['id']}/{p['id']}: unknown aspect {p['aspect']!r}"
+    for d in t["flashcards"]:
+        assert d["aspect"] in keys, f"{t['id']} flashcards {d['title']!r}: unknown aspect {d['aspect']!r}"
 
 
 def entry_href(t: dict, e: dict) -> str:
@@ -86,7 +89,8 @@ def crumbs(t: dict | None = None, *extra: tuple[str, str]) -> str:
 def tabs(t: dict, current: str) -> str:
     items = [("overview", f"#{t['id']}", "Overview"),
              ("notes", f"#{t['id']}-notes", "Notes"),
-             ("essays", f"#{t['id']}-essays", "Essays")]
+             ("essays", f"#{t['id']}-essays", "Essays"),
+             ("cards", f"#{t['id']}-cards", "Flashcards")]
     links = "".join(f'<a href="{href}"{" aria-current=\"page\"" if key == current else ""}>{label}</a>'
                     for key, href, label in items)
     return f'<nav class="tabs" aria-label="{esc(t["name"])} sections">{links}</nav>'
@@ -330,6 +334,55 @@ def essay_page_view(t: dict, p: dict) -> str:
     return view(t, p["id"], body)
 
 
+# ------------------------------------------------------------------- flashcards
+
+def card(q: str, a: str) -> str:
+    return (f'<button type="button" class="fc" aria-pressed="false">'
+            f'<span class="fc-q">{inline(q)}</span>'
+            f'<span class="fc-a">{inline(a)}</span>'
+            f'<span class="fc-hint" aria-hidden="true">Tap to reveal</span></button>')
+
+
+def deck(title: str, meta: str, cards: list[tuple[str, str]]) -> str:
+    return f"""
+<section class="deck">
+  <div class="deck-head">
+    <h2 class="block-title">{esc(title)}</h2>
+    <p class="deck-meta">{meta} · {len(cards)} cards</p>
+    <div class="deck-tools">
+      <button type="button" class="deck-btn" data-act="shuffle">Shuffle</button>
+      <button type="button" class="deck-btn" data-act="reveal">Show all answers</button>
+      <button type="button" class="deck-btn" data-act="reset">Hide all answers</button>
+    </div>
+  </div>
+  <div class="fc-grid">{''.join(card(q, a) for q, a in cards)}</div>
+</section>"""
+
+
+def flashcards_view(t: dict) -> str:
+    aspects = {a["key"]: a for a in t["aspects"]}
+    decks = [deck(d["title"], f'{esc(aspects[d["aspect"]]["name"])} · {esc(d["source"])}', d["cards"])
+             for d in t["flashcards"]]
+    # Starter decks built from the fact files, so every topic has cards to practise.
+    people = [(f"Who was {e['name']}?", f"{e['role']} ({e['dates']})") for e in t["entries"] if e["kind"] == "person"]
+    events = [(f"What was {e['name']}?", f"{e['role']} ({e['dates']})") for e in t["entries"] if e["kind"] == "event"]
+    dated = [(f"What happened: {row[0]}?", row[1]) for row in t["timeline"]]
+    decks.append(deck("Key people", "Built from the fact files", people))
+    decks.append(deck("Key events", "Built from the fact files", events))
+    decks.append(deck("Timeline", "Built from the topic timeline", dated))
+    body = f"""
+{crumbs(t)}
+{strip(t, "-cards-" + t["id"])}
+<header class="page-head">
+  <p class="topic-dates">{t['dates']}</p>
+  <h1>{esc(t['short'])}: Flashcards</h1>
+  <p class="lede">Read the question, say your answer out loud, then tap the card to check. Shuffle a deck once you know it in order.</p>
+</header>
+{tabs(t, "cards")}
+{''.join(decks)}"""
+    return view(t, f"{t['id']}-cards", body)
+
+
 # ------------------------------------------------------------------------ build
 
 def build() -> None:
@@ -339,6 +392,7 @@ def build() -> None:
         views.append(overview_view(t))
         views.append(notes_view(t))
         views.append(essays_view(t))
+        views.append(flashcards_view(t))
         views += [entry_view(t, e) for e in t["entries"]]
         views += [essay_page_view(t, p) for p in t.get("essays", [])]
     template = (HERE / "template.html").read_text(encoding="utf-8")

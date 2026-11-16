@@ -140,6 +140,7 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; text-wrap: balan
 .tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--ink); margin-block: 8px 20px; overflow-x: auto; }
 .tabs a { padding: 10px 16px 8px; font-family: var(--tlabel); letter-spacing: 0.05em; text-decoration: none; color: var(--muted); border: 1px solid transparent; border-bottom: 0; white-space: nowrap; }
 .tabs a:hover { color: var(--accent); }
+@media (max-width: 480px) { .tabs a { padding: 9px 9px 7px; font-size: 0.88rem; letter-spacing: 0.02em; } }
 .tabs a[aria-current="page"] { color: var(--paper); background: var(--accent); }
 .strip-art { height: 72px; margin-top: 16px; border: 1px solid var(--rule); }
 .page-head { padding-block: 18px 6px; }
@@ -192,6 +193,27 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; text-wrap: balan
 .qlist .q-use { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
 .qlist .q-use::before { content: "How to use it: "; font-family: var(--tlabel); color: var(--accent); font-size: 0.85rem; letter-spacing: 0.04em; font-style: normal; }
 .by-aspect { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+
+
+/* Flashcards */
+.deck { margin-bottom: 12px; }
+.deck-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; }
+.deck-head .block-title { margin-bottom: 0; }
+.deck-meta { margin: 0; color: var(--muted); font-size: 0.9rem; flex: 1 1 200px; }
+.deck-tools { display: flex; flex-wrap: wrap; gap: 6px; flex-basis: 100%; margin: 8px 0 12px; }
+.deck-btn { font: inherit; font-family: var(--tlabel); font-size: 0.85rem; letter-spacing: 0.04em; padding: 5px 12px; background: var(--surface); color: var(--ink); border: 1px solid var(--rule); border-radius: 2px; cursor: pointer; }
+.deck-btn:hover { border-color: var(--accent); color: var(--accent); }
+.fc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 10px; }
+.fc { font: inherit; color: var(--ink); text-align: left; cursor: pointer; display: grid; align-content: start; gap: 10px; min-height: 140px; padding: 16px 16px 12px; background: var(--surface); border: 1px solid var(--rule); border-top: 4px solid var(--accent); border-radius: 2px; transition: border-color 150ms ease, background 150ms ease; }
+.fc:hover { border-color: var(--accent); }
+.fc:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.fc-q { font-size: 1.02rem; font-weight: 700; }
+.fc-a { display: none; padding-top: 10px; border-top: 1px dashed var(--rule); }
+.fc-hint { font-family: var(--tlabel); font-size: 0.78rem; letter-spacing: 0.04em; color: var(--muted); align-self: end; }
+.fc[aria-pressed="true"] { background: var(--paper); }
+.fc[aria-pressed="true"] .fc-a { display: block; }
+.fc[aria-pressed="true"] .fc-hint { display: none; }
+@media (prefers-reduced-motion: reduce) { .fc { transition: none; } }
 
 /* Rendered Markdown */
 .prose { max-width: 72ch; }
@@ -249,5 +271,27 @@ h1, h2, h3, h4 { font-family: var(--display); font-weight: 400; text-wrap: balan
   }
   window.addEventListener("hashchange", show);
   show();
+
+  document.addEventListener("click", function (e) {
+    var card = e.target.closest(".fc");
+    if (card) {
+      card.setAttribute("aria-pressed", card.getAttribute("aria-pressed") === "true" ? "false" : "true");
+      return;
+    }
+    var btn = e.target.closest(".deck-btn");
+    if (!btn) return;
+    var grid = btn.closest(".deck").querySelector(".fc-grid");
+    var cards = Array.prototype.slice.call(grid.children);
+    var act = btn.getAttribute("data-act");
+    if (act === "shuffle") {
+      for (var i = cards.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp;
+      }
+      cards.forEach(function (c) { c.setAttribute("aria-pressed", "false"); grid.appendChild(c); });
+    } else {
+      cards.forEach(function (c) { c.setAttribute("aria-pressed", act === "reveal" ? "true" : "false"); });
+    }
+  });
 })();
 </script>
