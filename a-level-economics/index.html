@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<title>After Hours Economics</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a city at night. Sticky signage bar + ticker tape, a skyline hero, then district "blocks"
+   for each part of the course. Micro is lit in neon teal, macro in sodium-streetlamp amber. */
+:root{
+  --night:#090d17;      /* sky */
+  --night-2:#0f1524;    /* building face */
+  --night-3:#161e33;    /* raised surface */
+  --line:#24304b;       /* window frames / rules */
+  --fg:#e7e9f1;
+  --muted:#8d96ad;
+  --neon:#3fd6cc;       /* micro */
+  --sodium:#f4a62a;     /* macro */
+  --neon-dim:rgba(63,214,204,.14);
+  --sodium-dim:rgba(244,166,42,.14);
+  --up:#4ade80; --down:#f87171;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:6px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--night);color:var(--fg)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.6;margin:0;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--night)}
+a{color:inherit}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--neon);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;letter-spacing:.01em;margin:0;line-height:1.05}
+.mono{font-family:var(--f-mono)}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.micro{--accent:var(--neon);--accent-dim:var(--neon-dim)}
+.macro{--accent:var(--sodium);--accent-dim:var(--sodium-dim)}
+
+/* ---------- header ---------- */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(9,13,23,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:16px;padding-block:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:10px;text-decoration:none}
+.brand b{font-family:var(--f-display);font-weight:900;font-size:24px;letter-spacing:.04em;text-transform:uppercase;color:var(--sodium);text-shadow:0 0 18px rgba(244,166,42,.45)}
+.brand span{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+nav.main{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+nav.main a{white-space:nowrap;text-decoration:none;font-size:13.5px;font-weight:500;padding:6px 10px;border-radius:var(--r);color:var(--muted)}
+nav.main a:hover{color:var(--fg);background:var(--night-3)}
+nav.main a[aria-current="page"]{color:var(--night);background:var(--fg)}
+.ticker{border-top:1px solid var(--line);overflow:hidden;white-space:nowrap;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.ticker .track{display:inline-flex;gap:34px;padding:6px 0;animation:tick 70s linear infinite}
+.ticker .t b{color:var(--fg);font-weight:500}
+.ticker .t i{font-style:normal}
+.ticker .t .u{color:var(--up)} .ticker .t .d{color:var(--down)}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,13,23,.92) 0%,rgba(9,13,23,.6) 45%,rgba(9,13,23,0) 75%);pointer-events:none}
+.hero .inner{position:relative;z-index:1;padding-block:64px 150px}
+.hero h1{font-size:clamp(46px,9vw,104px);font-weight:900;text-transform:uppercase;max-width:11ch}
+.hero h1 em{font-style:normal;color:var(--sodium);text-shadow:0 0 30px rgba(244,166,42,.5)}
+.hero p{max-width:56ch;color:#c4c9d8;font-size:16.5px;margin:18px 0 0}
+
+/* ---------- generic ---------- */
+main section{padding-block:44px}
+.sec-head{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.sec-head h2{font-size:clamp(34px,5vw,52px);font-weight:800;text-transform:uppercase}
+.sec-head p{margin:6px 0 0;color:var(--muted);max-width:62ch}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.lv-AS{color:var(--fg)}
+.chip.lv-A{color:#f0abfc;border-color:rgba(240,171,252,.35)}
+.chip.on{color:var(--up);border-color:rgba(74,222,128,.4)}
+.chip.off{color:var(--muted);border-style:dashed}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--night-3);padding:8px 14px;border-radius:var(--r);cursor:pointer;font-size:14px;font-weight:500;text-decoration:none}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--sodium);color:#1a1205;border-color:var(--sodium)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.seg button{background:none;border:0;padding:7px 12px;cursor:pointer;font-size:13px;color:var(--muted)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--fg);color:var(--night)}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+select{background:var(--night-3);border:1px solid var(--line);border-radius:var(--r);padding:7px 10px;max-width:100%}
+.note{border:1px dashed var(--line);border-radius:var(--r);padding:12px 14px;color:var(--muted);font-size:13.5px}
+.note b{color:var(--fg);font-weight:600}
+
+/* ---------- districts (home) ---------- */
+.districts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.district{position:relative;display:block;text-decoration:none;background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:20px 20px 18px;overflow:hidden;min-width:0}
+.district::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+.district:hover{border-color:var(--accent)}
+.district h3{font-size:32px;font-weight:800;text-transform:uppercase;color:var(--accent);margin:8px 0 10px}
+.district ul{margin:0;padding:0;list-style:none;display:grid;gap:3px;font-size:14px;color:#c4c9d8}
+.district ul li span{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-right:8px}
+.district .meta{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tool{display:flex;flex-direction:column;gap:8px;text-decoration:none;background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.tool:hover{border-color:var(--muted)}
+.tool .n{font-family:var(--f-display);font-weight:800;font-size:44px;line-height:1}
+.tool h3{font-family:var(--f-body);font-size:15px;font-weight:600}
+.tool p{margin:0;color:var(--muted);font-size:13.5px}
+.papers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.paper{padding:18px;background:var(--night-2);min-width:0}
+.paper+.paper{border-left:1px solid var(--line)}
+.paper .code{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.paper h3{font-size:26px;font-weight:800;text-transform:uppercase;margin:4px 0 8px}
+.paper p{margin:0;font-size:13.5px;color:#c4c9d8}
+.paper .stats{display:flex;gap:16px;margin-top:12px;font-family:var(--f-mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+
+/* ---------- spec topics ---------- */
+.unit{margin-bottom:30px}
+.unit-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
+.unit-h h3{font-size:26px;font-weight:800;text-transform:uppercase}
+.unit-h .num{font-family:var(--f-display);font-weight:900;font-size:26px;color:var(--accent)}
+details.topic{border:1px solid var(--line);border-radius:var(--r);background:var(--night-2);margin-bottom:8px}
+details.topic[open]{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+details.topic summary{list-style:none;cursor:pointer;display:flex;gap:12px;align-items:center;padding:12px 14px;flex-wrap:wrap}
+details.topic summary::-webkit-details-marker{display:none}
+details.topic summary .code{font-family:var(--f-mono);font-size:13px;color:var(--accent);min-width:3.2em}
+details.topic summary .ttl{font-weight:600;font-size:15.5px;flex:1;min-width:0}
+details.topic summary .caret{color:var(--muted);transition:transform .2s}
+details.topic[open] summary .caret{transform:rotate(90deg)}
+.topic-body{padding:0 14px 16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.blk{min-width:0}
+.blk h4{margin:0 0 6px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.blk ul{margin:0;padding-left:18px;font-size:14px}
+.blk li{margin-bottom:3px}
+.blk li::marker{color:var(--accent)}
+.topic-foot{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap}
+
+/* ---------- flashcards ---------- */
+.deck{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px;align-items:start}
+.stage{perspective:1400px}
+.card{position:relative;height:340px;cursor:pointer;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:10px;border:1px solid var(--line);padding:26px 28px;display:flex;flex-direction:column;overflow:auto}
+.face.front{background:linear-gradient(160deg,var(--night-3),var(--night-2))}
+.face.back{background:var(--night-2);transform:rotateY(180deg);border-color:var(--accent)}
+.face .tag{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.face .q{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,3.6vw,36px);line-height:1.12;margin:auto 0;text-wrap:balance}
+.face .a{font-size:16.5px;line-height:1.6;margin:auto 0;white-space:pre-line}
+.face .hint{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.card-ctrls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.card-ctrls .count{margin-left:auto;font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.btn.got{border-color:rgba(74,222,128,.45);color:var(--up)}
+.btn.again{border-color:rgba(248,113,113,.45);color:var(--down)}
+.side{background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;min-width:0}
+.side label{display:grid;gap:4px;font-size:12px;color:var(--muted);font-family:var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.side .stat{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums}
+.meter{height:6px;border-radius:3px;background:var(--line);overflow:hidden;display:flex}
+.meter i{display:block;height:100%}
+.chk{display:flex;gap:8px;align-items:center;font-size:13.5px;cursor:pointer}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+
+/* ---------- scaffold sections ---------- */
+.slots{display:grid;gap:12px}
+.slot-topic{background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.slot-topic header{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.slot-topic header .code{font-family:var(--f-mono);font-size:13px;color:var(--accent)}
+.slot-topic header b{font-weight:600}
+.slot-topic header .chip{margin-left:auto}
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.slot{border:1px dashed var(--line);border-radius:var(--r);padding:12px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.slot .ttl{font-size:14px;font-weight:500}
+.slot .ph{flex:1;min-height:70px;border-radius:4px;display:grid;place-items:center;font-family:var(--f-mono);font-size:11.5px;color:var(--muted);text-align:center;padding:8px;
+  background:repeating-linear-gradient(135deg,transparent 0 9px,rgba(141,150,173,.06) 9px 10px)}
+.terms{display:flex;flex-wrap:wrap;gap:6px}
+.term{font-size:13.5px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--night-3)}
+.essay-list{margin:0;padding-left:18px;font-size:14px}
+.essay-list li{margin-bottom:4px}
+.essay-list li::marker{color:var(--accent)}
+
+footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);font-size:12.5px}
+
+@media (max-width:860px){
+  .tools{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .papers{grid-template-columns:1fr}
+  .paper+.paper{border-left:0;border-top:1px solid var(--line)}
+  .deck{grid-template-columns:1fr}
+  .topic-body{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .districts{grid-template-columns:1fr}
+  .tools{grid-template-columns:1fr 1fr}
+  nav.main{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap}
+  .card{height:380px}
+  .face{padding:20px}
+  .hero .inner{padding-block:44px 120px}
+}
+@media (prefers-reduced-motion:reduce){
+  .ticker .track{animation:none}
+  .card{transition:none}
+  *{scroll-behavior:auto}
+}
+</style>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#home"><b>After Hours</b><span>OCR H460 Economics</span></a>
+    <nav class="main" aria-label="Sections">
+      <a href="#home">Home</a>
+      <a href="#micro">Micro</a>
+      <a href="#macro">Macro</a>
+      <a href="#flashcards">Flashcards</a>
+      <a href="#diagrams">Diagrams</a>
+      <a href="#concepts">Key concepts</a>
+      <a href="#essays">Essays</a>
+    </nav>
+  </div>
+  <div class="ticker" aria-hidden="true"><div class="track" id="ticker"></div></div>
+</header>
+
+<main id="app"></main>
+
+<footer>
+  <div class="wrap">Built from the OCR A Level Economics specification (H460, version 3.0). Topic codes match the spec. The AS / A Level split follows the usual Year 12 / Year 13 teaching order and is not stated in the H460 document itself.</div>
+</footer>
+
+<script>
+/* =====================================================================
+   SPEC DATA — transcribed from OCR H460 v3.0, sections 2c and 2d.
+   level: "AS" = Year 12 / AS content, "A" = A Level only (Year 13).
+   ===================================================================== */
+const UNITS = {
+  micro: [
+    {n:1, t:"Introduction to microeconomics"},
+    {n:2, t:"The role of markets"},
+    {n:3, t:"Business objectives"},
+    {n:4, t:"Market structures"},
+    {n:5, t:"The labour market"}
+  ],
+  macro: [
+    {n:1, t:"Aggregate demand and aggregate supply"},
+    {n:2, t:"Economic policy objectives"},
+    {n:3, t:"Implementing policy"},
+    {n:4, t:"The global context"},
+    {n:5, t:"The financial sector"}
+  ]
+};
+
+const TOPICS = [
+/* ---------------- MICRO ---------------- */
+{area:"micro",level:"AS",code:"1.1",title:"The economic problem",
+ explain:["Economic goods and free goods","The economic problem: scarcity, choice, needs, and wants","Normative and positive statements","The role of economic agents: government, firms, and households","The factors of production: land, labour, capital, and enterprise","The rewards of the factors of production: rent, wages, interest and profit"],
+ evaluate:["The problem of scarcity and the requirement to make choices","Rationality as a way of understanding the behaviour of economic agents","The different objectives of the economic agents in an economy"]},
+{area:"micro",level:"AS",code:"1.2",title:"The allocation of resources",
+ explain:["Incentives","Market, planned and mixed economic systems","Economic efficiency: productive and allocative efficiency"],
+ evaluate:["The effectiveness of incentives on the behaviour of economic agents and resource allocation","The allocation of resources in the different economic systems"]},
+{area:"micro",level:"AS",code:"1.3",title:"Opportunity cost",
+ explain:["Opportunity cost and trade-off"],
+ diagram:["Movements along a production possibility curve (PPC)","Shifts of a production possibility curve (PPC)","The usefulness of the concept of opportunity cost"]},
+{area:"micro",level:"AS",code:"2.1",title:"Specialisation and trade",
+ explain:["Specialisation and the division of labour","Barter systems","Money as a medium of exchange"],
+ evaluate:["The role of specialisation and the division of labour in addressing the problem of scarcity"]},
+{area:"micro",level:"AS",code:"2.2",title:"Demand",
+ diagram:["The relationship between price and quantity demanded","Individual and market demand","Joint, competitive and composite demand","Movements along the demand curve (extension/contraction)","Shifts of the demand curve (increase/decrease)"]},
+{area:"micro",level:"AS",code:"2.3",title:"Supply",
+ diagram:["The relationship between price and quantity supplied","Individual and market supply","Joint and competitive supply","Movements along the supply curve (extension/contraction)","Shifts of the supply curve (increase/decrease)"]},
+{area:"micro",level:"AS",code:"2.4",title:"Consumer and producer surplus",
+ diagram:["Consumer surplus and producer surplus","The effects of changes in price on consumer surplus","The effects of changes in price on producer surplus"],
+ evaluate:["The impact of changes in price on consumer and producer surplus"]},
+{area:"micro",level:"AS",code:"2.5",title:"The interaction of markets",
+ explain:["Ceteris paribus"],
+ diagram:["The interaction of demand and supply","Market equilibrium and disequilibrium"],
+ evaluate:["The impact of changes in demand and/or supply in one market on a related market(s)"]},
+{area:"micro",level:"AS",code:"2.6",title:"Elasticity",
+ explain:["Elasticity"],
+ calc:["Price elasticity of demand (PED)","Income elasticity of demand (YED)","Cross elasticity of demand (XED)","Price elasticity of supply (PES)"],
+ diagram:["Different values of PED, YED, XED and PES","The relationship between PED and a firm’s total revenue"],
+ evaluate:["Factors which determine the value of PED, YED, XED and PES","The usefulness and significance of PED, YED, XED and PES"]},
+{area:"micro",level:"AS",code:"2.7",title:"The concept of the margin",
+ explain:["Margin","Total and marginal utility, diminishing marginal utility and the demand curve"],
+ calc:["Marginal values"]},
+{area:"micro",level:"AS",code:"2.8",title:"Market failure and externalities",
+ explain:["Market failure","Marginal social cost, marginal external cost, marginal private cost, marginal social benefit, marginal external benefit and marginal private benefit"],
+ diagram:["Positive and negative externalities (external benefits and external costs); consumption and production"]},
+{area:"micro",level:"AS",code:"2.9",title:"Information failure",
+ explain:["Information failure","Asymmetric information and moral hazard","Merit and demerit goods"],
+ diagram:["Market failure caused by information failure"],
+ evaluate:["Consumption and production of merit goods","Consumption and production of demerit goods"]},
+{area:"micro",level:"AS",code:"2.10",title:"Public goods",
+ explain:["Public goods, private goods and quasi-public goods","The characteristics of a public good; non-excludability, non-diminishability/non-rivalry, non-rejectability and zero marginal cost","The free rider problem"],
+ evaluate:["The provision of public goods"]},
+{area:"micro",level:"AS",code:"2.11",title:"Government intervention",
+ explain:["Government intervention in markets: taxation, subsidies, government expenditure, price controls, buffer stock systems, public/private partnerships, legislation, regulation, tradable pollution permits, information provision, competition policy","Government failure"],
+ evaluate:["The effectiveness of government intervention","Causes and consequences of government failure"]},
+{area:"micro",level:"A",code:"3.1",title:"Business objectives",
+ explain:["Maximisation objectives: profit, sales revenue, sales volume, growth and utility","Non-maximising objectives: profit satisficing, social welfare, corporate social responsibility (CSR)","The principal-agent problem"],
+ evaluate:["Maximisation and non-maximisation objectives","Factors which influence the choice of objectives"]},
+{area:"micro",level:"A",code:"3.2",title:"Costs and economies of scale",
+ calc:["Fixed, variable, total, average, marginal costs"],
+ explain:["Short run and long run in terms of fixed and variable factors"],
+ diagram:["The law of diminishing returns","Internal and external economies of scale","Diseconomies of scale","Minimum efficient scale"],
+ evaluate:["Causes of economies and diseconomies of scale","The significance of economies and diseconomies of scale"]},
+{area:"micro",level:"A",code:"3.3",title:"Revenue and profit",
+ calc:["Total, average and marginal revenue","Profit/loss"],
+ explain:["Accounting, normal and supernormal profit"]},
+{area:"micro",level:"A",code:"4.1",title:"Perfect competition",
+ explain:["The characteristics of perfect competition"],
+ diagram:["Short run perfect competition; supernormal profit/loss","Long run perfect competition: normal profits","Individual firm in perfect competition as a price taker","Equilibrium price and output for a firm in perfect competition","Allocative efficiency in short run and long run perfect competition","Productive efficiency in long run perfect competition"]},
+{area:"micro",level:"A",code:"4.2",title:"Monopoly",
+ explain:["The characteristics of monopoly","Dynamic efficiency","X-inefficiency"],
+ diagram:["Monopoly; supernormal profit in both short and long run","A monopolist as a price maker","Equilibrium price and output for a profit maximising monopolist","Productive and allocative efficiency with a profit maximising monopolist","Price discrimination by a firm with monopoly power","Natural monopoly"],
+ evaluate:["Advantages and disadvantages of a monopoly","Advantages and disadvantages of a natural monopoly"]},
+{area:"micro",level:"A",code:"4.3",title:"Monopolistic competition",
+ explain:["The characteristics of monopolistic competition"],
+ diagram:["Short run monopolistic competition; supernormal profit/loss","Long run monopolistic competition; normal profits","Equilibrium price and output for a firm in monopolistic competition"],
+ evaluate:["Advantages and disadvantages of monopolistic competition"]},
+{area:"micro",level:"A",code:"4.4",title:"Oligopoly",
+ explain:["The characteristics of oligopoly","Non-price competition","Interdependence: kinked demand curve","Types of collusion","Product differentiation"],
+ calc:["Concentration ratios (evaluate and calculate)"],
+ evaluate:["Concentration ratios","Advantages and disadvantages of oligopoly markets"]},
+{area:"micro",level:"A",code:"4.5",title:"Contestable markets",
+ explain:["The characteristics of a contestable market","Productive and allocative efficiency in a contestable market"],
+ evaluate:["Advantages and disadvantages of a contestable market"]},
+{area:"micro",level:"A",code:"5.1",title:"Demand for labour",
+ explain:["Derived demand for labour","Factors affecting the demand for labour in an industry","Factors affecting wage elasticity of demand for labour","Productivity and unit labour costs"],
+ diagram:["Marginal revenue product theory in relation to employment and wage determination"]},
+{area:"micro",level:"A",code:"5.2",title:"Supply of labour",
+ explain:["Factors affecting the supply of labour to an industry","Factors affecting the wage elasticity of the supply of labour","Short run and long run supply of labour"],
+ diagram:["Economic rent and transfer earnings"]},
+{area:"micro",level:"A",code:"5.3",title:"The interaction of labour markets",
+ explain:["Wage differentials","Monopsony","Trade union","Bilateral monopoly"],
+ diagram:["The determination of wages in a highly competitive labour market","Changes in demand for, and supply of, labour"],
+ evaluate:["The impact of changes in labour market flexibility and mobility of labour","The impact of trade union activity on labour markets","The impact of a monopsonist employer on a labour market","The impact of a bilateral monopoly on a labour market"]},
+
+/* ---------------- MACRO ---------------- */
+{area:"macro",level:"AS",code:"1.1",title:"Circular flow of income",
+ explain:["The circular flow of income, with injections and leakages","The methods of measuring national income, output and expenditure"]},
+{area:"macro",level:"AS",code:"1.2",title:"Aggregate demand",
+ explain:["Aggregate demand and its components"],
+ diagram:["The relationship between aggregate demand and price level","Shifts in the aggregate demand curve"],
+ evaluate:["The relationship between changes in income and consumption","The role of expectations"]},
+{area:"macro",level:"AS",code:"1.3",title:"Aggregate supply",
+ explain:["Aggregate supply"],
+ diagram:["The relationship between aggregate supply and price level in the short run and long run","Shifts in the aggregate supply curve in the short run and long run"]},
+{area:"macro",level:"AS",code:"1.4",title:"The interaction of aggregate demand and supply",
+ explain:["The assumptions underlying the aggregate demand and aggregate supply models","Equilibrium in the macroeconomy"],
+ evaluate:["Effects of changes in aggregate demand and aggregate supply on macroeconomic indicators"]},
+{area:"macro",level:"A",code:"1.5",title:"The multiplier and the accelerator",
+ explain:["Factors which determine the size of the national income multiplier"],
+ diagram:["The national income multiplier and accelerator","The impact of the national income multiplier and accelerator on aggregate demand and economic cycle","Output gaps; aggregate demand and aggregate supply model and a production possibility curve (PPC)"],
+ calc:["Average and marginal propensities to consume, save and withdraw","Size of the national income multiplier"],
+ evaluate:["Causes and consequences of an output gap"]},
+{area:"macro",level:"AS",code:"2.1",title:"Economic growth",
+ explain:["Economic growth","The policy objective of economic growth","The different stages of the economic cycle","Real and nominal Gross Domestic Product (GDP); changes in GDP over time"],
+ calc:["Economic growth rates","GDP per capita"],
+ diagram:["Short run and long run economic growth"],
+ evaluate:["Causes and consequences of economic growth in the short run and long run"]},
+{area:"macro",level:"AS",code:"2.2",title:"Development",
+ explain:["The structure of an economy in terms of primary, secondary and tertiary sectors","The policy objective of sustainable development"],
+ evaluate:["The relationship between economic growth and sustainable development","The usefulness of macroeconomic measures such as GDP, the Human Development Index (HDI) and other alternative social and cultural indicators"]},
+{area:"macro",level:"AS",code:"2.3",title:"Employment",
+ explain:["Employment and unemployment","The policy objective of full employment","The labour force survey and claimant count measures of unemployment"],
+ evaluate:["Causes and consequences of unemployment","Effects of full employment"]},
+{area:"macro",level:"AS",code:"2.4",title:"Inflation",
+ explain:["Inflation, deflation, disinflation and hyperinflation","The policy objective of low and stable inflation","Real and nominal values","Measuring inflation using the Consumer Prices Index and Retail Prices Index"],
+ calc:["The rate of inflation using index numbers"],
+ evaluate:["Causes and consequences of inflation and deflation"]},
+{area:"macro",level:"AS",code:"2.5",title:"Balance of payments",
+ explain:["Balance of payments","The components of the current account: trade in goods, trade in services, primary and secondary income","The policy objective of a sustainable balance of payments position","Imbalances on the balance of payments"],
+ calc:["Balances on the different components on the balance of payments"],
+ evaluate:["Causes and consequences of imbalances on the balance of payments"]},
+{area:"macro",level:"AS",code:"2.6",title:"Trends in macroeconomic indicators",
+ explain:["Key trends in UK macroeconomic performance in the last 20 years"],
+ evaluate:["The current performance of the UK economy compared with other developed economies, emerging and developing economies"]},
+{area:"macro",level:"A",code:"2.7",title:"Income distribution and welfare",
+ explain:["Income and wealth; distribution and inequality","The policy objective of a more even distribution of income","Absolute and relative poverty","Inequality data; Gini coefficients and relevant quantiles"],
+ diagram:["The distribution of income (Lorenz curve)"],
+ evaluate:["Causes and consequences of poverty and inequality"]},
+{area:"macro",level:"A",code:"2.8",title:"The Phillips Curve",
+ explain:["Natural rate of unemployment; non-accelerating inflation rate of unemployment (NAIRU)"],
+ diagram:["Keynesian and neo-classical approaches to aggregate supply","Short-run and long-run Phillips Curve"],
+ evaluate:["The usefulness of the Phillips Curve for macroeconomic policymakers"]},
+{area:"macro",level:"AS",code:"3.1",title:"Fiscal policy",
+ explain:["Government budget","Direct, indirect, progressive, proportional and regressive taxation","Current and capital government expenditure","Budget surplus, deficit and balanced budget","Cyclical and structural budget position","National and government debt","Discretionary fiscal policy and automatic stabilisers","Crowding out","The Laffer curve"],
+ calc:["Average and marginal tax rates"],
+ evaluate:["The effectiveness of using fiscal policy to achieve the government’s macroeconomic objectives"]},
+{area:"macro",level:"AS",code:"3.2",title:"Monetary policy",
+ diagram:["Changes in interest rates","Changes in money supply","Inflation rate targets","Quantitative easing","Influence of exchange rates"],
+ evaluate:["The effectiveness of using monetary policy to achieve the government’s macroeconomic objectives"]},
+{area:"macro",level:"AS",code:"3.3",title:"Supply side policy",
+ diagram:["Privatisation, deregulation and subsidies","Competition policy","Investment in infrastructure, education, training, research and development","Reforms of the tax and benefit system","Improved labour market flexibility","Immigration control"],
+ evaluate:["The effectiveness of using supply side policy measures to achieve the government’s macroeconomic objectives"]},
+{area:"macro",level:"AS",code:"3.4",title:"Policy conflicts",
+ evaluate:["Conflicts and trade-offs between policy objectives"]},
+{area:"macro",level:"AS",code:"4.1",title:"International trade",
+ explain:["International trade","Patterns of international trade over time"],
+ evaluate:["Advantages and disadvantages of international trade to developed, emerging and developing countries"]},
+{area:"macro",level:"A",code:"4.2",title:"Exchange rates",
+ calc:["Exchange rates"],
+ diagram:["Determination of exchange rates in fixed and floating exchange rate systems"],
+ evaluate:["Causes and consequences of exchange rate changes","Advantages and disadvantages of different exchange rate systems"]},
+{area:"macro",level:"A",code:"4.3",title:"Globalisation",
+ explain:["Globalisation","International competitiveness","Absolute and comparative advantage","Terms of trade","Marshall-Lerner condition and J-curve"],
+ calc:["Terms of trade"],
+ evaluate:["Comparative advantage as an explanation of international trade patterns","Causes and consequences of globalisation on developed, emerging and developing countries","The impact of the performance of emerging economies on other economies"]},
+{area:"macro",level:"A",code:"4.4",title:"Trade policies and negotiations",
+ explain:["Protectionism","Economic integration through free trade areas, customs unions, monetary union, economic union"],
+ diagram:["The impact of tariffs and quotas on trade creation and trade diversion"],
+ evaluate:["Advantages and disadvantages of protectionism and free trade","The role of the World Trade Organisation (WTO) in promoting free trade"]},
+{area:"macro",level:"A",code:"5.1",title:"Money and interest rates",
+ explain:["Functions and characteristics of money","The creation and supply of money","Narrow and broad money in terms of liquidity","The relationship between the money supply and the price level; Fisher equation of exchange"],
+ diagram:["The determination of interest rates"]},
+{area:"macro",level:"A",code:"5.2",title:"The financial sector",
+ explain:["The role of the financial sector","The role of savings and investment in promoting economic development","The Harrod-Domar model","Microfinance"],
+ evaluate:["The role of the financial sector in promoting economic development"]},
+{area:"macro",level:"A",code:"5.3",title:"Financial regulation",
+ explain:["Purpose and methods of financial regulation","The role and functions of a central bank"],
+ evaluate:["The importance of the regulation of financial institutions","The effectiveness of different policy measures available to a central bank in targeting macroeconomic indicators","The role of the International Monetary Fund (IMF) and the World Bank in regulating the global financial system"]}
+];
+TOPICS.forEach(t=>{t.id=(t.area==="micro"?"mi":"ma")+t.code;t.unit=+t.code.split(".")[0];});
+const topicById=id=>TOPICS.find(t=>t.id===id);
+
+/* =====================================================================
+   FLASHCARDS — every answer comes from the H460 document only.
+   [topic id or "exam", question, answer]
+   ===================================================================== */
+const CARDS_RAW = [
+/* exam & assessment */
+["exam","What are the three components of OCR A Level Economics (H460)?","01 Microeconomics\n02 Macroeconomics\n03 Themes in economics\nYou must sit all three."],
+["exam","How long is each H460 paper, how many marks, and what is it worth?","Each is a 2 hour written paper out of 80 marks, worth 33.33% of the A Level."],
+["exam","What does Component 3 (Themes in economics) assess?","It is fully synoptic. It has no content of its own: you apply micro and macro content to a specific unseen theme."],
+["exam","What is the structure of Paper 3?","30 multiple choice questions (mainly AO1 and AO2, some AO3 and AO4), then short answer and extended response questions on an unseen theme for 50 marks."],
+["exam","What is the structure of Papers 1 and 2?","Data response questions on stimulus material, then:\n• one extended response from a choice of two that both require a quantitative response\n• one from a choice of two that do not (a quantitative answer alongside a narrative one is still credited)."],
+["exam","How should you split your time in Papers 1 and 2?","45–50 minutes reading the stimulus and doing the data response questions, then about 40 minutes on each 25-mark question."],
+["exam","How should you split your time in Paper 3?","40–45 minutes on the 30 MCQs, 15–20 minutes reading the data response stimulus, about 60 minutes on the remaining 50 marks."],
+["exam","What is the mark range for short answer and extended response questions?","Short answer: up to 4 marks.\nExtended response: from 8 marks up to 25 marks."],
+["exam","What is AO1?","Demonstrate knowledge of terms/concepts and theories/models to show an understanding of the behaviour of economic agents and how they are affected by and respond to economic issues."],
+["exam","What is AO2?","Apply knowledge and understanding to various economic contexts to show how economic agents are affected by and respond to economic issues."],
+["exam","What is AO3?","Analyse issues within economics, showing an understanding of their impact on economic agents."],
+["exam","What is AO4?","Evaluate economic arguments and use qualitative and quantitative evidence to support informed judgements relating to economic issues."],
+["exam","How are the four assessment objectives weighted across the whole A Level?","25% each.\nPapers 1 and 2: AO1 8, AO2 8, AO3 8.33, AO4 9.\nPaper 3: AO1 9, AO2 9, AO3 8.33, AO4 7."],
+["exam","Which command words go with AO1 and AO2?","Calculate, Compare, Describe, Distinguish between, Explain, Identify, State."],
+["exam","Which command words go with AO3 and AO4?","AO3: Explain.\nAO4: Evaluate."],
+["exam","In the spec, what does ‘explain’ require?","• demonstrate knowledge and understanding by stating a definition, explaining a concept or giving an example\n• apply knowledge and understanding to a context\n• present logical chains of reasoning"],
+["exam","What does ‘explain, with the aid of a diagram’ add on top of ‘explain’?","• construct and label an appropriate diagram\n• describe coherently what the diagram illustrates"],
+["exam","What four things does ‘evaluate’ require?","• weigh up both sides of the argument\n• compare alternatives\n• critically reflect on the usefulness and limitations of economic models and data\n• come to a supported judgement"],
+["exam","What share of the marks tests quantitative skills?","At least 20% of A Level marks (15% of AS marks), at a minimum of Level 2 maths."],
+["exam","List the quantitative skills in Appendix 5c.","• ratios and fractions\n• percentages and percentage changes\n• mean, median and relevant quantiles\n• construct and interpret standard graphs\n• index numbers\n• cost, revenue and profit (marginal, average, totals)\n• converting money to real terms\n• elasticity calculations and interpreting them\n• interpreting written, graphical and numerical information"],
+["exam","Are Papers 1 and 2 synoptic?","In part. Each extended writing question needs you to link different parts of the micro and macro content."],
+["exam","When are the exams and can you retake?","One series a year in May/June, all papers at the end of the course. You can retake as often as you like, but you retake all components."],
+
+/* micro 1 */
+["mi1.1","What is the economic problem?","Scarcity, choice, needs and wants."],
+["mi1.1","What are the four factors of production?","Land, labour, capital and enterprise."],
+["mi1.1","What is the reward to each factor of production?","Land → rent\nLabour → wages\nCapital → interest\nEnterprise → profit"],
+["mi1.1","Who are the three economic agents?","Government, firms and households."],
+["mi1.1","What are the two types of economic statement?","Normative and positive statements."],
+["mi1.1","What three evaluation points does 1.1 name?","• Scarcity and the need to make choices\n• Rationality as a way of understanding economic agents’ behaviour\n• The different objectives of economic agents"],
+["mi1.2","Name the three economic systems.","Market, planned and mixed."],
+["mi1.2","Which two types of economic efficiency are in 1.2?","Productive efficiency and allocative efficiency."],
+["mi1.3","Which concept is paired with opportunity cost in 1.3?","Trade-off."],
+["mi1.3","What PPC diagrams must you be able to draw for 1.3?","Movements along a PPC and shifts of a PPC, and use them to show the usefulness of opportunity cost."],
+
+/* micro 2 */
+["mi2.1","What does 2.1 cover besides specialisation?","The division of labour, barter systems and money as a medium of exchange."],
+["mi2.2","What are the three types of related demand?","Joint, competitive and composite demand."],
+["mi2.2","Movement vs shift of the demand curve: what are the terms?","Movement along: extension / contraction.\nShift: increase / decrease."],
+["mi2.3","What are the two types of related supply?","Joint and competitive supply. (Composite only applies to demand.)"],
+["mi2.3","Movement vs shift of the supply curve: what are the terms?","Movement along: extension / contraction.\nShift: increase / decrease."],
+["mi2.4","What do you need to show on diagrams for 2.4?","Consumer surplus and producer surplus, and how a change in price affects each."],
+["mi2.5","Which assumption term is named in 2.5?","Ceteris paribus."],
+["mi2.5","What does 2.5 ask you to evaluate?","The impact of changes in demand and/or supply in one market on related markets."],
+["mi2.6","Which four elasticities must you explain and calculate?","PED: price elasticity of demand\nYED: income elasticity of demand\nXED: cross elasticity of demand\nPES: price elasticity of supply"],
+["mi2.6","Which elasticity is linked to a firm’s total revenue on the spec?","PED. You need a diagram showing how PED relates to total revenue."],
+["mi2.6","What two things about elasticities must you evaluate?","The factors that determine the values of PED, YED, XED and PES, and their usefulness and significance."],
+["mi2.7","Which utility ideas link to the demand curve in 2.7?","Total and marginal utility, and diminishing marginal utility."],
+["mi2.8","Name the six marginal cost and benefit terms in 2.8.","Marginal social cost (MSC)\nMarginal external cost (MEC)\nMarginal private cost (MPC)\nMarginal social benefit (MSB)\nMarginal external benefit (MEB)\nMarginal private benefit (MPB)"],
+["mi2.8","Which four externality diagrams does 2.8 imply?","Positive and negative externalities, each in consumption and in production."],
+["mi2.9","What are the two specific information problems in 2.9?","Asymmetric information and moral hazard."],
+["mi2.9","Which goods are linked to information failure?","Merit and demerit goods. You evaluate their consumption and production."],
+["mi2.10","What are the three types of good in 2.10?","Public goods, private goods and quasi-public goods."],
+["mi2.10","What are the four characteristics of a public good?","Non-excludability\nNon-diminishability / non-rivalry\nNon-rejectability\nZero marginal cost"],
+["mi2.10","Which problem is linked to public goods?","The free rider problem."],
+["mi2.11","List the eleven forms of government intervention in 2.11.","Taxation, subsidies, government expenditure, price controls, buffer stock systems, public/private partnerships, legislation, regulation, tradable pollution permits, information provision, competition policy."],
+["mi2.11","What must you evaluate about government failure?","Its causes and consequences, alongside the effectiveness of intervention."],
+
+/* micro 3 */
+["mi3.1","Name the five maximisation objectives.","Profit, sales revenue, sales volume, growth and utility."],
+["mi3.1","Name the three non-maximising objectives.","Profit satisficing, social welfare and corporate social responsibility (CSR)."],
+["mi3.1","Which agency problem appears in 3.1?","The principal-agent problem."],
+["mi3.2","Which five cost measures must you calculate?","Fixed, variable, total, average and marginal costs."],
+["mi3.2","How does the spec define short run vs long run?","In terms of fixed and variable factors."],
+["mi3.2","Which four cost ideas need diagrams in 3.2?","The law of diminishing returns, internal and external economies of scale, diseconomies of scale, and minimum efficient scale."],
+["mi3.3","Which three revenue measures must you calculate?","Total, average and marginal revenue (plus profit/loss)."],
+["mi3.3","What are the three types of profit in 3.3?","Accounting, normal and supernormal profit."],
+
+/* micro 4 */
+["mi4.1","Perfect competition: profit in the short run vs long run?","Short run: supernormal profit or loss.\nLong run: normal profit."],
+["mi4.1","Is a perfectly competitive firm a price taker or price maker?","A price taker."],
+["mi4.1","When is perfect competition allocatively vs productively efficient?","Allocatively efficient in both the short run and the long run.\nProductively efficient in the long run."],
+["mi4.2","Monopoly: profit in the short run vs long run?","Supernormal profit in both the short and the long run."],
+["mi4.2","Which two efficiency concepts are introduced with monopoly?","Dynamic efficiency and X-inefficiency."],
+["mi4.2","Which monopoly diagrams are on the spec?","Supernormal profit, price maker, profit maximising equilibrium, productive and allocative efficiency, price discrimination, natural monopoly."],
+["mi4.3","Monopolistic competition: profit in the short run vs long run?","Short run: supernormal profit or loss.\nLong run: normal profit."],
+["mi4.4","Which model shows interdependence in oligopoly?","The kinked demand curve."],
+["mi4.4","What five oligopoly features must you explain?","Characteristics of oligopoly, non-price competition, interdependence (kinked demand curve), types of collusion, product differentiation."],
+["mi4.4","Which oligopoly measure must you calculate and evaluate?","Concentration ratios."],
+["mi4.5","Which two efficiencies are linked to contestable markets?","Productive and allocative efficiency."],
+
+/* micro 5 */
+["mi5.1","What kind of demand is the demand for labour, according to 5.1?","Derived demand."],
+["mi5.1","Which theory explains employment and wage determination in 5.1?","Marginal revenue product (MRP) theory."],
+["mi5.1","Which two labour productivity ideas are in 5.1?","Productivity and unit labour costs."],
+["mi5.2","Which diagram concept splits a worker’s earnings in 5.2?","Economic rent and transfer earnings."],
+["mi5.3","Name the four labour market institutions/structures in 5.3.","Wage differentials, monopsony, trade unions and bilateral monopoly."],
+["mi5.3","What four labour market impacts must you evaluate?","• Changes in flexibility and mobility of labour\n• Trade union activity\n• A monopsonist employer\n• A bilateral monopoly"],
+
+/* macro 1 */
+["ma1.1","What flows in and out of the circular flow?","Injections and leakages."],
+["ma1.1","What are the three ways of measuring national income?","Income, output and expenditure."],
+["ma1.2","What two things about AD must you evaluate?","The relationship between changes in income and consumption, and the role of expectations."],
+["ma1.3","Over which two time periods is AS analysed?","The short run and the long run, both for the AS–price level relationship and for shifts."],
+["ma1.5","Which two macro ideas in 1.5 affect AD and the economic cycle?","The national income multiplier and the accelerator."],
+["ma1.5","Which propensities must you calculate?","Average and marginal propensities to consume, save and withdraw."],
+["ma1.5","Which two models can show an output gap?","The AD/AS model and the production possibility curve (PPC)."],
+
+/* macro 2 */
+["ma2.1","What is the difference you must know in GDP measures (2.1)?","Real vs nominal GDP, and changes in GDP over time."],
+["ma2.1","What must you calculate for economic growth?","Economic growth rates and GDP per capita."],
+["ma2.1","What type of growth diagram is in 2.1?","Short run and long run economic growth."],
+["ma2.2","What are the three sectors of an economy?","Primary, secondary and tertiary."],
+["ma2.2","Which development measures must you evaluate?","GDP, the Human Development Index (HDI) and other alternative social and cultural indicators."],
+["ma2.3","What are the two UK measures of unemployment?","The Labour Force Survey and the claimant count."],
+["ma2.4","Name the four price-level terms in 2.4.","Inflation, deflation, disinflation and hyperinflation."],
+["ma2.4","Which two indices measure UK inflation?","The Consumer Prices Index (CPI) and the Retail Prices Index (RPI)."],
+["ma2.4","How must you calculate the rate of inflation?","Using index numbers."],
+["ma2.5","What are the four components of the current account?","Trade in goods, trade in services, primary income and secondary income."],
+["ma2.5","What is the policy objective for the balance of payments?","A sustainable balance of payments position."],
+["ma2.6","Over what period must you know UK macro trends?","The last 20 years, compared with developed, emerging and developing economies."],
+["ma2.7","What are the two types of poverty?","Absolute and relative poverty."],
+["ma2.7","Which data and diagram measure inequality?","Gini coefficients and relevant quantiles; the Lorenz curve."],
+["ma2.8","What does NAIRU stand for?","Non-accelerating inflation rate of unemployment."],
+["ma2.8","Which two approaches to aggregate supply are compared in 2.8?","Keynesian and neo-classical."],
+["ma2.8","Which Phillips Curves must you draw?","The short-run and the long-run Phillips Curve."],
+
+/* macro 3 */
+["ma3.1","Name the five types of taxation in 3.1.","Direct, indirect, progressive, proportional and regressive."],
+["ma3.1","What are the two types of government expenditure?","Current and capital."],
+["ma3.1","What are the three possible budget positions?","Budget surplus, deficit and balanced budget."],
+["ma3.1","Which two ways of describing a budget position split the cycle from the long term?","Cyclical and structural budget position."],
+["ma3.1","What are the two types of fiscal policy action?","Discretionary fiscal policy and automatic stabilisers."],
+["ma3.1","Which tax rates must you calculate?","Average and marginal tax rates."],
+["ma3.1","Name the two debt concepts and the two other ideas at the end of 3.1.","National and government debt; crowding out; the Laffer curve."],
+["ma3.2","List the five monetary policy areas in 3.2.","Changes in interest rates, changes in money supply, inflation rate targets, quantitative easing, influence of exchange rates."],
+["ma3.3","List the six supply side policy areas in 3.3.","• Privatisation, deregulation and subsidies\n• Competition policy\n• Investment in infrastructure, education, training, R&D\n• Reforms of the tax and benefit system\n• Improved labour market flexibility\n• Immigration control"],
+["ma3.4","What does 3.4 ask you to evaluate?","Conflicts and trade-offs between policy objectives."],
+
+/* macro 4 */
+["ma4.1","Which three country groups do you evaluate trade for?","Developed, emerging and developing countries."],
+["ma4.2","Which two exchange rate systems must you draw?","Fixed and floating."],
+["ma4.3","Which two types of advantage explain trade?","Absolute and comparative advantage."],
+["ma4.3","Which condition and curve link exchange rates to the trade balance?","The Marshall-Lerner condition and the J-curve."],
+["ma4.3","What trade measure must you calculate in 4.3?","Terms of trade."],
+["ma4.4","Name the four levels of economic integration in 4.4.","Free trade areas, customs unions, monetary union, economic union."],
+["ma4.4","What do tariffs and quotas cause in 4.4’s diagrams?","Trade creation and trade diversion."],
+["ma4.4","Which organisation’s role in free trade must you evaluate?","The World Trade Organisation (WTO)."],
+
+/* macro 5 */
+["ma5.1","How are narrow and broad money distinguished?","In terms of liquidity."],
+["ma5.1","Which equation links money supply and the price level?","The Fisher equation of exchange."],
+["ma5.1","What interest rate diagram is in 5.1?","The determination of interest rates."],
+["ma5.2","Which growth model is in 5.2?","The Harrod-Domar model."],
+["ma5.2","Which small-scale finance idea is in 5.2?","Microfinance."],
+["ma5.3","Which two international institutions regulate the global financial system?","The International Monetary Fund (IMF) and the World Bank."],
+["ma5.3","What must you know about central banks?","Their role and functions, and how effective their policy measures are at targeting macro indicators."]
+];
+const CARDS = CARDS_RAW.map(([tid,q,a],i)=>{
+  const t = tid==="exam"?null:topicById(tid);
+  return {id:"c"+i, tid, q, a, area: t?t.area:"exam", level: t?t.level:"all", t};
+});
+
+/* ---------- helpers ---------- */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const AREA_LABEL={micro:"Micro",macro:"Macro",exam:"Exam"};
+const LEVEL_LABEL={AS:"AS",A:"A Level"};
+const state = {
+  level: store.get("ahe.level","all"),
+  area: "all",
+  fc: {area:"all",level:"all",topic:"all",onlyAgain:false,i:0,order:null,flipped:false},
+  marks: store.get("ahe.marks",{})
+};
+const lvChip = l=>`<span class="chip lv-${l}">${LEVEL_LABEL[l]}</span>`;
+const unitTitle=(area,n)=>UNITS[area].find(u=>u.n===n).t;
+const matchLevel=(t,l)=>l==="all"||t.level===l;
+
+function levelSeg(id,val){
+  return `<div class="seg" role="group" aria-label="Level" id="${id}">
+    ${[["all","All"],["AS","AS"],["A","A Level"]].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${val===v}">${l}</button>`).join("")}
+  </div>`;
+}
+function areaSeg(id,val,withExam){
+  const opts=[["all","All"],["micro","Micro"],["macro","Macro"]]; if(withExam)opts.push(["exam","Exam"]);
+  return `<div class="seg" role="group" aria-label="Area" id="${id}">
+    ${opts.map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${val===v}">${l}</button>`).join("")}
+  </div>`;
+}
+function bindSeg(id,fn){
+  const el=document.getElementById(id); if(!el)return;
+  el.addEventListener("click",e=>{const b=e.target.closest("button");if(b)fn(b.dataset.v)});
+}
+
+/* ---------- ticker ---------- */
+(function(){
+  const items=[["H460/01","MICRO","33.33%","u"],["H460/02","MACRO","33.33%","u"],["H460/03","THEMES","SYNOPTIC","u"],
+    ["PED","2.6","CALC","u"],["NAIRU","2.8","LRPC","d"],["CPI","2.4","INDEX","u"],["RPI","2.4","INDEX","d"],["GINI","2.7","LORENZ","d"],
+    ["MRP","5.1","WAGES","u"],["QE","3.2","MONEY","u"],["MSC","2.8","EXT","d"],["HDI","2.2","DEV","u"],["J-CURVE","4.3","TRADE","d"],
+    ["MPC","1.5","MULT","u"],["WTO","4.4","FREE TRADE","u"],["MES","3.2","SCALE","u"],["AO4","EVAL","25%","u"]];
+  const html=items.map(([a,b,c,d])=>`<span class="t"><b>${a}</b> ${b} <i class="${d}">${d==="u"?"▲":"▼"} ${c}</i></span>`).join("");
+  $("#ticker").innerHTML=html+html;
+})();
+
+/* ---------- skyline (canvas) ---------- */
+function drawSkyline(cv){
+  const ctx=cv.getContext("2d"); const dpr=Math.min(window.devicePixelRatio||1,2);
+  const w=cv.clientWidth,h=cv.clientHeight; if(!w||!h)return;
+  cv.width=w*dpr;cv.height=h*dpr;ctx.scale(dpr,dpr);
+  let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
+  const sky=ctx.createLinearGradient(0,0,0,h);
+  sky.addColorStop(0,"#090d17");sky.addColorStop(.6,"#101830");sky.addColorStop(1,"#1d1a2c");
+  ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+  // haze glow
+  const g=ctx.createRadialGradient(w*.78,h,10,w*.78,h,h*.9);
+  g.addColorStop(0,"rgba(244,166,42,.20)");g.addColorStop(1,"rgba(244,166,42,0)");
+  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  for(let i=0;i<70;i++){ctx.fillStyle=`rgba(231,233,241,${.15+rnd()*.35})`;ctx.fillRect(rnd()*w,rnd()*h*.45,1,1)}
+  const layers=[{c:"#121a2e",min:.25,max:.55,win:.05},{c:"#0c1222",min:.12,max:.42,win:.13}];
+  layers.forEach((L,li)=>{
+    let x=-10;
+    while(x<w){
+      const bw=28+rnd()*70, bh=h*(L.min+rnd()*(L.max-L.min));
+      const y=h-bh;
+      ctx.fillStyle=L.c;ctx.fillRect(x,y,bw,bh);
+      if(rnd()<.18){ctx.fillRect(x+bw/2-1,y-18-rnd()*24,2,30);} // antenna
+      // windows
+      for(let wy=y+8;wy<h-6;wy+=9){
+        for(let wx=x+5;wx<x+bw-6;wx+=8){
+          if(rnd()<L.win){
+            const r=rnd();
+            ctx.fillStyle=r<.7?"rgba(244,166,42,.85)":r<.9?"rgba(63,214,204,.8)":"rgba(231,233,241,.7)";
+            ctx.fillRect(wx,wy,3,4);
+          }
+        }
+      }
+      x+=bw+(li?2:6);
+    }
+  });
+}
+
+/* ---------- views ---------- */
+function viewHome(){
+  const count=(a,l)=>TOPICS.filter(t=>t.area===a&&t.level===l);
+  const district=(a,l)=>{
+    const ts=count(a,l); const units=[...new Set(ts.map(t=>t.unit))];
+    return `<a class="district ${a}" href="#${a}" data-level="${l}">
+      <div class="eyebrow">${a==="micro"?"Component 01":"Component 02"} · ${l==="AS"?"Year 12":"Year 13"}</div>
+      <h3>${AREA_LABEL[a]}economics · ${LEVEL_LABEL[l]}</h3>
+      <ul>${units.map(u=>`<li><span>${u}</span>${esc(unitTitle(a,u))}${ts.filter(t=>t.unit===u).length<TOPICS.filter(t=>t.area===a&&t.unit===u).length?" (part)":""}</li>`).join("")}</ul>
+      <div class="meta"><span>${ts.length} topics</span><span>${CARDS.filter(c=>c.t&&c.t.area===a&&c.t.level===l).length} flashcards</span></div>
+    </a>`;
+  };
+  const nDiag=TOPICS.reduce((s,t)=>s+(t.diagram||[]).length,0);
+  const nEval=TOPICS.reduce((s,t)=>s+(t.evaluate||[]).length,0);
+  const nTerms=TOPICS.reduce((s,t)=>s+(t.explain||[]).length+(t.calc||[]).length,0);
+  return `
+  <div class="hero"><canvas id="sky" aria-hidden="true"></canvas>
+    <div class="wrap inner">
+      <div class="eyebrow">OCR A Level Economics · H460 · 3 papers · 240 marks</div>
+      <h1>The market <em>never</em> sleeps</h1>
+      <p>The whole H460 spec, split into microeconomics and macroeconomics, AS and A Level. Flashcards are loaded and ready. Diagrams, key concepts and essay plans have their slots laid out against the spec, waiting for content.</p>
+    </div>
+  </div>
+  <section><div class="wrap">
+    <div class="sec-head"><div><div class="eyebrow">Districts</div><h2>Pick your block</h2></div></div>
+    <div class="districts">${district("micro","AS")}${district("macro","AS")}${district("micro","A")}${district("macro","A")}</div>
+  </div></section>
+  <section style="padding-top:0"><div class="wrap">
+    <div class="sec-head"><div><div class="eyebrow">Study tools</div><h2>Open late</h2></div></div>
+    <div class="tools">
+      <a class="tool" href="#flashcards"><span class="chip on">● Filled</span><span class="n">${CARDS.length}</span><h3>Flashcards</h3><p>Drawn from the spec, including exam format and assessment objectives.</p></a>
+      <a class="tool" href="#diagrams"><span class="chip off">○ Empty</span><span class="n">${nDiag}</span><h3>Diagrams &amp; explanations</h3><p>Every “explain, with the aid of a diagram” point in the spec.</p></a>
+      <a class="tool" href="#concepts"><span class="chip off">○ Empty</span><span class="n">${nTerms}</span><h3>Key concepts</h3><p>Every term you are asked to explain or calculate.</p></a>
+      <a class="tool" href="#essays"><span class="chip off">○ Empty</span><span class="n">${nEval}</span><h3>Possible essays</h3><p>Every “evaluate” point, which is where the 25-markers come from.</p></a>
+    </div>
+  </div></section>
+  <section style="padding-top:0"><div class="wrap">
+    <div class="sec-head"><div><div class="eyebrow">Exam night</div><h2>The three papers</h2></div></div>
+    <div class="papers">
+      <div class="paper micro"><div class="code">H460/01</div><h3 style="color:var(--neon)">Microeconomics</h3><p>Data response, then one 25-mark quantitative essay from two, and one non-quantitative essay from two.</p><div class="stats"><span>2 hrs</span><span>80 marks</span><span>33.33%</span></div></div>
+      <div class="paper macro"><div class="code">H460/02</div><h3 style="color:var(--sodium)">Macroeconomics</h3><p>Same format as Paper 1, on macro content.</p><div class="stats"><span>2 hrs</span><span>80 marks</span><span>33.33%</span></div></div>
+      <div class="paper"><div class="code">H460/03</div><h3>Themes in economics</h3><p>Fully synoptic. 30 MCQs, then 50 marks of questions on an unseen theme.</p><div class="stats"><span>2 hrs</span><span>80 marks</span><span>33.33%</span></div></div>
+    </div>
+  </div></section>`;
+}
+
+function topicBlock(t){
+  const lists=[["Explain",t.explain],["Explain and calculate",t.calc],["Explain with a diagram",t.diagram],["Evaluate",t.evaluate]]
+    .filter(([,l])=>l&&l.length)
+    .map(([h,l])=>`<div class="blk"><h4>${h}</h4><ul>${l.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`).join("");
+  const n=CARDS.filter(c=>c.tid===t.id).length;
+  return `<details class="topic"><summary><span class="code">${t.code}</span><span class="ttl">${esc(t.title)}</span>${lvChip(t.level)}<span class="caret">›</span></summary>
+    <div class="topic-body">${lists}
+      <div class="topic-foot">
+        ${n?`<a class="btn" href="#flashcards" data-fc-topic="${t.id}">${n} flashcard${n>1?"s":""}</a>`:""}
+        ${t.diagram?`<a class="btn" href="#diagrams">Diagrams (${t.diagram.length})</a>`:""}
+        ${t.evaluate?`<a class="btn" href="#essays">Essay areas (${t.evaluate.length})</a>`:""}
+      </div>
+    </div></details>`;
+}
+
+function viewArea(area){
+  const ts=TOPICS.filter(t=>t.area===area&&matchLevel(t,state.level));
+  const comp=area==="micro"?"Component 01 · H460/01":"Component 02 · H460/02";
+  const blurb=area==="micro"
+    ?"The economic problem, how markets work and fail, what firms are trying to do, market structures and the labour market."
+    :"How the whole economy behaves, what government is aiming for, the tools it uses, trade and globalisation, and the financial sector.";
+  const units=UNITS[area].filter(u=>ts.some(t=>t.unit===u.n));
+  return `<section class="${area}"><div class="wrap">
+    <div class="sec-head"><div><div class="eyebrow">${comp}</div><h2 style="color:var(--accent)">${area==="micro"?"Microeconomics":"Macroeconomics"}</h2><p>${blurb}</p></div>
+      ${levelSeg("lvl",state.level)}</div>
+    ${units.map(u=>`<div class="unit"><div class="unit-h"><span class="num">${u.n}</span><h3>${esc(u.t)}</h3></div>
+      ${ts.filter(t=>t.unit===u.n).map(topicBlock).join("")}</div>`).join("")}
+  </div></section>`;
+}
+
+/* flashcards */
+function fcPool(){
+  const f=state.fc;
+  return CARDS.filter(c=>{
+    if(f.area!=="all"&&c.area!==f.area)return false;
+    if(f.level!=="all"&&c.area!=="exam"&&c.level!==f.level)return false;
+    if(f.level!=="all"&&c.area==="exam"&&f.area!=="exam")return false;
+    if(f.topic!=="all"&&c.tid!==f.topic)return false;
+    if(f.onlyAgain&&state.marks[c.id]!=="again")return false;
+    return true;
+  });
+}
+function viewFlashcards(){
+  const f=state.fc;
+  const topics=TOPICS.filter(t=>(f.area==="all"||t.area===f.area)&&matchLevel(t,f.level)&&CARDS.some(c=>c.tid===t.id));
+  if(f.topic!=="all"&&f.topic!=="exam"&&!topics.some(t=>t.id===f.topic))f.topic="all";
+  return `<section><div class="wrap">
+    <div class="sec-head"><div><div class="eyebrow">Filled from the spec</div><h2>Flashcards</h2>
+      <p>Every answer here comes straight from the H460 specification. The spec mostly lists what you need to know rather than defining it, so these cards drill the lists, the structure and the exam format. Definitions get added once you send your notes.</p></div></div>
+    <div class="filters">${areaSeg("fcArea",f.area,true)}${levelSeg("fcLevel",f.level)}
+      <select id="fcTopic" aria-label="Topic"><option value="all">All topics</option>
+        ${f.area==="all"||f.area==="exam"?`<option value="exam" ${f.topic==="exam"?"selected":""}>Exam &amp; assessment</option>`:""}
+        ${topics.map(t=>`<option value="${t.id}" ${f.topic===t.id?"selected":""}>${AREA_LABEL[t.area]} ${t.code} · ${esc(t.title)}</option>`).join("")}
+      </select>
+      <button class="btn" id="fcShuffle" type="button">Shuffle</button>
+    </div>
+    <div class="deck">
+      <div><div id="fcStage"></div></div>
+      <aside class="side" id="fcSide"></aside>
+    </div>
+  </div></section>`;
+}
+function renderCard(){
+  const pool=fcPool(); const f=state.fc;
+  if(!f.order||f.order.length!==pool.length||!f.order.every(id=>pool.some(c=>c.id===id)))f.order=pool.map(c=>c.id);
+  if(f.i>=f.order.length)f.i=0;
+  const stage=$("#fcStage"); if(!stage)return;
+  if(!pool.length){
+    stage.innerHTML=`<div class="note empty">${f.onlyAgain?"No cards marked “Again” in this set. Nice.":"No cards match these filters."}</div>`;
+  } else {
+    const c=CARDS.find(x=>x.id===f.order[f.i]);
+    const cls=c.area==="exam"?"":c.area;
+    const tag=c.t?`<span class="chip" style="color:var(--accent);border-color:var(--accent)">${AREA_LABEL[c.area]} ${c.t.code}</span>${lvChip(c.t.level)}<span class="hint">${esc(c.t.title)}</span>`
+                 :`<span class="chip">Exam &amp; assessment</span>`;
+    const mk=state.marks[c.id];
+    stage.innerHTML=`<div class="stage ${cls}" style="${cls?"":"--accent:var(--fg)"}">
+      <div class="card ${f.flipped?"flipped":""}" id="card" tabindex="0" role="button" aria-label="Flashcard. Press space to flip.">
+        <div class="face front"><div class="tag">${tag}</div><div class="q">${esc(c.q)}</div><div class="hint">Tap or press space to flip</div></div>
+        <div class="face back"><div class="tag">${tag}</div><div class="a">${esc(c.a)}</div><div class="hint">${mk==="got"?"Marked: got it":mk==="again"?"Marked: again":"Not marked yet"}</div></div>
+      </div></div>
+      <div class="card-ctrls">
+        <button class="btn" type="button" id="fcPrev" aria-label="Previous card">← Prev</button>
+        <button class="btn" type="button" id="fcFlip">Flip</button>
+        <button class="btn again" type="button" id="fcAgain">Again</button>
+        <button class="btn got" type="button" id="fcGot">Got it</button>
+        <button class="btn" type="button" id="fcNext" aria-label="Next card">Next →</button>
+        <span class="count">${f.i+1} / ${pool.length}</span>
+      </div>`;
+    $("#card").onclick=flip; $("#fcFlip").onclick=flip;
+    $("#fcPrev").onclick=()=>move(-1); $("#fcNext").onclick=()=>move(1);
+    $("#fcGot").onclick=()=>mark(c.id,"got"); $("#fcAgain").onclick=()=>mark(c.id,"again");
+  }
+  renderSide(pool);
+}
+function renderSide(pool){
+  const got=pool.filter(c=>state.marks[c.id]==="got").length;
+  const again=pool.filter(c=>state.marks[c.id]==="again").length;
+  const n=pool.length||1;
+  $("#fcSide").innerHTML=`
+    <div class="eyebrow">This set</div>
+    <div class="meter" aria-hidden="true"><i style="width:${got/n*100}%;background:var(--up)"></i><i style="width:${again/n*100}%;background:var(--down)"></i></div>
+    <div class="stat"><span>Cards</span><span>${pool.length}</span></div>
+    <div class="stat" style="color:var(--up)"><span>Got it</span><span>${got}</span></div>
+    <div class="stat" style="color:var(--down)"><span>Again</span><span>${again}</span></div>
+    <div class="stat"><span>Unmarked</span><span>${pool.length-got-again}</span></div>
+    <label class="chk" style="text-transform:none;letter-spacing:0;font-family:var(--f-body);font-size:13.5px;color:var(--fg);display:flex"><input type="checkbox" id="fcOnlyAgain" ${state.fc.onlyAgain?"checked":""}> Only show “Again” cards</label>
+    <button class="btn" type="button" id="fcReset">Clear marks in this set</button>
+    <div class="hint mono" style="font-size:11.5px;color:var(--muted)">Keys: space flips · ← → move · 1 again · 2 got it. Marks are saved in this browser only.</div>`;
+  $("#fcOnlyAgain").onchange=e=>{state.fc.onlyAgain=e.target.checked;state.fc.i=0;state.fc.flipped=false;state.fc.order=null;renderCard();};
+  $("#fcReset").onclick=()=>{pool.forEach(c=>delete state.marks[c.id]);store.set("ahe.marks",state.marks);renderCard();};
+}
+function flip(){state.fc.flipped=!state.fc.flipped;const c=$("#card");if(c)c.classList.toggle("flipped",state.fc.flipped);}
+function move(d){const n=fcPool().length;if(!n)return;state.fc.i=(state.fc.i+d+n)%n;state.fc.flipped=false;renderCard();}
+function mark(id,v){state.marks[id]=v;store.set("ahe.marks",state.marks);
+  if(state.fc.onlyAgain&&v==="got"){state.fc.order=null;state.fc.flipped=false;renderCard();}else move(1);}
+function bindFlashcards(){
+  bindSeg("fcArea",v=>{Object.assign(state.fc,{area:v,topic:"all",i:0,order:null,flipped:false});render();});
+  bindSeg("fcLevel",v=>{Object.assign(state.fc,{level:v,topic:"all",i:0,order:null,flipped:false});render();});
+  $("#fcTopic").onchange=e=>{Object.assign(state.fc,{topic:e.target.value,i:0,order:null,flipped:false});renderCard();};
+  $("#fcShuffle").onclick=()=>{const o=fcPool().map(c=>c.id);for(let i=o.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]]}
+    state.fc.order=o;state.fc.i=0;state.fc.flipped=false;renderCard();};
+  renderCard();
+}
+
+/* scaffold sections */
+function scaffoldFilters(){
+  return `<div class="filters">${areaSeg("scArea",state.area,false)}${levelSeg("lvl",state.level)}</div>`;
+}
+function scaffoldTopics(key){
+  return TOPICS.filter(t=>(state.area==="all"||t.area===state.area)&&matchLevel(t,state.level)&&key(t).length);
+}
+function topicHeader(t){return `<header><span class="code">${AREA_LABEL[t.area]} ${t.code}</span><b>${esc(t.title)}</b>${lvChip(t.level)}</header>`;}
+
+function viewDiagrams(){
+  const ts=scaffoldTopics(t=>t.diagram||[]);
+  return `<section><div class="wrap">
+    <div class="sec-head"><div><div class="eyebrow">Not filled yet</div><h2>Diagrams &amp; explanations</h2>
+      <p>One slot for every point the spec says to “explain, with the aid of a diagram”. Each needs a labelled diagram and a coherent explanation of what it shows.</p></div></div>
+    ${scaffoldFilters()}
+    <div class="slots">${ts.map(t=>`<div class="slot-topic ${t.area}">${topicHeader(t)}
+      <div class="slot-grid">${t.diagram.map(d=>`<div class="slot"><div class="ttl">${esc(d)}</div><div class="ph">Diagram + explanation<br>not added yet</div></div>`).join("")}</div></div>`).join("")}</div>
+  </div></section>`;
+}
+function viewConcepts(){
+  const ts=scaffoldTopics(t=>[...(t.explain||[]),...(t.calc||[])]);
+  return `<section><div class="wrap">
+    <div class="sec-head"><div><div class="eyebrow">Not filled yet</div><h2>Key concepts</h2>
+      <p>Every term the spec asks you to explain or calculate, grouped by topic. Definitions, examples and formulas go here once you send your content.</p></div></div>
+    ${scaffoldFilters()}
+    <div class="slots">${ts.map(t=>`<div class="slot-topic ${t.area}">${topicHeader(t)}
+      <div class="terms">${[...(t.explain||[]),...(t.calc||[]).map(x=>x+" (calculate)")].map(x=>`<span class="term">${esc(x)}</span>`).join("")}</div>
+      <div class="note" style="margin-top:10px">Definitions not added yet.</div></div>`).join("")}</div>
+  </div></section>`;
+}
+function viewEssays(){
+  const ts=scaffoldTopics(t=>t.evaluate||[]);
+  return `<section><div class="wrap">
+    <div class="sec-head"><div><div class="eyebrow">Not filled yet</div><h2>Possible essays</h2>
+      <p>The 25-mark questions are built from the spec’s “evaluate” points, listed here by topic. Essay titles and plans go in each slot once you send them.</p></div></div>
+    ${scaffoldFilters()}
+    <div class="slots">${ts.map(t=>`<div class="slot-topic ${t.area}">${topicHeader(t)}
+      <div class="eyebrow" style="margin-bottom:6px">Spec evaluation points</div>
+      <ul class="essay-list">${t.evaluate.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+      <div class="note" style="margin-top:10px">No essay questions or plans added yet.</div></div>`).join("")}</div>
+  </div></section>`;
+}
+
+/* ---------- router ---------- */
+const ROUTES={home:viewHome,micro:()=>viewArea("micro"),macro:()=>viewArea("macro"),flashcards:viewFlashcards,diagrams:viewDiagrams,concepts:viewConcepts,essays:viewEssays};
+function current(){const h=location.hash.slice(1);return ROUTES[h]?h:"home";}
+function render(keepScroll){
+  const r=current();
+  $("#app").innerHTML=ROUTES[r]();
+  document.querySelectorAll("nav.main a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+r?"page":"false"));
+  if(r==="home"){
+    const cv=$("#sky");drawSkyline(cv);
+    document.querySelectorAll(".district").forEach(d=>d.addEventListener("click",()=>{state.level=d.dataset.level;store.set("ahe.level",state.level);}));
+  }
+  bindSeg("lvl",v=>{state.level=v;store.set("ahe.level",v);render(true);});
+  bindSeg("scArea",v=>{state.area=v;render(true);});
+  document.querySelectorAll("[data-fc-topic]").forEach(a=>a.addEventListener("click",()=>{
+    const t=topicById(a.dataset.fcTopic);Object.assign(state.fc,{area:t.area,level:"all",topic:t.id,i:0,order:null,flipped:false,onlyAgain:false});
+  }));
+  if(r==="flashcards")bindFlashcards();
+  if(!keepScroll)window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",()=>render());
+window.addEventListener("resize",()=>{const cv=$("#sky");if(cv)drawSkyline(cv);});
+document.addEventListener("keydown",e=>{
+  if(current()!=="flashcards"||e.target.matches("select,input"))return;
+  if(e.key===" "){e.preventDefault();flip();}
+  else if(e.key==="ArrowRight")move(1);
+  else if(e.key==="ArrowLeft")move(-1);
+  else if(e.key==="1"){const c=fcPool().length&&state.fc.order[state.fc.i];if(c)mark(c,"again");}
+  else if(e.key==="2"){const c=fcPool().length&&state.fc.order[state.fc.i];if(c)mark(c,"got");}
+});
+render();
+</script>
+
+</body>
+</html>
