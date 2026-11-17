@@ -10,9 +10,9 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a city at night. Sticky signage bar + ticker tape, a skyline hero, then district "blocks"
+/* Layout: a city at night. Quiet sticky bar, a low skyline hero, then topic groups
    for each part of the course. Micro is lit in neon teal, macro in sodium-streetlamp amber. */
 :root{
   --night:#090d17;      /* sky */
@@ -26,7 +26,7 @@
   --neon-dim:rgba(63,214,204,.14);
   --sodium-dim:rgba(244,166,42,.14);
   --up:#4ade80; --down:#f87171;
-  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
   --r:6px;
@@ -40,9 +40,9 @@ a{color:inherit}
 button,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--neon);outline-offset:2px}
 .wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-h1,h2,h3{font-family:var(--f-display);text-wrap:balance;letter-spacing:.01em;margin:0;line-height:1.05}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;text-wrap:balance;letter-spacing:-.01em;margin:0;line-height:1.15}
 .mono{font-family:var(--f-mono)}
-.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;color:var(--muted)}
 .micro{--accent:var(--neon);--accent-dim:var(--neon-dim)}
 .macro{--accent:var(--sodium);--accent-dim:var(--sodium-dim)}
 
@@ -50,34 +50,28 @@ h1,h2,h3{font-family:var(--f-display);text-wrap:balance;letter-spacing:.01em;mar
 header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(9,13,23,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .bar{display:flex;align-items:center;gap:16px;padding-block:10px;flex-wrap:wrap}
 .brand{display:flex;align-items:baseline;gap:10px;text-decoration:none}
-.brand b{font-family:var(--f-display);font-weight:900;font-size:24px;letter-spacing:.04em;text-transform:uppercase;color:var(--sodium);text-shadow:0 0 18px rgba(244,166,42,.45)}
+.brand b{font-family:var(--f-display);font-weight:500;font-size:21px;color:var(--fg)}
 .brand span{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
 nav.main{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
 nav.main a{white-space:nowrap;text-decoration:none;font-size:13.5px;font-weight:500;padding:6px 10px;border-radius:var(--r);color:var(--muted)}
 nav.main a:hover{color:var(--fg);background:var(--night-3)}
 nav.main a[aria-current="page"]{color:var(--night);background:var(--fg)}
-.ticker{border-top:1px solid var(--line);overflow:hidden;white-space:nowrap;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
-.ticker .track{display:inline-flex;gap:34px;padding:6px 0;animation:tick 70s linear infinite}
-.ticker .t b{color:var(--fg);font-weight:500}
-.ticker .t i{font-style:normal}
-.ticker .t .u{color:var(--up)} .ticker .t .d{color:var(--down)}
-@keyframes tick{to{transform:translateX(-50%)}}
 
 /* ---------- hero ---------- */
 .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
 .hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,13,23,.92) 0%,rgba(9,13,23,.6) 45%,rgba(9,13,23,0) 75%);pointer-events:none}
-.hero .inner{position:relative;z-index:1;padding-block:64px 150px}
-.hero h1{font-size:clamp(46px,9vw,104px);font-weight:900;text-transform:uppercase;max-width:11ch}
-.hero h1 em{font-style:normal;color:var(--sodium);text-shadow:0 0 30px rgba(244,166,42,.5)}
+.hero .inner{position:relative;z-index:1;padding-block:56px 120px}
+.hero h1{font-size:clamp(34px,5.5vw,54px);max-width:16ch}
+.hero h1 em{color:var(--sodium)}
 .hero p{max-width:56ch;color:#c4c9d8;font-size:16.5px;margin:18px 0 0}
 
 /* ---------- generic ---------- */
 main section{padding-block:44px}
 .sec-head{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
-.sec-head h2{font-size:clamp(34px,5vw,52px);font-weight:800;text-transform:uppercase}
+.sec-head h2{font-size:clamp(26px,3.4vw,34px)}
 .sec-head p{margin:6px 0 0;color:var(--muted);max-width:62ch}
-.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .chip.lv-AS{color:var(--fg)}
 .chip.lv-A{color:#f0abfc;border-color:rgba(240,171,252,.35)}
 .chip.on{color:var(--up);border-color:rgba(74,222,128,.4)}
@@ -96,32 +90,32 @@ select{background:var(--night-3);border:1px solid var(--line);border-radius:var(
 
 /* ---------- districts (home) ---------- */
 .districts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.district{position:relative;display:block;text-decoration:none;background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:20px 20px 18px;overflow:hidden;min-width:0}
-.district::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+.district{position:relative;display:flex;flex-direction:column;text-decoration:none;background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:20px 20px 18px;overflow:hidden;min-width:0}
+.district::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--accent);opacity:.7}
 .district:hover{border-color:var(--accent)}
-.district h3{font-size:32px;font-weight:800;text-transform:uppercase;color:var(--accent);margin:8px 0 10px}
+.district h3{font-size:24px;color:var(--fg);margin:6px 0 10px}
 .district ul{margin:0;padding:0;list-style:none;display:grid;gap:3px;font-size:14px;color:#c4c9d8}
 .district ul li span{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-right:8px}
-.district .meta{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.district .meta{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:14px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 .tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .tool{display:flex;flex-direction:column;gap:8px;text-decoration:none;background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
 .tool:hover{border-color:var(--muted)}
-.tool .n{font-family:var(--f-display);font-weight:800;font-size:44px;line-height:1}
+.tool .n{font-family:var(--f-display);font-size:34px;line-height:1}
 .tool h3{font-family:var(--f-body);font-size:15px;font-weight:600}
 .tool p{margin:0;color:var(--muted);font-size:13.5px}
 .papers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .paper{padding:18px;background:var(--night-2);min-width:0}
 .paper+.paper{border-left:1px solid var(--line)}
 .paper .code{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
-.paper h3{font-size:26px;font-weight:800;text-transform:uppercase;margin:4px 0 8px}
+.paper h3{font-size:21px;margin:4px 0 8px}
 .paper p{margin:0;font-size:13.5px;color:#c4c9d8}
 .paper .stats{display:flex;gap:16px;margin-top:12px;font-family:var(--f-mono);font-size:12.5px;font-variant-numeric:tabular-nums}
 
 /* ---------- spec topics ---------- */
 .unit{margin-bottom:30px}
 .unit-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
-.unit-h h3{font-size:26px;font-weight:800;text-transform:uppercase}
-.unit-h .num{font-family:var(--f-display);font-weight:900;font-size:26px;color:var(--accent)}
+.unit-h h3{font-size:22px}
+.unit-h .num{font-family:var(--f-mono);font-size:14px;color:var(--accent)}
 details.topic{border:1px solid var(--line);border-radius:var(--r);background:var(--night-2);margin-bottom:8px}
 details.topic[open]{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
 details.topic summary{list-style:none;cursor:pointer;display:flex;gap:12px;align-items:center;padding:12px 14px;flex-wrap:wrap}
@@ -132,7 +126,7 @@ details.topic summary .caret{color:var(--muted);transition:transform .2s}
 details.topic[open] summary .caret{transform:rotate(90deg)}
 .topic-body{padding:0 14px 16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .blk{min-width:0}
-.blk h4{margin:0 0 6px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.blk h4{margin:0 0 6px;font-size:13px;color:var(--muted);font-weight:500}
 .blk ul{margin:0;padding-left:18px;font-size:14px}
 .blk li{margin-bottom:3px}
 .blk li::marker{color:var(--accent)}
@@ -147,7 +141,7 @@ details.topic[open] summary .caret{transform:rotate(90deg)}
 .face.front{background:linear-gradient(160deg,var(--night-3),var(--night-2))}
 .face.back{background:var(--night-2);transform:rotateY(180deg);border-color:var(--accent)}
 .face .tag{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.face .q{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,3.6vw,36px);line-height:1.12;margin:auto 0;text-wrap:balance}
+.face .q{font-family:var(--f-display);font-size:clamp(22px,2.8vw,28px);line-height:1.3;margin:auto 0;text-wrap:balance}
 .face .a{font-size:16.5px;line-height:1.6;margin:auto 0;white-space:pre-line}
 .face .hint{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
 .card-ctrls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
@@ -155,7 +149,7 @@ details.topic[open] summary .caret{transform:rotate(90deg)}
 .btn.got{border-color:rgba(74,222,128,.45);color:var(--up)}
 .btn.again{border-color:rgba(248,113,113,.45);color:var(--down)}
 .side{background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;min-width:0}
-.side label{display:grid;gap:4px;font-size:12px;color:var(--muted);font-family:var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.side label{display:grid;gap:4px;font-size:12px;color:var(--muted)}
 .side .stat{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums}
 .meter{height:6px;border-radius:3px;background:var(--line);overflow:hidden;display:flex}
 .meter i{display:block;height:100%}
@@ -198,15 +192,14 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
   .hero .inner{padding-block:44px 120px}
 }
 @media (prefers-reduced-motion:reduce){
-  .ticker .track{animation:none}
-  .card{transition:none}
+    .card{transition:none}
   *{scroll-behavior:auto}
 }
 </style>
 
 <header class="top">
   <div class="wrap bar">
-    <a class="brand" href="#home"><b>After Hours</b><span>OCR H460 Economics</span></a>
+    <a class="brand" href="#home"><b>After Hours</b><span>A Level Economics</span></a>
     <nav class="main" aria-label="Sections">
       <a href="#home">Home</a>
       <a href="#micro">Micro</a>
@@ -217,7 +210,6 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
       <a href="#essays">Essays</a>
     </nav>
   </div>
-  <div class="ticker" aria-hidden="true"><div class="track" id="ticker"></div></div>
 </header>
 
 <main id="app"></main>
@@ -616,15 +608,6 @@ function bindSeg(id,fn){
   el.addEventListener("click",e=>{const b=e.target.closest("button");if(b)fn(b.dataset.v)});
 }
 
-/* ---------- ticker ---------- */
-(function(){
-  const items=[["H460/01","MICRO","33.33%","u"],["H460/02","MACRO","33.33%","u"],["H460/03","THEMES","SYNOPTIC","u"],
-    ["PED","2.6","CALC","u"],["NAIRU","2.8","LRPC","d"],["CPI","2.4","INDEX","u"],["RPI","2.4","INDEX","d"],["GINI","2.7","LORENZ","d"],
-    ["MRP","5.1","WAGES","u"],["QE","3.2","MONEY","u"],["MSC","2.8","EXT","d"],["HDI","2.2","DEV","u"],["J-CURVE","4.3","TRADE","d"],
-    ["MPC","1.5","MULT","u"],["WTO","4.4","FREE TRADE","u"],["MES","3.2","SCALE","u"],["AO4","EVAL","25%","u"]];
-  const html=items.map(([a,b,c,d])=>`<span class="t"><b>${a}</b> ${b} <i class="${d}">${d==="u"?"▲":"▼"} ${c}</i></span>`).join("");
-  $("#ticker").innerHTML=html+html;
-})();
 
 /* ---------- skyline (canvas) ---------- */
 function drawSkyline(cv){
@@ -681,26 +664,26 @@ function viewHome(){
   return `
   <div class="hero"><canvas id="sky" aria-hidden="true"></canvas>
     <div class="wrap inner">
-      <div class="eyebrow">OCR A Level Economics · H460 · 3 papers · 240 marks</div>
-      <h1>The market <em>never</em> sleeps</h1>
-      <p>The whole H460 spec, split into microeconomics and macroeconomics, AS and A Level. Flashcards are loaded and ready. Diagrams, key concepts and essay plans have their slots laid out against the spec, waiting for content.</p>
+      <div class="eyebrow">OCR H460</div>
+      <h1>A Level Economics revision</h1>
+      <p>Everything in the spec, grouped into micro and macro, AS and A Level. The flashcards are done. Diagrams, definitions and essay plans still need writing.</p>
     </div>
   </div>
   <section><div class="wrap">
-    <div class="sec-head"><div><div class="eyebrow">Districts</div><h2>Pick your block</h2></div></div>
+    <div class="sec-head"><div><h2>Topics</h2></div></div>
     <div class="districts">${district("micro","AS")}${district("macro","AS")}${district("micro","A")}${district("macro","A")}</div>
   </div></section>
   <section style="padding-top:0"><div class="wrap">
-    <div class="sec-head"><div><div class="eyebrow">Study tools</div><h2>Open late</h2></div></div>
+    <div class="sec-head"><div><h2>Revision</h2></div></div>
     <div class="tools">
-      <a class="tool" href="#flashcards"><span class="chip on">● Filled</span><span class="n">${CARDS.length}</span><h3>Flashcards</h3><p>Drawn from the spec, including exam format and assessment objectives.</p></a>
-      <a class="tool" href="#diagrams"><span class="chip off">○ Empty</span><span class="n">${nDiag}</span><h3>Diagrams &amp; explanations</h3><p>Every “explain, with the aid of a diagram” point in the spec.</p></a>
-      <a class="tool" href="#concepts"><span class="chip off">○ Empty</span><span class="n">${nTerms}</span><h3>Key concepts</h3><p>Every term you are asked to explain or calculate.</p></a>
-      <a class="tool" href="#essays"><span class="chip off">○ Empty</span><span class="n">${nEval}</span><h3>Possible essays</h3><p>Every “evaluate” point, which is where the 25-markers come from.</p></a>
+      <a class="tool" href="#flashcards"><span class="chip on">Done</span><span class="n">${CARDS.length}</span><h3>Flashcards</h3><p>Spec content plus how the exams work.</p></a>
+      <a class="tool" href="#diagrams"><span class="chip off">To do</span><span class="n">${nDiag}</span><h3>Diagrams &amp; explanations</h3><p>Every point the spec wants drawn.</p></a>
+      <a class="tool" href="#concepts"><span class="chip off">To do</span><span class="n">${nTerms}</span><h3>Key concepts</h3><p>Terms to define or calculate.</p></a>
+      <a class="tool" href="#essays"><span class="chip off">To do</span><span class="n">${nEval}</span><h3>Possible essays</h3><p>The spec’s evaluate points, which the 25-markers come from.</p></a>
     </div>
   </div></section>
   <section style="padding-top:0"><div class="wrap">
-    <div class="sec-head"><div><div class="eyebrow">Exam night</div><h2>The three papers</h2></div></div>
+    <div class="sec-head"><div><h2>The exams</h2></div></div>
     <div class="papers">
       <div class="paper micro"><div class="code">H460/01</div><h3 style="color:var(--neon)">Microeconomics</h3><p>Data response, then one 25-mark quantitative essay from two, and one non-quantitative essay from two.</p><div class="stats"><span>2 hrs</span><span>80 marks</span><span>33.33%</span></div></div>
       <div class="paper macro"><div class="code">H460/02</div><h3 style="color:var(--sodium)">Macroeconomics</h3><p>Same format as Paper 1, on macro content.</p><div class="stats"><span>2 hrs</span><span>80 marks</span><span>33.33%</span></div></div>
@@ -732,7 +715,7 @@ function viewArea(area){
     :"How the whole economy behaves, what government is aiming for, the tools it uses, trade and globalisation, and the financial sector.";
   const units=UNITS[area].filter(u=>ts.some(t=>t.unit===u.n));
   return `<section class="${area}"><div class="wrap">
-    <div class="sec-head"><div><div class="eyebrow">${comp}</div><h2 style="color:var(--accent)">${area==="micro"?"Microeconomics":"Macroeconomics"}</h2><p>${blurb}</p></div>
+    <div class="sec-head"><div><div class="eyebrow">${comp}</div><h2>${area==="micro"?"Microeconomics":"Macroeconomics"}</h2><p>${blurb}</p></div>
       ${levelSeg("lvl",state.level)}</div>
     ${units.map(u=>`<div class="unit"><div class="unit-h"><span class="num">${u.n}</span><h3>${esc(u.t)}</h3></div>
       ${ts.filter(t=>t.unit===u.n).map(topicBlock).join("")}</div>`).join("")}
@@ -756,8 +739,8 @@ function viewFlashcards(){
   const topics=TOPICS.filter(t=>(f.area==="all"||t.area===f.area)&&matchLevel(t,f.level)&&CARDS.some(c=>c.tid===t.id));
   if(f.topic!=="all"&&f.topic!=="exam"&&!topics.some(t=>t.id===f.topic))f.topic="all";
   return `<section><div class="wrap">
-    <div class="sec-head"><div><div class="eyebrow">Filled from the spec</div><h2>Flashcards</h2>
-      <p>Every answer here comes straight from the H460 specification. The spec mostly lists what you need to know rather than defining it, so these cards drill the lists, the structure and the exam format. Definitions get added once you send your notes.</p></div></div>
+    <div class="sec-head"><div><h2>Flashcards</h2>
+      <p>Answers come from the spec only, so they cover lists and structure rather than definitions.</p></div></div>
     <div class="filters">${areaSeg("fcArea",f.area,true)}${levelSeg("fcLevel",f.level)}
       <select id="fcTopic" aria-label="Topic"><option value="all">All topics</option>
         ${f.area==="all"||f.area==="exam"?`<option value="exam" ${f.topic==="exam"?"selected":""}>Exam &amp; assessment</option>`:""}
@@ -777,7 +760,7 @@ function renderCard(){
   if(f.i>=f.order.length)f.i=0;
   const stage=$("#fcStage"); if(!stage)return;
   if(!pool.length){
-    stage.innerHTML=`<div class="note empty">${f.onlyAgain?"No cards marked “Again” in this set. Nice.":"No cards match these filters."}</div>`;
+    stage.innerHTML=`<div class="note empty">${f.onlyAgain?"No cards marked “Again” in this set.":"No cards match these filters."}</div>`;
   } else {
     const c=CARDS.find(x=>x.id===f.order[f.i]);
     const cls=c.area==="exam"?"":c.area;
@@ -786,7 +769,7 @@ function renderCard(){
     const mk=state.marks[c.id];
     stage.innerHTML=`<div class="stage ${cls}" style="${cls?"":"--accent:var(--fg)"}">
       <div class="card ${f.flipped?"flipped":""}" id="card" tabindex="0" role="button" aria-label="Flashcard. Press space to flip.">
-        <div class="face front"><div class="tag">${tag}</div><div class="q">${esc(c.q)}</div><div class="hint">Tap or press space to flip</div></div>
+        <div class="face front"><div class="tag">${tag}</div><div class="q">${esc(c.q)}</div><div class="hint">Tap to flip</div></div>
         <div class="face back"><div class="tag">${tag}</div><div class="a">${esc(c.a)}</div><div class="hint">${mk==="got"?"Marked: got it":mk==="again"?"Marked: again":"Not marked yet"}</div></div>
       </div></div>
       <div class="card-ctrls">
@@ -845,34 +828,34 @@ function topicHeader(t){return `<header><span class="code">${AREA_LABEL[t.area]}
 function viewDiagrams(){
   const ts=scaffoldTopics(t=>t.diagram||[]);
   return `<section><div class="wrap">
-    <div class="sec-head"><div><div class="eyebrow">Not filled yet</div><h2>Diagrams &amp; explanations</h2>
-      <p>One slot for every point the spec says to “explain, with the aid of a diagram”. Each needs a labelled diagram and a coherent explanation of what it shows.</p></div></div>
+    <div class="sec-head"><div><h2>Diagrams &amp; explanations</h2>
+      <p>Each point the spec says to explain with a diagram. Not written yet.</p></div></div>
     ${scaffoldFilters()}
     <div class="slots">${ts.map(t=>`<div class="slot-topic ${t.area}">${topicHeader(t)}
-      <div class="slot-grid">${t.diagram.map(d=>`<div class="slot"><div class="ttl">${esc(d)}</div><div class="ph">Diagram + explanation<br>not added yet</div></div>`).join("")}</div></div>`).join("")}</div>
+      <div class="slot-grid">${t.diagram.map(d=>`<div class="slot"><div class="ttl">${esc(d)}</div><div class="ph">Not drawn yet</div></div>`).join("")}</div></div>`).join("")}</div>
   </div></section>`;
 }
 function viewConcepts(){
   const ts=scaffoldTopics(t=>[...(t.explain||[]),...(t.calc||[])]);
   return `<section><div class="wrap">
-    <div class="sec-head"><div><div class="eyebrow">Not filled yet</div><h2>Key concepts</h2>
-      <p>Every term the spec asks you to explain or calculate, grouped by topic. Definitions, examples and formulas go here once you send your content.</p></div></div>
+    <div class="sec-head"><div><h2>Key concepts</h2>
+      <p>Terms from the spec, by topic. Definitions not written yet.</p></div></div>
     ${scaffoldFilters()}
     <div class="slots">${ts.map(t=>`<div class="slot-topic ${t.area}">${topicHeader(t)}
       <div class="terms">${[...(t.explain||[]),...(t.calc||[]).map(x=>x+" (calculate)")].map(x=>`<span class="term">${esc(x)}</span>`).join("")}</div>
-      <div class="note" style="margin-top:10px">Definitions not added yet.</div></div>`).join("")}</div>
+      </div>`).join("")}</div>
   </div></section>`;
 }
 function viewEssays(){
   const ts=scaffoldTopics(t=>t.evaluate||[]);
   return `<section><div class="wrap">
-    <div class="sec-head"><div><div class="eyebrow">Not filled yet</div><h2>Possible essays</h2>
-      <p>The 25-mark questions are built from the spec’s “evaluate” points, listed here by topic. Essay titles and plans go in each slot once you send them.</p></div></div>
+    <div class="sec-head"><div><h2>Possible essays</h2>
+      <p>The spec’s evaluate points by topic. Essay titles and plans not written yet.</p></div></div>
     ${scaffoldFilters()}
     <div class="slots">${ts.map(t=>`<div class="slot-topic ${t.area}">${topicHeader(t)}
       <div class="eyebrow" style="margin-bottom:6px">Spec evaluation points</div>
       <ul class="essay-list">${t.evaluate.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
-      <div class="note" style="margin-top:10px">No essay questions or plans added yet.</div></div>`).join("")}</div>
+      <div class="note" style="margin-top:10px">No plans yet.</div></div>`).join("")}</div>
   </div></section>`;
 }
 
