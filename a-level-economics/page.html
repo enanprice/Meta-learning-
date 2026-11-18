@@ -18,6 +18,7 @@
   --neon-dim:rgba(63,214,204,.14);
   --sodium-dim:rgba(244,166,42,.14);
   --up:#4ade80; --down:#f87171;
+  --fig-c:#a5b4fc;      /* second curve in diagrams */
   --f-display:"Newsreader",Georgia,"Times New Roman",serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -166,6 +167,38 @@ details.topic[open] summary .caret{transform:rotate(90deg)}
 .essay-list li{margin-bottom:4px}
 .essay-list li::marker{color:var(--accent)}
 
+/* ---------- diagrams ---------- */
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:14px}
+.dslot{border:1px solid var(--line);border-radius:var(--r);padding:14px;background:var(--night);min-width:0;display:flex;flex-direction:column;gap:10px}
+.dslot.wide{grid-column:1/-1}
+.dslot h4{margin:0;font-size:14.5px;font-weight:600}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:14px}
+.dslot:not(.wide) .figs{max-width:460px}
+figure{margin:0;min-width:0}
+figcaption{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);text-align:center;margin-top:4px}
+.fig{width:100%;height:auto;display:block;overflow:visible;max-width:460px;margin:0 auto}
+.fig text{font-family:var(--f-mono);font-size:11px}
+.expl p{margin:0 0 8px;font-size:14px;color:#c4c9d8;max-width:72ch}
+.expl p:last-child{margin-bottom:0}
+/* ---------- essays ---------- */
+details.essay{border:1px solid var(--line);border-radius:var(--r);background:var(--night);margin-top:8px}
+details.essay summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;gap:3px}
+details.essay summary::-webkit-details-marker{display:none}
+details.essay .spec{font-family:var(--f-mono);font-size:11.5px;color:var(--accent)}
+details.essay .eq{font-family:var(--f-display);font-size:18px;line-height:1.35}
+details.essay[open] summary{border-bottom:1px solid var(--line)}
+.eb{padding:14px;display:grid;gap:14px;font-size:14px}
+.eb h5{margin:0 0 6px;font-size:13px;font-weight:500;color:var(--muted)}
+.eb ul{margin:0;padding-left:18px}
+.eb li{margin-bottom:4px}
+.eb li::marker{color:var(--accent)}
+.eb p{margin:0}
+.ecols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.ed{color:#c4c9d8}
+.ed b{font-weight:500;color:var(--fg)}
+.ej{border-left:2px solid var(--accent);padding-left:12px}
+@media (max-width:700px){.ecols{grid-template-columns:1fr}}
+
 footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);font-size:12.5px}
 
 @media (max-width:860px){
@@ -210,6 +243,8 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
   <div class="wrap">Built from the OCR A Level Economics specification (H460, version 3.0). Topic codes match the spec. The AS / A Level split follows the usual Year 12 / Year 13 teaching order and is not stated in the H460 document itself.</div>
 </footer>
 
+<script src="diagrams.js"></script>
+<script src="essays.js"></script>
 <script>
 /* =====================================================================
    SPEC DATA — transcribed from OCR H460 v3.0, sections 2c and 2d.
@@ -658,7 +693,7 @@ function viewHome(){
     <div class="wrap inner">
       <div class="eyebrow">OCR H460</div>
       <h1>A Level Economics revision</h1>
-      <p>Everything in the spec, grouped into micro and macro, AS and A Level. The flashcards are done. Diagrams, definitions and essay plans still need writing.</p>
+      <p>Everything in the spec, grouped into micro and macro, AS and A Level. Flashcards, diagrams and essay plans are done. Definitions for key concepts are still to come.</p>
     </div>
   </div>
   <section><div class="wrap">
@@ -669,9 +704,9 @@ function viewHome(){
     <div class="sec-head"><div><h2>Revision</h2></div></div>
     <div class="tools">
       <a class="tool" href="#flashcards"><span class="chip on">Done</span><span class="n">${CARDS.length}</span><h3>Flashcards</h3><p>Spec content plus how the exams work.</p></a>
-      <a class="tool" href="#diagrams"><span class="chip off">To do</span><span class="n">${nDiag}</span><h3>Diagrams &amp; explanations</h3><p>Every point the spec wants drawn.</p></a>
+      <a class="tool" href="#diagrams"><span class="chip on">Done</span><span class="n">${nDiag}</span><h3>Diagrams &amp; explanations</h3><p>Every point the spec wants drawn, with an explanation.</p></a>
       <a class="tool" href="#concepts"><span class="chip off">To do</span><span class="n">${nTerms}</span><h3>Key concepts</h3><p>Terms to define or calculate.</p></a>
-      <a class="tool" href="#essays"><span class="chip off">To do</span><span class="n">${nEval}</span><h3>Possible essays</h3><p>The spec’s evaluate points, which the 25-markers come from.</p></a>
+      <a class="tool" href="#essays"><span class="chip on">Done</span><span class="n">${nEval}</span><h3>Possible essays</h3><p>A 25-mark plan for every evaluate point.</p></a>
     </div>
   </div></section>
   <section style="padding-top:0"><div class="wrap">
@@ -819,12 +854,17 @@ function topicHeader(t){return `<header><span class="code">${AREA_LABEL[t.area]}
 
 function viewDiagrams(){
   const ts=scaffoldTopics(t=>t.diagram||[]);
+  const D=window.DIAG||{};
   return `<section><div class="wrap">
     <div class="sec-head"><div><h2>Diagrams &amp; explanations</h2>
-      <p>Each point the spec says to explain with a diagram. Not written yet.</p></div></div>
+      <p>Every point the spec says to explain with a diagram, drawn and explained. In the exam: label both axes, every curve and every equilibrium, then say in words what the diagram shows.</p></div></div>
     ${scaffoldFilters()}
     <div class="slots">${ts.map(t=>`<div class="slot-topic ${t.area}">${topicHeader(t)}
-      <div class="slot-grid">${t.diagram.map(d=>`<div class="slot"><div class="ttl">${esc(d)}</div><div class="ph">Not drawn yet</div></div>`).join("")}</div></div>`).join("")}</div>
+      <div class="dgrid">${t.diagram.map((d,i)=>{const x=D[t.id+"|"+i];
+        if(!x)return `<div class="slot"><div class="ttl">${esc(d)}</div><div class="ph">Not drawn yet</div></div>`;
+        return `<article class="dslot${x.figs.length>1?" wide":""}"><h4>${esc(d)}</h4>
+          <div class="figs">${x.figs.map(f=>`<figure>${FIG(f)}${f.cap?`<figcaption>${esc(f.cap)}</figcaption>`:""}</figure>`).join("")}</div>
+          <div class="expl">${x.t.split("\n").map(p=>`<p>${esc(p)}</p>`).join("")}</div></article>`;}).join("")}</div></div>`).join("")}</div>
   </div></section>`;
 }
 function viewConcepts(){
@@ -840,14 +880,19 @@ function viewConcepts(){
 }
 function viewEssays(){
   const ts=scaffoldTopics(t=>t.evaluate||[]);
+  const E=window.ESSAYS||{};
+  const li=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
   return `<section><div class="wrap">
     <div class="sec-head"><div><h2>Possible essays</h2>
-      <p>The spec’s evaluate points by topic. Essay titles and plans not written yet.</p></div></div>
+      <p>A plan for every evaluate point in the spec. You get about 40 minutes per 25-marker: two or three chains of analysis, evaluation on each, then a judgement that says what the answer depends on.</p></div></div>
     ${scaffoldFilters()}
     <div class="slots">${ts.map(t=>`<div class="slot-topic ${t.area}">${topicHeader(t)}
-      <div class="eyebrow" style="margin-bottom:6px">Spec evaluation points</div>
-      <ul class="essay-list">${t.evaluate.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
-      <div class="note" style="margin-top:10px">No plans yet.</div></div>`).join("")}</div>
+      ${t.evaluate.map((x,i)=>{const p=E[t.id+"|"+i];
+        if(!p)return `<div class="note" style="margin-top:8px">${esc(x)}: no plan yet.</div>`;
+        return `<details class="essay"><summary><span class="spec">Spec: ${esc(x)}</span><span class="eq">${esc(p.q)}</span></summary>
+          <div class="eb"><div class="ed"><b>Diagram:</b> ${esc(p.d)}</div>
+          <div class="ecols"><div><h5>Analysis</h5>${li(p.a)}</div><div><h5>Evaluation</h5>${li(p.e)}</div></div>
+          <div class="ej"><h5>Judgement</h5><p>${esc(p.j)}</p></div></div></details>`;}).join("")}</div>`).join("")}</div>
   </div></section>`;
 }
 
