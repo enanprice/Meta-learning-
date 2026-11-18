@@ -77,7 +77,7 @@ function mono(a,b,o){o=o||{};const AR=q=>a-b*q,MR=q=>a-2*b*q;
     s.dots.push({p:[qMin,ACmin],t:"min AC",dx:6,dy:16});}
   return s}
 /* AD / AS */
-const ADf=sh=>({f:x=>2+12/(x-sh+.8),x0:sh+.9,x1:9.3,lp:[sh+1.15,8.9]});
+const ADf=sh=>{const f=x=>2+12/(x-sh+.8),x0=Math.max(sh+.9,.2);return {f,x0,x1:9.3,lp:[x0+.25,Math.min(8.9,f(x0)-.2)]}};
 const SRASf=sh=>({f:x=>.6+1.1*(x-sh),x0:Math.max(.3,sh+.3),x1:Math.min(9.3,sh+7.8)});
 const meet=(f,g,lo,hi)=>{const x=solve(v=>f(v)-g(v),lo,hi);return [x,f(x)]};
 const adas={x:"Real GDP",y:"Price level"};
@@ -85,7 +85,7 @@ function adShift(sh1,sh2,o){o=o||{};const a1=ADf(sh1),a2=ADf(sh2),s1=SRASf(0);
   const e1=meet(a1.f,s1.f,sh1+1,9.3),e2=meet(a2.f,s1.f,sh2+1,9.3);
   const s={...adas,cap:o.cap,lines:[{...a1,l:o.l1||"AD1",c:"a"},{...a2,l:o.l2||"AD2",c:o.c2||"c",d:o.d2},{...s1,l:"SRAS",c:"b"}],
     guides:[{p:e1,xl:"Y1",yl:"P1"},{p:e2,xl:"Y2",yl:"P2"}],arrows:[]};
-  const ya=6.6,xa=sh=>sh-.8+12/(ya-2),dir=sh2>sh1?1:-1;
+  const ya=sh2<sh1?5.2:6.6,xa=sh=>sh-.8+12/(ya-2),dir=sh2>sh1?1:-1;
   if(sh1!==sh2)s.arrows.push({f:[xa(sh1)+.25*dir,ya],t:[xa(sh2)-.25*dir,ya]});
   if(o.lras){s.lines.push({p:[[o.lras,.3],[o.lras,9.4]],l:"LRAS",c:"m",lp:[o.lras+.15,.6]})}
   return s}
@@ -315,7 +315,7 @@ const DIAG={
   arrows:[{f:[4.8,p1(5)+.2],t:[3.25,p1(3)-.1],c:"m"},{f:[3.25,p1(3)+.35],t:[4.8,p2(5)-.05],c:"m"}],text:[{p:[5,-.95],t:"NAIRU",c:"m",a:"middle"}]}],
  t:"The short-run Phillips curve (SRPC) shows a trade-off: lower unemployment comes with higher inflation. Push unemployment below its natural rate (A to B) and inflation rises.\nThe neo-classical view, from Friedman: workers come to expect the higher inflation and bargain for higher wages, so the SRPC shifts up (B to C). Unemployment returns to its natural rate (the NAIRU), but now with higher inflation. So the long-run Phillips curve (LRPC) is vertical at the NAIRU: there is no long-run trade-off.\nThe 1970s, with high inflation and high unemployment at the same time (stagflation), broke the original curve. The flat curve of the 2010s and the inflation surge of 2021–23 show the relationship isn't stable."}})(),
 
-"ma3.2|0":{figs:[adShift(0,-1.6,{l1:"AD1",l2:"AD2"})],
+"ma3.2|0":{figs:[adShift(0,-2.4,{l1:"AD1",l2:"AD2"})],
  t:"Raising Bank Rate makes borrowing more expensive and saving more attractive. It cuts the disposable income of people with variable-rate mortgages, lowers asset prices, and tends to strengthen the pound.\nConsumption, investment and net exports all fall, so AD shifts left (AD1 to AD2). Inflation falls, but so does growth, and unemployment rises. A rate cut does the reverse.\nThe full effect takes around 18 to 24 months to come through."},
 "ma3.2|1":{figs:[{x:"Quantity of money",y:"Interest rate",lines:[{p:[[1,9.8],[8.5,.8]],l:"Md",c:"b"},{p:[[4,.3],[4,9.4]],l:"Ms1",lp:[4.15,9.2]},{p:[[6,.3],[6,9.4]],l:"Ms2",c:"c",lp:[6.15,9.2]}],
   guides:[{p:[4,6.2],xl:null,yl:"r1"},{p:[6,3.8],xl:null,yl:"r2"}],arrows:[{f:[4.2,8],t:[5.8,8]}]}],

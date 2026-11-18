@@ -98,7 +98,7 @@ select{background:var(--night-3);border:1px solid var(--line);border-radius:var(
 .district ul{margin:0;padding:0;list-style:none;display:grid;gap:3px;font-size:14px;color:#c4c9d8}
 .district ul li span{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-right:8px}
 .district .meta{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:14px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
-.tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:14px}
 .tool{display:flex;flex-direction:column;gap:8px;text-decoration:none;background:var(--night-2);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
 .tool:hover{border-color:var(--muted)}
 .tool .n{font-family:var(--f-display);font-size:34px;line-height:1}
@@ -193,6 +193,11 @@ figcaption{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);text-al
 .defs div{min-width:0;padding-block:8px;border-top:1px solid var(--line)}
 .defs dt{font-weight:600;font-size:14.5px;margin-bottom:2px}
 .defs dd{margin:0;font-size:14px;color:#c4c9d8}
+/* ---------- answers ---------- */
+.ans-intro{margin:0 0 4px;color:var(--muted);font-size:14px;max-width:70ch}
+.ans-figs{max-width:760px}
+.eb .ans-text p{margin:0 0 10px;max-width:75ch;line-height:1.65}
+.eb .ans-text p:last-child{margin-bottom:0}
 /* ---------- essays ---------- */
 details.essay{border:1px solid var(--line);border-radius:var(--r);background:var(--night);margin-top:8px}
 details.essay summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;gap:3px}
@@ -215,7 +220,6 @@ details.essay[open] summary{border-bottom:1px solid var(--line)}
 footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);font-size:12.5px}
 
 @media (max-width:860px){
-  .tools{grid-template-columns:repeat(2,minmax(0,1fr))}
   .papers{grid-template-columns:1fr}
   .paper+.paper{border-left:0;border-top:1px solid var(--line)}
   .deck{grid-template-columns:1fr}
@@ -223,7 +227,6 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
 }
 @media (max-width:560px){
   .districts{grid-template-columns:1fr}
-  .tools{grid-template-columns:1fr 1fr}
   nav.main{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap}
   .card{height:380px}
   .face{padding:20px}
@@ -246,6 +249,7 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
       <a href="#diagrams">Diagrams</a>
       <a href="#concepts">Key concepts</a>
       <a href="#essays">Essays</a>
+      <a href="#answers">Answers</a>
     </nav>
   </div>
 </header>
@@ -260,6 +264,7 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
 <script src="essays.js"></script>
 <script src="cards.js"></script>
 <script src="concepts.js"></script>
+<script src="answers.js"></script>
 <script>
 /* =====================================================================
    SPEC DATA — transcribed from OCR H460 v3.0, sections 2c and 2d.
@@ -722,6 +727,7 @@ function viewHome(){
       <a class="tool" href="#diagrams"><span class="chip on">Done</span><span class="n">${nDiag}</span><h3>Diagrams &amp; explanations</h3><p>Every point the spec wants drawn, with an explanation.</p></a>
       <a class="tool" href="#concepts"><span class="chip">AS macro done</span><span class="n">${nTerms}</span><h3>Key concepts</h3><p>Definitions for AS macro; term lists for the rest.</p></a>
       <a class="tool" href="#essays"><span class="chip on">Done</span><span class="n">${nEval}</span><h3>Possible essays</h3><p>A 25-mark plan for every evaluate point.</p></a>
+      <a class="tool" href="#answers"><span class="chip">AS macro</span><span class="n">${(window.ANSWERS||[]).length}</span><h3>Example answers</h3><p>Model 4, 10 and 20 mark answers with notes on why they score.</p></a>
     </div>
   </div></section>
   <section style="padding-top:0"><div class="wrap">
@@ -913,8 +919,31 @@ function viewEssays(){
   </div></section>`;
 }
 
+function viewAnswers(){
+  const A=window.ANSWERS||[],D=window.DIAG||{},m=state.ansMarks||"all";
+  const groups=[[4,"4-mark questions","Knowledge and application: define, calculate, explain one or two points. No evaluation needed."],
+    [10,"10-mark questions","Analysis: developed chains of reasoning, usually with a diagram. One qualifying point helps."],
+    [20,"20-mark questions","Analysis and evaluation on both sides, real UK context, and a justified judgement that says what it depends on."]];
+  const card=x=>{const t=topicById(x.t);
+    return `<details class="essay ans"><summary><span class="spec">${x.marks} marks · Macro ${t.code} ${esc(t.title)}</span><span class="eq">${esc(x.q)}</span></summary>
+      <div class="eb">
+        ${x.figs?`<div class="figs ans-figs">${x.figs.map(([k,i])=>{const f=D[k]&&D[k].figs[i];return f?`<figure>${FIG(f)}</figure>`:""}).join("")}</div>`:""}
+        <div class="ans-text"><h5>Example answer</h5>${x.a.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+        <div class="ej"><h5>Why it scores</h5><ul>${x.n.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
+      </div></details>`};
+  return `<section class="macro"><div class="wrap">
+    <div class="sec-head"><div><h2>Example answers</h2>
+      <p>Model answers for AS macroeconomics. Try each question yourself before you open it, then compare. Check mark allocations against OCR past papers, since they vary from paper to paper.</p></div></div>
+    <div class="filters"><div class="seg" role="group" aria-label="Marks" id="ansMarks">
+      ${[["all","All"],["4","4 marks"],["10","10 marks"],["20","20 marks"]].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${m===v}">${l}</button>`).join("")}
+    </div></div>
+    ${groups.filter(([k])=>m==="all"||String(k)===m).map(([k,h,d])=>`<div class="unit"><div class="unit-h"><h3>${h}</h3></div>
+      <p class="ans-intro">${d}</p>${A.filter(x=>x.marks===k).map(card).join("")}</div>`).join("")}
+  </div></section>`;
+}
+
 /* ---------- router ---------- */
-const ROUTES={home:viewHome,micro:()=>viewArea("micro"),macro:()=>viewArea("macro"),flashcards:viewFlashcards,diagrams:viewDiagrams,concepts:viewConcepts,essays:viewEssays};
+const ROUTES={home:viewHome,micro:()=>viewArea("micro"),macro:()=>viewArea("macro"),flashcards:viewFlashcards,diagrams:viewDiagrams,concepts:viewConcepts,essays:viewEssays,answers:viewAnswers};
 function current(){const h=location.hash.slice(1);return ROUTES[h]?h:"home";}
 function render(keepScroll){
   const r=current();
@@ -930,6 +959,7 @@ function render(keepScroll){
     const t=topicById(a.dataset.fcTopic);Object.assign(state.fc,{area:t.area,level:"all",topic:t.id,i:0,order:null,flipped:false,onlyAgain:false});
   }));
   if(r==="flashcards")bindFlashcards();
+  bindSeg("ansMarks",v=>{state.ansMarks=v;render(true);});
   if(!keepScroll)window.scrollTo(0,0);
 }
 window.addEventListener("hashchange",()=>render());
