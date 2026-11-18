@@ -1,0 +1,181 @@
+/* Key concept definitions. Keyed by topic id: [term, definition].
+   Currently written for AS macroeconomics only. */
+window.CONCEPTS={
+"ma1.1":[
+ ["Circular flow of income","A model of how money flows round the economy: households supply factors of production to firms and receive incomes; they spend those incomes on firms' goods and services."],
+ ["Injections","Spending that enters the circular flow from outside the household–firm loop: investment (I), government spending (G) and exports (X)."],
+ ["Leakages (withdrawals)","Income that leaves the circular flow: savings (S), taxation (T) and imports (M)."],
+ ["Equilibrium national income","Reached when injections equal leakages (I + G + X = S + T + M), so national income has no tendency to change."],
+ ["Gross Domestic Product (GDP)","The total value of all goods and services produced within a country over a period, usually a year."],
+ ["Output method","Measures national income by adding up the value added at each stage of production across all sectors."],
+ ["Income method","Measures national income by adding up all factor incomes: wages, rent, interest and profit."],
+ ["Expenditure method","Measures national income by adding up all spending on final goods and services: C + I + G + (X − M)."]
+],
+"ma1.2":[
+ ["Aggregate demand (AD)","Total planned spending on an economy's goods and services at each price level over a period. AD = C + I + G + (X − M)."],
+ ["Consumption (C)","Spending by households on goods and services. The largest component of UK AD, roughly 60%."],
+ ["Investment (I)","Spending by firms on capital goods such as machinery, buildings and technology, which increase future productive capacity."],
+ ["Government spending (G)","Spending by the government on goods and services, such as NHS staff and new schools. Transfer payments like benefits are not included."],
+ ["Net exports (X − M)","The value of exports minus the value of imports."],
+ ["Disposable income","Income after direct taxes have been deducted and benefits added. The main determinant of consumption."],
+ ["Wealth effect","A lower price level, or rising house and share prices, raises the real value of people's wealth, so they spend more."],
+ ["Movement along AD","Caused only by a change in the price level."],
+ ["Shift in AD","Caused by a change in any component of AD for reasons other than the price level: confidence, interest rates, taxes, government spending, the exchange rate, incomes abroad."],
+ ["Expectations","Consumers' and firms' beliefs about the future (jobs, incomes, demand, inflation). Confidence raises consumption and investment; pessimism cuts them."]
+],
+"ma1.3":[
+ ["Aggregate supply (AS)","The total quantity of goods and services firms are willing and able to produce at each price level over a period."],
+ ["Short-run aggregate supply (SRAS)","AS when some costs, such as wages, are fixed. It slopes upwards because a higher price level makes production more profitable."],
+ ["Long-run aggregate supply (LRAS)","The economy's productive capacity when all factors are fully employed. Classical economists draw it vertical, because in the long run output doesn't depend on the price level."],
+ ["Shift in SRAS","Caused by a change in production costs: wages, raw material and energy prices, indirect taxes, subsidies, the exchange rate (import prices), short-run productivity."],
+ ["Shift in LRAS","Caused by a change in the quantity or quality of factors of production: technology, investment, education and training, population and migration, institutions."],
+ ["Full employment level of output (Yfe)","The maximum sustainable output when all resources are fully employed. It's where the classical LRAS sits."],
+ ["Supply shock","A sudden, unexpected change in costs or productive capacity, such as an oil price spike or a pandemic, that shifts AS."]
+],
+"ma1.4":[
+ ["Macroeconomic equilibrium","Where AD = AS. It sets the equilibrium price level and the equilibrium level of real output."],
+ ["Assumptions of the AD/AS model","Ceteris paribus; the economy can be treated as one market; the price level is an average of all prices; productive capacity is fixed in the short run."],
+ ["Demand-side shock","A sudden change in AD, for example a financial crisis cutting consumer and business spending."],
+ ["Stagflation","Rising inflation together with falling output and rising unemployment, typically caused by SRAS shifting left."],
+ ["Macroeconomic indicators","Measures of how the economy is performing: real GDP growth, unemployment, inflation and the current account balance."]
+],
+"ma2.1":[
+ ["Economic growth","An increase in real GDP over time (short run), or an increase in the economy's productive capacity (long run)."],
+ ["Short-run growth","A rise in real GDP from higher AD using up spare capacity: a move from inside the PPC towards it."],
+ ["Long-run growth","An increase in productive potential, shown by LRAS shifting right or the PPC shifting out."],
+ ["Nominal GDP","GDP measured at current prices, so it isn't adjusted for inflation."],
+ ["Real GDP","GDP adjusted for inflation, measured at constant prices, so it shows the actual change in output."],
+ ["GDP per capita","GDP divided by population. A better indicator of average living standards than total GDP."],
+ ["Economic growth rate","The percentage change in real GDP: (this year − last year) ÷ last year × 100."],
+ ["Economic cycle","The fluctuation of real GDP around its trend: boom, downturn, recession and recovery."],
+ ["Boom","A period of fast growth, with output above trend, falling unemployment and rising inflationary pressure."],
+ ["Recession","Two consecutive quarters of negative real GDP growth."],
+ ["Recovery","The phase after a recession when real GDP starts growing again."],
+ ["Trend growth","The average, sustainable rate of growth of an economy's productive capacity over a long period."]
+],
+"ma2.2":[
+ ["Primary sector","Industries that extract or harvest natural resources: farming, fishing, mining, forestry."],
+ ["Secondary sector","Industries that turn raw materials into finished goods: manufacturing and construction."],
+ ["Tertiary sector","Industries that provide services: retail, finance, healthcare, education, tourism. About 80% of UK output."],
+ ["Economic development","A broad improvement in living standards and welfare: health, education, freedom, not only income."],
+ ["Sustainable development","Development that meets the needs of the present without compromising the ability of future generations to meet their own needs."],
+ ["Human Development Index (HDI)","A composite measure from 0 to 1 combining health (life expectancy), education (years of schooling) and income (GNI per capita at PPP)."],
+ ["Purchasing power parity (PPP)","Adjusting exchange rates for differences in the cost of living, so incomes in different countries can be compared fairly."],
+ ["Alternative indicators of welfare","Measures beyond GDP, such as wellbeing and happiness surveys, the Gini coefficient, environmental indicators and the Multidimensional Poverty Index."]
+],
+"ma2.3":[
+ ["Employment","The number of people in paid work."],
+ ["Unemployment","People without a job who are available to start within two weeks and have actively looked for work in the past four weeks (the ILO definition)."],
+ ["Unemployment rate","The number unemployed as a percentage of the labour force (employed + unemployed)."],
+ ["Labour force","Everyone of working age who is either in work or unemployed and looking for work."],
+ ["Economic inactivity","People of working age who are neither employed nor unemployed, e.g. students, carers, the long-term sick."],
+ ["Labour Force Survey (LFS)","A quarterly household survey using the ILO definition. The official UK measure of unemployment."],
+ ["Claimant count","The number of people claiming unemployment-related benefits. Usually lower than the LFS figure, since not every unemployed person claims."],
+ ["Full employment","When everyone who wants a job at the going wage has one. Some frictional unemployment remains."],
+ ["Cyclical (demand-deficient) unemployment","Unemployment caused by a lack of aggregate demand in a downturn or recession."],
+ ["Structural unemployment","Unemployment caused by a mismatch between workers' skills or location and the jobs available, often after an industry declines."],
+ ["Frictional unemployment","Short-term unemployment while people move between jobs."],
+ ["Seasonal unemployment","Unemployment caused by regular seasonal changes in demand, e.g. tourism, agriculture."],
+ ["Real-wage unemployment","Unemployment caused by wages being held above the market-clearing level, e.g. by a minimum wage or trade unions."],
+ ["Hysteresis","When unemployment persists after its original cause has gone, because the long-term unemployed lose skills and motivation."],
+ ["Underemployment","People in work who want more hours than they have, or who are in jobs below their skill level."]
+],
+"ma2.4":[
+ ["Inflation","A sustained rise in the general price level over time."],
+ ["Deflation","A sustained fall in the general price level."],
+ ["Disinflation","A fall in the rate of inflation: prices are still rising, but more slowly."],
+ ["Hyperinflation","Extremely high and accelerating inflation, often defined as more than 50% a month, e.g. Zimbabwe in 2008."],
+ ["Low and stable inflation","The policy objective. In the UK the target is 2% CPI inflation, set by the government for the Bank of England."],
+ ["Consumer Prices Index (CPI)","A weighted index of the prices of a representative basket of about 700 goods and services. The measure used for the UK inflation target."],
+ ["Retail Prices Index (RPI)","An older price index that includes housing costs such as mortgage interest and council tax, and uses a different formula. Usually higher than CPI."],
+ ["Index number","A number showing the change in a value relative to a base year set at 100. Inflation rate = (new index − old index) ÷ old index × 100."],
+ ["Nominal value","A value measured in current prices, not adjusted for inflation."],
+ ["Real value","A value adjusted for inflation, showing changes in actual purchasing power. Real value = nominal value ÷ price index × 100."],
+ ["Demand-pull inflation","Inflation caused by aggregate demand growing faster than the economy's capacity to produce."],
+ ["Cost-push inflation","Inflation caused by rising costs of production (wages, energy, raw materials, import prices) shifting SRAS left."],
+ ["Menu costs","The costs to firms of changing prices frequently: reprinting menus, price lists and labels."],
+ ["Shoe-leather costs","The time and effort spent managing cash and moving money around to avoid losing value to inflation."]
+],
+"ma2.5":[
+ ["Balance of payments","A record of all financial transactions between one country and the rest of the world over a period."],
+ ["Current account","Records trade in goods and services, primary income and secondary income."],
+ ["Trade in goods","Exports minus imports of physical goods (visible trade). The UK has a large deficit."],
+ ["Trade in services","Exports minus imports of services such as finance, insurance and tourism (invisible trade). The UK has a surplus."],
+ ["Primary income","Income from investments abroad (profits, dividends, interest) and wages earned abroad, minus the same paid to foreigners."],
+ ["Secondary income","Transfers where nothing is received in return: foreign aid, migrants' remittances, payments to international organisations."],
+ ["Current account deficit","When the value of imports of goods and services plus income outflows is greater than exports plus income inflows."],
+ ["Financial account","Records flows of investment into and out of a country: FDI, portfolio investment, bank flows and reserves."],
+ ["Sustainable balance of payments position","A current account balance that can be financed indefinitely without forcing a sudden fall in the exchange rate or sharp cuts in spending."],
+ ["Imbalance","A persistent and large current account deficit or surplus."],
+ ["Expenditure-switching policies","Policies that make domestic goods relatively cheaper than imports, such as devaluation or tariffs."],
+ ["Expenditure-reducing policies","Policies that cut total spending, including on imports, such as higher taxes or higher interest rates."]
+],
+"ma2.6":[
+ ["Macroeconomic performance","How well an economy meets its objectives: growth, low unemployment, low and stable inflation, and a sustainable balance of payments."],
+ ["Productivity puzzle","The slow growth of UK labour productivity since the 2008 financial crisis, compared with earlier trends and other countries."],
+ ["Developed economy","A high-income country with a large service sector and high living standards, e.g. the UK, US, Germany."],
+ ["Emerging economy","A country moving from low to middle or high income, with fast growth and industrialisation, e.g. India, Brazil, Indonesia."],
+ ["Developing economy","A low-income country with a large primary sector and lower living standards, e.g. many in sub-Saharan Africa."]
+],
+"ma3.1":[
+ ["Fiscal policy","The use of government spending, taxation and borrowing to influence the economy."],
+ ["Government budget","The government's plan of its spending and tax revenue for the coming year, announced by the Chancellor."],
+ ["Direct tax","A tax on income or wealth, paid directly to the government, e.g. income tax, corporation tax."],
+ ["Indirect tax","A tax on spending, collected by sellers, e.g. VAT, fuel duty."],
+ ["Progressive tax","A tax where the proportion of income paid rises as income rises, e.g. UK income tax."],
+ ["Proportional tax","A tax where the same proportion of income is paid at every income level."],
+ ["Regressive tax","A tax where the proportion of income paid falls as income rises, e.g. VAT measured against income."],
+ ["Current expenditure","Day-to-day government spending on running public services: salaries, medicines, benefits."],
+ ["Capital expenditure","Government spending on long-term assets: roads, hospitals, schools, infrastructure."],
+ ["Budget deficit","When government spending is greater than tax revenue in a year, so the government must borrow."],
+ ["Budget surplus","When tax revenue is greater than government spending in a year."],
+ ["Balanced budget","When government spending equals tax revenue."],
+ ["Cyclical deficit","The part of the deficit caused by the economic cycle. It disappears as the economy recovers."],
+ ["Structural deficit","The part of the deficit that remains even when the economy is at full capacity."],
+ ["National (government) debt","The total stock of money the government owes, built up from past deficits."],
+ ["Discretionary fiscal policy","Deliberate changes to spending or tax rates by the government."],
+ ["Automatic stabilisers","Spending and tax revenue that change automatically with the cycle (benefits rise and tax revenue falls in a recession), smoothing AD."],
+ ["Crowding out","When higher government borrowing raises interest rates or uses up resources, reducing private sector spending and investment."],
+ ["Laffer curve","Shows that as tax rates rise, tax revenue first rises, then falls, as very high rates reduce work incentives and increase avoidance."],
+ ["Average tax rate","Total tax paid ÷ total income × 100."],
+ ["Marginal tax rate","The percentage of tax paid on the last (extra) pound of income."]
+],
+"ma3.2":[
+ ["Monetary policy","The use of interest rates, the money supply and the exchange rate to influence the economy. In the UK, run by the Bank of England."],
+ ["Bank Rate","The interest rate the Bank of England pays on commercial banks' reserves. It influences all other interest rates in the economy."],
+ ["Monetary Policy Committee (MPC)","The nine-member committee at the Bank of England that sets Bank Rate to meet the inflation target."],
+ ["Money supply","The total amount of money in the economy, including notes, coins and bank deposits."],
+ ["Inflation rate target","The rate of inflation the central bank aims for. In the UK it's 2% CPI; if inflation misses by more than 1 percentage point, the Governor writes to the Chancellor."],
+ ["Transmission mechanism","How a change in interest rates affects the economy: through borrowing and saving, mortgage payments, asset prices, the exchange rate and confidence, which together change AD and inflation."],
+ ["Quantitative easing (QE)","The central bank creates new money electronically to buy assets, mainly government bonds, to lower long-term interest rates and boost spending."],
+ ["Exchange rate (influence of)","Interest rate changes affect hot money flows. Higher rates strengthen the currency, making exports dearer and imports cheaper, which lowers AD and inflation."]
+],
+"ma3.3":[
+ ["Supply-side policy","Policies that aim to increase the economy's productive capacity, shifting LRAS right."],
+ ["Market-based supply-side policy","Policies that work by freeing up markets: tax cuts, privatisation, deregulation, reducing trade union power."],
+ ["Interventionist supply-side policy","Policies where the government acts directly: spending on education, training, infrastructure and R&D."],
+ ["Privatisation","Transferring a firm or industry from public to private ownership, e.g. BT, British Gas."],
+ ["Deregulation","Removing rules and restrictions that limit competition in a market."],
+ ["Subsidy (supply-side)","Government payments to firms that lower costs or encourage training, investment or R&D."],
+ ["Competition policy","Government action to promote competition: blocking anti-competitive mergers, fining cartels. In the UK, run by the CMA."],
+ ["Infrastructure","The basic physical systems an economy needs: transport, energy, broadband, water."],
+ ["Labour market flexibility","How easily the labour market adapts: ease of hiring and firing, flexible hours and contracts, worker mobility."],
+ ["Tax and benefit reform","Changing taxes and benefits to increase incentives to work and invest, e.g. raising the personal allowance, tapering benefits more gradually."],
+ ["Immigration control","Government rules on who can come to the country to work, which affect the size and skills of the labour force."]
+],
+"ma3.4":[
+ ["Policy conflict","When pursuing one macroeconomic objective makes another harder to achieve."],
+ ["Trade-off","Having to accept a worse outcome on one objective to improve another, e.g. higher inflation for lower unemployment."],
+ ["Growth vs inflation","Demand-led growth can push the economy beyond capacity, raising inflation."],
+ ["Growth vs current account","Rising incomes increase spending on imports, worsening the current account."],
+ ["Growth vs the environment","More output usually means more pollution and faster use of natural resources."],
+ ["Unemployment vs inflation","Shown by the short-run Phillips curve: cutting unemployment below its natural rate raises inflation."]
+],
+"ma4.1":[
+ ["International trade","The exchange of goods and services between countries."],
+ ["Exports","Goods and services produced domestically and sold abroad. An injection into the circular flow."],
+ ["Imports","Goods and services produced abroad and bought domestically. A leakage from the circular flow."],
+ ["Patterns of trade","Which countries trade with which, and in what goods and services. For the UK: a shift towards services exports, the EU as the largest (though falling) partner, and the growing importance of China."],
+ ["Gains from trade","Benefits from specialisation and exchange: higher total output, lower prices, more choice, economies of scale."]
+]
+};

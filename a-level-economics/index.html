@@ -188,6 +188,11 @@ figcaption{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);text-al
 .fig text{font-family:var(--f-mono);font-size:11px}
 .expl p{margin:0 0 8px;font-size:14px;color:#c4c9d8;max-width:72ch}
 .expl p:last-child{margin-bottom:0}
+/* ---------- definitions ---------- */
+.defs{margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:10px 22px}
+.defs div{min-width:0;padding-block:8px;border-top:1px solid var(--line)}
+.defs dt{font-weight:600;font-size:14.5px;margin-bottom:2px}
+.defs dd{margin:0;font-size:14px;color:#c4c9d8}
 /* ---------- essays ---------- */
 details.essay{border:1px solid var(--line);border-radius:var(--r);background:var(--night);margin-top:8px}
 details.essay summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;gap:3px}
@@ -254,6 +259,7 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
 <script src="diagrams.js"></script>
 <script src="essays.js"></script>
 <script src="cards.js"></script>
+<script src="concepts.js"></script>
 <script>
 /* =====================================================================
    SPEC DATA — transcribed from OCR H460 v3.0, sections 2c and 2d.
@@ -702,7 +708,7 @@ function viewHome(){
     <div class="wrap inner">
       <div class="eyebrow">OCR H460</div>
       <h1>A Level Economics revision</h1>
-      <p>Everything in the spec, grouped into micro and macro, AS and A Level. Flashcards, diagrams and essay plans are done. Definitions for key concepts are still to come.</p>
+      <p>Everything in the spec, grouped into micro and macro, AS and A Level. Flashcards, diagrams and essay plans are done. Key concept definitions are written for AS macro.</p>
     </div>
   </div>
   <section><div class="wrap">
@@ -714,7 +720,7 @@ function viewHome(){
     <div class="tools">
       <a class="tool" href="#flashcards"><span class="chip on">Done</span><span class="n">${CARDS.length}</span><h3>Flashcards</h3><p>Definitions, formulas and calculations for every topic.</p></a>
       <a class="tool" href="#diagrams"><span class="chip on">Done</span><span class="n">${nDiag}</span><h3>Diagrams &amp; explanations</h3><p>Every point the spec wants drawn, with an explanation.</p></a>
-      <a class="tool" href="#concepts"><span class="chip off">To do</span><span class="n">${nTerms}</span><h3>Key concepts</h3><p>Terms to define or calculate.</p></a>
+      <a class="tool" href="#concepts"><span class="chip">AS macro done</span><span class="n">${nTerms}</span><h3>Key concepts</h3><p>Definitions for AS macro; term lists for the rest.</p></a>
       <a class="tool" href="#essays"><span class="chip on">Done</span><span class="n">${nEval}</span><h3>Possible essays</h3><p>A 25-mark plan for every evaluate point.</p></a>
     </div>
   </div></section>
@@ -877,13 +883,15 @@ function viewDiagrams(){
   </div></section>`;
 }
 function viewConcepts(){
-  const ts=scaffoldTopics(t=>[...(t.explain||[]),...(t.calc||[])]);
+  const C=window.CONCEPTS||{};
+  const ts=scaffoldTopics(t=>C[t.id]||[...(t.explain||[]),...(t.calc||[])]);
   return `<section><div class="wrap">
     <div class="sec-head"><div><h2>Key concepts</h2>
-      <p>Terms from the spec, by topic. Definitions not written yet.</p></div></div>
+      <p>Definitions are written for AS macroeconomics. Other topics show the terms the spec lists, with definitions to come.</p></div></div>
     ${scaffoldFilters()}
     <div class="slots">${ts.map(t=>`<div class="slot-topic ${t.area}">${topicHeader(t)}
-      <div class="terms">${[...(t.explain||[]),...(t.calc||[]).map(x=>x+" (calculate)")].map(x=>`<span class="term">${esc(x)}</span>`).join("")}</div>
+      ${C[t.id]?`<dl class="defs">${C[t.id].map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>`
+      :`<div class="terms">${[...(t.explain||[]),...(t.calc||[]).map(x=>x+" (calculate)")].map(x=>`<span class="term">${esc(x)}</span>`).join("")}</div>`}
       </div>`).join("")}</div>
   </div></section>`;
 }
