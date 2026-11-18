@@ -14,7 +14,7 @@ One essay plan for your teacher's third topic: **the events of February–Octobe
 | 3–4 Apr | Lenin returns; April Theses: no support for the PG, "All power to the Soviets", "Peace, Bread, Land" |
 | 18 Apr–May | The Milyukov Note promises to fight on, sparking the April Crisis. Milyukov and Guchkov resign; first coalition with socialists |
 | 18 Jun | Kerensky's June Offensive begins and collapses within weeks, with heavy losses and mass desertion |
-| 3–5 Jul | July Days: armed demonstrations in Petrograd. Bolsheviks blamed; Lenin called a German agent and flees to Finland; Trotsky arrested |
+| 3–7 Jul | July Days: armed demonstrations in Petrograd. Bolsheviks blamed; Lenin called a German agent and flees to Finland; Trotsky arrested |
 | Jul | Kerensky becomes Prime Minister. Death penalty restored at the front |
 | 27–30 Aug | Kornilov Affair: Kerensky arms the Red Guards and releases Bolsheviks to defend Petrograd |
 | Sep | Bolsheviks win majorities in the Petrograd and Moscow Soviets. Trotsky becomes chairman of the Petrograd Soviet |
@@ -22,7 +22,7 @@ One essay plan for your teacher's third topic: **the events of February–Octobe
 | 24–26 Oct | Military Revolutionary Committee seizes Petrograd. Winter Palace taken. Decrees on Peace and Land |
 
 - Throughout 1917 peasants seized land without waiting for the PG. Inflation and food shortages continued, and desertion from the army soared.
-- Bolshevik membership grew roughly tenfold during 1917 (estimates vary).
+- Bolshevik membership rose from 24,000 in February 1917 to 200,000 by September 1917.
 
 ## Introduction
 
@@ -39,7 +39,7 @@ One essay plan for your teacher's third topic: **the events of February–Octobe
   - The war kept inflation, food shortages and transport breakdown going.
   - It also delayed land reform and elections. The PG argued it couldn't hold elections or redistribute land while soldiers were at the front.
 - **Analysis:** the war tied the PG to the Allies and the old elites, and left it unable to offer what people wanted: peace, bread and land. The Bolsheviks offered exactly that.
-- **Counter:** leaving the war was very hard: the Allies' loans, national honour, and fear of German occupation. Lenin's own peace at Brest-Litovsk later cost a third of the population.
+- **Counter:** leaving the war was very hard: the Allies' loans, national honour, and fear of German occupation. Lenin's own peace at Brest-Litovsk later cost 34% of the population.
 - **Mini-judgement:** the main reason the PG lost support.
 
 ## Paragraph 2: The PG's weak position: Dual Power (structural weakness)

@@ -9,10 +9,10 @@ One essay plan for your teacher's first topic: **tsarism and why it remained in 
 | Factor | Evidence |
 |---|---|
 | Secret police | The Okhrana (founded 1881) infiltrated revolutionary groups. Its agents were inside the SRs and Bolsheviks. Censorship, exile to Siberia |
-| 1905: army loyalty | Troops fired on Bloody Sunday (9 January 1905). The Moscow rising was crushed in December 1905, with around 1,000 killed. Punitive expeditions along the Trans-Siberian Railway |
+| 1905: army loyalty | Troops fired on Bloody Sunday (9 January 1905). The Moscow rising was crushed in December 1905, with 1,059 rebels killed. Punitive expeditions along the Trans-Siberian Railway |
 | Stolypin's repression | Field courts-martial (1906–07) executed over 1,000 people. The noose became known as "Stolypin's necktie" |
 | Concessions | October Manifesto (17 October 1905): an elected Duma and civil rights. Redemption payments halved in 1906 and abolished from 1907 |
-| Taking concessions back | Fundamental Laws (April 1906): the Tsar kept "supreme autocratic power" and could rule by decree (Article 87). The First Duma lasted 72 days, the Second about three months. The June 1907 electoral law favoured landowners |
+| Taking concessions back | Fundamental Laws (April 1906): the Tsar kept "supreme autocratic power" and could rule by decree (Article 87). The First Duma lasted 73 days, the Second about three months. The June 1907 electoral law favoured landowners |
 | A divided opposition | SDs (1898) split into Bolsheviks and Mensheviks (1903). SRs (1901). Liberals split in 1905: Octobrists accepted the Manifesto, Kadets wanted more. Many revolutionary leaders, Lenin included, were in exile |
 | Loyalty | Peasant faith in the Tsar as "little father". The Orthodox Church preached obedience. The Romanov tercentenary (1913) drew loyal crowds |
 | Economic growth | Industrial growth about 8% a year in the 1890s and about 6% in 1908–13. Record harvest in 1913 |
