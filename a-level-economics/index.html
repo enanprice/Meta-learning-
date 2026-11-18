@@ -253,6 +253,7 @@ footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);fo
 
 <script src="diagrams.js"></script>
 <script src="essays.js"></script>
+<script src="cards.js"></script>
 <script>
 /* =====================================================================
    SPEC DATA — transcribed from OCR H460 v3.0, sections 2c and 2d.
@@ -603,7 +604,7 @@ const CARDS_RAW = [
 ["ma5.3","Which two international institutions regulate the global financial system?","The International Monetary Fund (IMF) and the World Bank."],
 ["ma5.3","What must you know about central banks?","Their role and functions, and how effective their policy measures are at targeting macro indicators."]
 ];
-const CARDS = CARDS_RAW.map(([tid,q,a],i)=>{
+const CARDS = CARDS_RAW.concat(window.MORE_CARDS||[]).map(([tid,q,a],i)=>{
   const t = tid==="exam"?null:topicById(tid);
   return {id:"c"+i, tid, q, a, area: t?t.area:"exam", level: t?t.level:"all", t};
 });
@@ -711,7 +712,7 @@ function viewHome(){
   <section style="padding-top:0"><div class="wrap">
     <div class="sec-head"><div><h2>Revision</h2></div></div>
     <div class="tools">
-      <a class="tool" href="#flashcards"><span class="chip on">Done</span><span class="n">${CARDS.length}</span><h3>Flashcards</h3><p>Spec content plus how the exams work.</p></a>
+      <a class="tool" href="#flashcards"><span class="chip on">Done</span><span class="n">${CARDS.length}</span><h3>Flashcards</h3><p>Definitions, formulas and calculations for every topic.</p></a>
       <a class="tool" href="#diagrams"><span class="chip on">Done</span><span class="n">${nDiag}</span><h3>Diagrams &amp; explanations</h3><p>Every point the spec wants drawn, with an explanation.</p></a>
       <a class="tool" href="#concepts"><span class="chip off">To do</span><span class="n">${nTerms}</span><h3>Key concepts</h3><p>Terms to define or calculate.</p></a>
       <a class="tool" href="#essays"><span class="chip on">Done</span><span class="n">${nEval}</span><h3>Possible essays</h3><p>A 25-mark plan for every evaluate point.</p></a>
@@ -775,7 +776,7 @@ function viewFlashcards(){
   if(f.topic!=="all"&&f.topic!=="exam"&&!topics.some(t=>t.id===f.topic))f.topic="all";
   return `<section><div class="wrap">
     <div class="sec-head"><div><h2>Flashcards</h2>
-      <p>Answers come from the spec only, so they cover lists and structure rather than definitions.</p></div></div>
+      <p>Definitions, formulas, worked calculations, causes and examples for every topic, plus how the exams work. Pick a topic to drill one area, or shuffle the lot.</p></div></div>
     <div class="filters">${areaSeg("fcArea",f.area,true)}${levelSeg("fcLevel",f.level)}
       <select id="fcTopic" aria-label="Topic"><option value="all">All topics</option>
         ${f.area==="all"||f.area==="exam"?`<option value="exam" ${f.topic==="exam"?"selected":""}>Exam &amp; assessment</option>`:""}
